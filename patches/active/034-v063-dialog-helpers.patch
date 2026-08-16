@@ -1,0 +1,58 @@
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1 +1,55 @@
++    private int dialogAccent(String label) {
++        String value = label == null ? "" : label.toUpperCase(Locale.ITALY);
++        if (value.contains("ELIMINA") || value.contains("AZZERA")
++                || value.contains("ANNULLA CICLO") || value.contains("SOSTITUISCI")) return RED;
++        return BLUE;
++    }
++
++    private void showAppThreeActionDialog(String title, String message,
++                                          String primaryLabel, Runnable primaryAction,
++                                          String secondaryLabel, Runnable secondaryAction,
++                                          String cancelLabel) {
++        final Dialog dialog = new Dialog(this);
++        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
++        LinearLayout panel = new LinearLayout(this);
++        panel.setOrientation(LinearLayout.VERTICAL);
++        panel.setPadding(dp(20), dp(18), dp(20), dp(18));
++        panel.setBackground(roundRect(darkroomMode ? Color.BLACK : CARD, 14, 1, BORDER));
++
++        TextView heading = text(title, 19, darkroomMode ? RED : TEXT_PRIMARY, true);
++        panel.addView(heading, margin(lp(-1, -2), 0, 0, 0, 12));
++        TextView body = text(message, 14, MUTED, false);
++        body.setLineSpacing(0, 1.08f);
++        panel.addView(body, margin(lp(-1, -2), 0, 0, 0, 16));
++
++        Button primary = compactButton(primaryLabel);
++        primary.setBackground(roundRect(darkroomMode ? RED : dialogAccent(primaryLabel), 9, 0, 0));
++        primary.setTextColor(Color.BLACK);
++        primary.setOnClickListener(v -> {
++            dialog.dismiss();
++            if (primaryAction != null) primaryAction.run();
++        });
++        panel.addView(primary, lp(-1, dp(52)));
++
++        Button secondary = compactButton(secondaryLabel);
++        secondary.setBackground(roundRect(darkroomMode ? RED : dialogAccent(secondaryLabel), 9, 0, 0));
++        secondary.setTextColor(Color.BLACK);
++        secondary.setOnClickListener(v -> {
++            dialog.dismiss();
++            if (secondaryAction != null) secondaryAction.run();
++        });
++        panel.addView(secondary, margin(lp(-1, dp(50)), 0, 8, 0, 0));
++
++        Button cancel = compactButton(cancelLabel);
++        cancel.setTextColor(darkroomMode ? RED : MUTED);
++        cancel.setOnClickListener(v -> dialog.dismiss());
++        panel.addView(cancel, margin(lp(-1, dp(48)), 0, 8, 0, 0));
++
++        dialog.setContentView(panel);
++        Window w = dialog.getWindow();
++        if (w != null) w.setBackgroundDrawableResource(android.R.color.transparent);
++        dialog.show();
++        if (w != null) w.setLayout((int)(getResources().getDisplayMetrics().widthPixels * 0.92f), ViewGroup.LayoutParams.WRAP_CONTENT);
++    }
++
+     private void showAppChoiceDialog(String title, String[] choices, ChoiceAction action, String cancelLabel) {
