@@ -1,0 +1,314 @@
+diff --git a/build_darkroom.py b/build_darkroom.py
+index 878a66a..620eb25 100644
+--- a/build_darkroom.py
++++ b/build_darkroom.py
+@@ -1,13 +1,13 @@
+ #!/usr/bin/env python3
+ """
+-Darkroom Timer v0.6.0 - build APK senza Gradle.
++Darkroom Timer v0.6.1 - build APK senza Gradle.
+ 
+ Dipendenze: SOLO Python 3 standard library + JDK (javac/jar/keytool)
+ e Android SDK già presente sul PC (platform android-34 + build-tools 34.0.0 o compatibili).
+ NON scarica nulla e NON usa Gradle.
+ 
+ Uso minimo:
+-    python build_darkroom.py DarkroomTimer-source-v0.6.0-WIP.zip
++    python build_darkroom.py DarkroomTimer-source-v0.6.1-WIP.zip
+ 
+ Opzionale:
+     python build_darkroom.py SOURCE.zip --sdk "C:\\Users\\NOME\\AppData\\Local\\Android\\Sdk"
+@@ -30,8 +30,8 @@ import tempfile
+ import zipfile
+ 
+ PACKAGE_ID = "it.darkroom.timer"
+-VERSION_NAME = "0.6.0"
+-VERSION_CODE = "26"
++VERSION_NAME = "0.6.1"
++VERSION_CODE = "27"
+ MIN_SDK = "26"
+ TARGET_SDK = "34"
+ COMPILE_SDK = "34"
+@@ -39,7 +39,7 @@ PREFERRED_BUILD_TOOLS = "34.0.0"
+ 
+ 
+ def log(msg: str) -> None:
+-    print(f"[Darkroom v0.6.0] {msg}", flush=True)
++    print(f"[Darkroom v0.6.1] {msg}", flush=True)
+ 
+ 
+ def fail(msg: str, code: int = 2) -> "None":
+@@ -234,9 +234,9 @@ def preflight(project: Path):
+         fail("Preflight manifest fallito. Mancano/sono errati: " + ", ".join(missing))
+     if gradle.is_file():
+         g = read_text(gradle)
+-        if not re.search(r"versionCode\s+26\b", g) or not re.search(r"versionName\s+['\"]0\.6\.0['\"]", g):
+-            fail("app/build.gradle non riporta versionCode 26 / versionName 0.6.0")
+-    log("Preflight v0.6.0 OK: manifest/versione/requisiti SONOFF invarianti verificati")
++        if not re.search(r"versionCode\s+27\b", g) or not re.search(r"versionName\s+['\"]0\.6\.1['\"]", g):
++            fail("app/build.gradle non riporta versionCode 27 / versionName 0.6.1")
++    log("Preflight v0.6.1 OK: manifest/versione/requisiti SONOFF invarianti verificati")
+ 
+ 
+ def write_sources_argfile(paths, out: Path):
+@@ -269,7 +269,7 @@ def make_signing(jdk_keytool: Path, out_dir: Path, provided_ks: str | None,
+ 
+     alphabet = string.ascii_letters + string.digits
+     password = "".join(secrets.choice(alphabet) for _ in range(24))
+-    log("Creo una nuova firma locale per la v0.6.0 (firma dedicata alla 0.6.0)")
++    log("Creo una nuova firma locale per la v0.6.1 (firma dedicata alla 0.6.1)")
+     run([
+         jdk_keytool, "-genkeypair", "-noprompt", "-v",
+         "-keystore", ks,
+@@ -451,7 +451,7 @@ def build(args):
+ 
+ 
+ def default_source() -> str | None:
+-    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.6.0-WIP*.zip"))
++    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.6.1-WIP*.zip"))
+     if len(candidates) == 1:
+         return str(candidates[0])
+     return None
+@@ -459,10 +459,10 @@ def default_source() -> str | None:
+ 
+ def main():
+     p = argparse.ArgumentParser(
+-        description="Compila Darkroom Timer v0.6.0 in APK senza Gradle e senza download automatici."
++        description="Compila Darkroom Timer v0.6.1 in APK senza Gradle e senza download automatici."
+     )
+     p.add_argument("source", nargs="?", default=default_source(),
+-                   help="ZIP WIP v0.6.0 oppure cartella progetto Android")
++                   help="ZIP WIP v0.6.1 oppure cartella progetto Android")
+     p.add_argument("--output", "-o", help="Percorso APK finale")
+     p.add_argument("--sdk", help="Percorso Android SDK già installato")
+     p.add_argument("--keystore", help="Keystore esistente; se omesso ne crea uno locale nuovo")
+@@ -473,7 +473,7 @@ def main():
+     args = p.parse_args()
+     if not args.source:
+         p.print_help()
+-        fail("Indica lo ZIP WIP v0.6.0 come primo argomento.")
++        fail("Indica lo ZIP WIP v0.6.1 come primo argomento.")
+     build(args)
+ 
+ 
+diff --git a/project/README.md b/project/README.md
+index c4a2095..5a81bf9 100644
+--- a/project/README.md
++++ b/project/README.md
+@@ -1,8 +1,10 @@
+-# Darkroom Timer DIY — v0.6.0
++# Darkroom Timer DIY — v0.6.1
+ 
+ Versione consolidata del progetto Darkroom Timer per SONOFF MINIR2 in modalità DIY.
+ 
+-Novità principali v0.6.0:
++Base v0.6.0 + correzioni v0.6.1:
++- raggruppamento automatico del LOG attivabile/disattivabile direttamente dal pannello;
++- dialogo di protezione camera oscura ridisegnato con pulsanti verticali a larghezza piena;
+ - dal LOG una scheda con tempo finale può essere caricata direttamente in STAMPA; i dati tecnici della scheda vengono riproposti automaticamente al salvataggio della nuova stampa;
+ - preferiti nel LOG con stellina e filtro rapido;
+ - raggruppamento automatico e discreto delle lavorazioni con stesso titolo e stessa data, con cronologia provino → stampe successive;
+@@ -12,4 +14,4 @@ Novità principali v0.6.0:
+ 
+ Restano invariati il controllo SONOFF/MINIR2, il provino automatico, il selettore della striscia migliore, il backup LOG, la cronologia tecnica e la modalità rossa inattinica.
+ 
+-versionCode 26 / versionName 0.6.0.
++versionCode 27 / versionName 0.6.1.
+diff --git a/project/app/build.gradle b/project/app/build.gradle
+index d2a8ca2..acb183f 100644
+--- a/project/app/build.gradle
++++ b/project/app/build.gradle
+@@ -10,8 +10,8 @@ android {
+         applicationId 'it.darkroom.timer'
+         minSdk 26
+         targetSdk 34
+-        versionCode 26
+-        versionName '0.6.0'
++        versionCode 27
++        versionName '0.6.1'
+     }
+ 
+     compileOptions {
+diff --git a/project/app/src/main/AndroidManifest.xml b/project/app/src/main/AndroidManifest.xml
+index dc7bd07..bdd6c55 100644
+--- a/project/app/src/main/AndroidManifest.xml
++++ b/project/app/src/main/AndroidManifest.xml
+@@ -1,8 +1,8 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="it.darkroom.timer"
+-    android:versionCode="26"
+-    android:versionName="0.6.0">
++    android:versionCode="27"
++    android:versionName="0.6.1">
+ 
+     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
+ 
+diff --git a/project/app/src/main/java/it/darkroom/timer/MainActivity.java b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+index 0a85841..5c4bb91 100644
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -75,7 +75,7 @@ public final class MainActivity extends Activity implements SonoffDiscovery.List
+     private static final int REQ_EXPORT_BACKUP = 4101;
+     private static final int REQ_IMPORT_BACKUP = 4102;
+     private static final int REQ_EXPORT_JPG = 4103;
+-    private static final String APP_VERSION = "0.6.0";
++    private static final String APP_VERSION = "0.6.1";
+ 
+     private static final class FoundDevice {
+         final DeviceConfig config;
+@@ -131,8 +131,10 @@ public final class MainActivity extends Activity implements SonoffDiscovery.List
+     private Button logFilter35Button;
+     private Button logFilter66Button;
+     private Button logFavoritesButton;
++    private Button logGroupingButton;
+     private String logFilter = "ALL";
+     private boolean logFavoritesOnly = false;
++    private boolean logGroupingEnabled = true;
+ 
+     private SonoffDiscovery discovery;
+     private DeviceConfig device;
+@@ -192,6 +194,7 @@ public final class MainActivity extends Activity implements SonoffDiscovery.List
+         darkroomMode = p.getBoolean("darkroomMode", false);
+         feedbackBeep = p.getBoolean("feedbackBeep", true);
+         darkroomProtection = p.getBoolean("darkroomProtection", true);
++        logGroupingEnabled = p.getBoolean("logGroupingEnabled", true);
+         configurePalette();
+         applyDarkroomWindow();
+         mode = p.getInt("mode", MODE_PRINT);
+@@ -642,6 +645,19 @@ public final class MainActivity extends Activity implements SonoffDiscovery.List
+         intro.addView(filterRow, margin(lp(-1, -2), 0, 0, 0, 8));
+         updateLogFilterButtons();
+ 
++        logGroupingButton = compactButton("");
++        logGroupingButton.setTextSize(12);
++        logGroupingButton.setOnClickListener(v -> {
++            logGroupingEnabled = !logGroupingEnabled;
++            getSharedPreferences("ui", MODE_PRIVATE).edit()
++                    .putBoolean("logGroupingEnabled", logGroupingEnabled)
++                    .apply();
++            updateLogGroupingButton();
++            refreshLogList();
++        });
++        intro.addView(logGroupingButton, margin(lp(-1, dp(43)), 0, 0, 0, 8));
++        updateLogGroupingButton();
++
+         LinearLayout backupRow = new LinearLayout(this);
+         backupRow.setOrientation(LinearLayout.HORIZONTAL);
+         Button exportBackup = compactButton("ESPORTA BACKUP");
+@@ -682,6 +698,20 @@ public final class MainActivity extends Activity implements SonoffDiscovery.List
+         logFavoritesButton.setContentDescription(logFavoritesOnly ? "Mostra tutte le schede" : "Mostra solo preferite");
+     }
+ 
++    private void updateLogGroupingButton() {
++        if (logGroupingButton == null) return;
++        int accent = darkroomMode ? RED : LOG_ACCENT;
++        logGroupingButton.setText("RAGGRUPPA TITOLO/GIORNO: " + (logGroupingEnabled ? "ON" : "OFF"));
++        logGroupingButton.setBackground(roundRect(logGroupingEnabled ? accent : BUTTON, 8,
++                logGroupingEnabled ? 0 : 1, BORDER));
++        logGroupingButton.setTextColor(logGroupingEnabled
++                ? (darkroomMode ? Color.BLACK : Color.WHITE)
++                : MUTED);
++        logGroupingButton.setContentDescription(logGroupingEnabled
++                ? "Disattiva raggruppamento automatico delle schede"
++                : "Attiva raggruppamento automatico delle schede");
++    }
++
+     private void styleLogFilterButton(Button b, boolean selected) {
+         int accent = darkroomMode ? RED : LOG_ACCENT;
+         b.setBackground(roundRect(selected ? accent : BUTTON, 8, selected ? 0 : 1, BORDER));
+@@ -736,7 +766,9 @@ public final class MainActivity extends Activity implements SonoffDiscovery.List
+         LinkedHashMap<String, LogGroup> byKey = new LinkedHashMap<>();
+         if (entries == null) return new ArrayList<>();
+         for (LogEntry e : entries) {
+-            String key = logGroupKey(e);
++            String key = logGroupingEnabled
++                    ? logGroupKey(e)
++                    : "single:" + e.id + ":" + e.timestamp;
+             LogGroup group = byKey.get(key);
+             if (group == null) {
+                 group = new LogGroup(key);
+@@ -1979,6 +2011,60 @@ public final class MainActivity extends Activity implements SonoffDiscovery.List
+         else restoreDarkroomProtection();
+     }
+ 
++    private void showDarkroomProtectionChoiceDialog(final Dialog settingsDialog) {
++        final Dialog choice = new Dialog(this);
++        choice.requestWindowFeature(Window.FEATURE_NO_TITLE);
++
++        LinearLayout panel = new LinearLayout(this);
++        panel.setOrientation(LinearLayout.VERTICAL);
++        panel.setPadding(dp(20), dp(18), dp(20), dp(18));
++        panel.setBackground(roundRect(darkroomMode ? Color.BLACK : CARD, 14, 1, BORDER));
++
++        TextView title = text("PROTEZIONE CAMERA OSCURA", 19, TEXT_PRIMARY, true);
++        panel.addView(title, margin(lp(-1, -2), 0, 0, 0, 12));
++
++        TextView message = text(
++                "Per evitare che notifiche e chiamate illuminino il telefono, Darkroom Timer deve poter gestire Non disturbare. "
++                        + "Android aprirà una schermata di sistema: autorizza Darkroom Timer e, tornando indietro, entrerai automaticamente in modalità camera oscura.\n\n"
++                        + "Puoi anche entrare senza protezione.",
++                14, TEXT_PRIMARY, false);
++        message.setLineSpacing(0, 1.08f);
++        panel.addView(message, margin(lp(-1, -2), 0, 0, 0, 16));
++
++        Button authorize = compactButton("AUTORIZZA NON DISTURBARE");
++        authorize.setBackground(roundRect(BLUE, 9, 0, 0));
++        authorize.setTextColor(Color.BLACK);
++        authorize.setOnClickListener(v -> {
++            choice.dismiss();
++            pendingDarkroomAfterDndPermission = true;
++            if (settingsDialog != null) settingsDialog.dismiss();
++            openDndAccessSettings();
++        });
++        panel.addView(authorize, lp(-1, dp(52)));
++
++        Button without = compactButton("ENTRA SENZA PROTEZIONE");
++        without.setOnClickListener(v -> {
++            choice.dismiss();
++            getSharedPreferences("ui", MODE_PRIVATE).edit().putBoolean("darkroomMode", true).apply();
++            if (settingsDialog != null) settingsDialog.dismiss();
++            recreate();
++        });
++        panel.addView(without, margin(lp(-1, dp(50)), 0, 8, 0, 0));
++
++        Button cancel = compactButton("ANNULLA");
++        cancel.setOnClickListener(v -> choice.dismiss());
++        panel.addView(cancel, margin(lp(-1, dp(48)), 0, 8, 0, 0));
++
++        choice.setContentView(panel);
++        Window w = choice.getWindow();
++        if (w != null) w.setBackgroundDrawableResource(android.R.color.transparent);
++        choice.show();
++        if (w != null) {
++            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
++            w.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
++        }
++    }
++
+     private void setDarkroomModeFromSettings(boolean enabled, Dialog settingsDialog) {
+         if (!enabled) {
+             restoreDarkroomProtection();
+@@ -1988,21 +2074,7 @@ public final class MainActivity extends Activity implements SonoffDiscovery.List
+             return;
+         }
+         if (darkroomProtection && !hasDndAccess()) {
+-            new AlertDialog.Builder(this)
+-                    .setTitle("Protezione camera oscura")
+-                    .setMessage("Per evitare che notifiche e chiamate illuminino il telefono, Darkroom Timer deve poter gestire Non disturbare. Android aprirà una schermata di sistema: autorizza Darkroom Timer e tornando indietro entrerai automaticamente in modalità camera oscura.\n\nPuoi anche entrare senza protezione.")
+-                    .setPositiveButton("AUTORIZZA", (d, w) -> {
+-                        pendingDarkroomAfterDndPermission = true;
+-                        if (settingsDialog != null) settingsDialog.dismiss();
+-                        openDndAccessSettings();
+-                    })
+-                    .setNeutralButton("ENTRA SENZA PROTEZIONE", (d, w) -> {
+-                        getSharedPreferences("ui", MODE_PRIVATE).edit().putBoolean("darkroomMode", true).apply();
+-                        if (settingsDialog != null) settingsDialog.dismiss();
+-                        recreate();
+-                    })
+-                    .setNegativeButton("ANNULLA", null)
+-                    .show();
++            showDarkroomProtectionChoiceDialog(settingsDialog);
+             return;
+         }
+         getSharedPreferences("ui", MODE_PRIVATE).edit().putBoolean("darkroomMode", true).apply();
