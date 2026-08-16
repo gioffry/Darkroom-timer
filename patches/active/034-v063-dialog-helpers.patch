@@ -1,6 +1,13 @@
 --- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
 +++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
-@@ -1 +1,55 @@
+@@ -1,8 +1,62 @@
+         dialog.setContentView(panel);
+         Window w = dialog.getWindow();
+         if (w != null) w.setBackgroundDrawableResource(android.R.color.transparent);
+         dialog.show();
+         if (w != null) w.setLayout((int)(getResources().getDisplayMetrics().widthPixels * 0.92f), ViewGroup.LayoutParams.WRAP_CONTENT);
+     }
+ 
 +    private int dialogAccent(String label) {
 +        String value = label == null ? "" : label.toUpperCase(Locale.ITALY);
 +        if (value.contains("ELIMINA") || value.contains("AZZERA")
