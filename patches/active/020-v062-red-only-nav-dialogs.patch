@@ -39,16 +39,7 @@
 +    private static final String APP_VERSION = "0.6.2";
  
      private static final class FoundDevice {
-@@ -103,4 +103,8 @@
-         }
-     }
- 
-+    private interface ChoiceAction {
-+        void choose(int index);
-+    }
-+
-     private TextView deviceStatus;
-@@ -420,13 +424,13 @@
+@@ -420,13 +420,13 @@
  
          LinearLayout modeRow = new LinearLayout(this);
          modeRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -68,21 +59,21 @@
 +        modeRow.addView(testModeButton, margin(lp(0, dp(68), 1f), dp(4), 0, dp(4), 0));
 +        modeRow.addView(logModeButton, margin(lp(0, dp(68), 1f), dp(4), 0, 0, 0));
          root.addView(modeRow, margin(lp(-1, -2), 0, 0, 0, 12));
-@@ -464,5 +468,5 @@
+@@ -464,5 +464,5 @@
          saveLogButton.setTextSize(16);
          saveLogButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
          saveLogButton.setAllCaps(false);
 -        saveLogButton.setTextColor(Color.WHITE);
 +        saveLogButton.setTextColor(darkroomMode ? Color.BLACK : Color.WHITE);
          saveLogButton.setBackground(roundRect(darkroomMode ? RED : LOG_ACCENT, 10, 0, 0));
-@@ -713,5 +717,5 @@
+@@ -713,5 +713,5 @@
      private void styleLogFilterButton(Button b, boolean selected) {
          int accent = darkroomMode ? RED : LOG_ACCENT;
          b.setBackground(roundRect(selected ? accent : BUTTON, 8, selected ? 0 : 1, BORDER));
 -        b.setTextColor(selected ? Color.WHITE : MUTED);
 +        b.setTextColor(selected ? (darkroomMode ? Color.BLACK : Color.WHITE) : MUTED);
      }
-@@ -944,10 +948,7 @@
+@@ -944,10 +944,7 @@
      private void showLogEditor(final LogEntry entry, final boolean isNew) {
          if (darkroomMode) {
 -            new AlertDialog.Builder(this)
@@ -96,7 +87,7 @@
 +                    "VAI ALLE IMPOSTAZIONI", this::showSettingsDialog, "ANNULLA");
              return;
          }
-@@ -1073,5 +1076,5 @@
+@@ -1073,5 +1070,5 @@
  
          Button save = compactButton("SALVA SCHEDA");
 -        save.setBackground(roundRect(GREEN, 9, 0, 0));
@@ -104,7 +95,7 @@
 +        save.setBackground(roundRect(darkroomMode ? RED : LOG_ACCENT, 9, 0, 0));
 +        save.setTextColor(darkroomMode ? Color.BLACK : Color.WHITE);
          save.setOnClickListener(v -> {
-@@ -1310,4 +1313,95 @@
+@@ -1310,4 +1307,57 @@
          return v.isEmpty() ? "scheda" : v;
      }
  
@@ -163,44 +154,8 @@
 +        if (w != null) w.setLayout((int)(getResources().getDisplayMetrics().widthPixels * 0.92f), ViewGroup.LayoutParams.WRAP_CONTENT);
 +    }
 +
-+    private void showAppChoiceDialog(String title, String[] choices, ChoiceAction action, String cancelLabel) {
-+        if (!darkroomMode) {
-+            new AlertDialog.Builder(this)
-+                    .setTitle(title)
-+                    .setItems(choices, (d, which) -> action.choose(which))
-+                    .setNegativeButton(cancelLabel, null)
-+                    .show();
-+            return;
-+        }
-+
-+        final Dialog dialog = new Dialog(this);
-+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-+        LinearLayout panel = new LinearLayout(this);
-+        panel.setOrientation(LinearLayout.VERTICAL);
-+        panel.setPadding(dp(18), dp(16), dp(18), dp(18));
-+        panel.setBackground(roundRect(Color.BLACK, 14, 1, BORDER));
-+        TextView heading = text(title, 18, RED, true);
-+        panel.addView(heading, margin(lp(-1, -2), 0, 0, 0, 12));
-+        for (int i = 0; i < choices.length; i++) {
-+            final int index = i;
-+            Button option = compactButton(choices[i]);
-+            option.setTextColor(RED);
-+            option.setOnClickListener(v -> { dialog.dismiss(); action.choose(index); });
-+            panel.addView(option, margin(lp(-1, dp(48)), 0, 0, 0, 7));
-+        }
-+        Button cancel = compactButton(cancelLabel);
-+        cancel.setTextColor(RED);
-+        cancel.setOnClickListener(v -> dialog.dismiss());
-+        panel.addView(cancel, margin(lp(-1, dp(48)), 0, 6, 0, 0));
-+        dialog.setContentView(panel);
-+        Window w = dialog.getWindow();
-+        if (w != null) w.setBackgroundDrawableResource(android.R.color.transparent);
-+        dialog.show();
-+        if (w != null) w.setLayout((int)(getResources().getDisplayMetrics().widthPixels * 0.94f), ViewGroup.LayoutParams.WRAP_CONTENT);
-+    }
-+
      private void showTechnicalLogDialog() {
-@@ -1342,10 +1434,7 @@
+@@ -1342,10 +1392,7 @@
          Button clear = compactButton("AZZERA CRONOLOGIA TECNICA");
          clear.setTextColor(RED);
 -        clear.setOnClickListener(v -> new AlertDialog.Builder(this)
@@ -214,7 +169,7 @@
 -                .setNegativeButton("ANNULLA", null)
 -                .show());
 +                }, "ANNULLA"));
-@@ -1439,14 +1528,11 @@
+@@ -1439,14 +1486,11 @@
      private void cancelCurrentCycle() {
          if (!armed) return;
 -        new AlertDialog.Builder(this)
@@ -233,24 +188,7 @@
 -                .show();
 +                }, "CONTINUA");
      }
-@@ -1535,14 +1621,10 @@
-             int cumulative = step * (i + 1);
-             choices[i] = (i + 1) + "ª striscia   —   " + formatTime(cumulative);
-         }
--        new AlertDialog.Builder(this)
--                .setTitle("Provino completato — scegli la striscia")
--                .setItems(choices, (dialog, which) -> {
-+        showAppChoiceDialog("PROVINO COMPLETATO — SCEGLI LA STRISCIA", choices, which -> {
-                     int imported = step * (which + 1);
-                     setMode(MODE_PRINT);
-                     setPrintTime(imported);
-                     setStatusPresentation("DAL PROVINO — " + formatTime(imported),
-                             "Tempo precompilato e ancora modificabile con + / − o scorciatoie prima di armare.", GREEN);
--                })
--                .setNegativeButton("NON ORA", null)
--                .show();
-+                }, "NON ORA");
-@@ -1588,9 +1665,11 @@
+@@ -1588,9 +1632,11 @@
      private Button modeButton(String s) {
          Button b = new Button(this);
          b.setText(s);
