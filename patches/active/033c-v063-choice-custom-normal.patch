@@ -1,0 +1,32 @@
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1,9 +0,0 @@
+-        if (!darkroomMode) {
+-            new AlertDialog.Builder(this)
+-                    .setTitle(title)
+-                    .setItems(choices, (d, which) -> action.choose(which))
+-                    .setNegativeButton(cancelLabel, null)
+-                    .show();
+-            return;
+-        }
+-
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1 +1 @@
+-        panel.setBackground(roundRect(Color.BLACK, 14, 1, BORDER));
++        panel.setBackground(roundRect(darkroomMode ? Color.BLACK : CARD, 14, 1, BORDER));
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1 +1 @@
+-        TextView heading = text(title, 18, RED, true);
++        TextView heading = text(title, 18, darkroomMode ? RED : TEXT_PRIMARY, true);
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1 +1 @@
+-            option.setTextColor(RED);
++            option.setTextColor(darkroomMode ? RED : TEXT_PRIMARY);
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1 +1 @@
+-        cancel.setTextColor(RED);
++        cancel.setTextColor(darkroomMode ? RED : MUTED);
