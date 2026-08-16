@@ -1,0 +1,143 @@
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -3,6 +3,7 @@
+ import android.app.Activity;
+ import android.app.AlertDialog;
+ import android.app.Dialog;
++import android.app.NotificationManager;
+ import android.content.BroadcastReceiver;
+ import android.content.Context;
+ import android.content.Intent;
+@@ -17,6 +18,7 @@
+ import android.os.Bundle;
+ import android.os.Handler;
+ import android.os.Looper;
++import android.provider.Settings;
+ import android.text.InputFilter;
+ import android.text.Editable;
+ import android.text.TextWatcher;
+@@ -63,6 +65,8 @@
+     private int TEXT_PRIMARY;
+     private boolean darkroomMode;
+     private boolean feedbackBeep;
++    private boolean darkroomProtection;
++    private boolean pendingDarkroomAfterDndPermission = false;
+ 
+     private static final int MODE_PRINT = 0;
+     private static final int MODE_TEST = 1;
+@@ -71,7 +75,7 @@
+     private static final int REQ_EXPORT_BACKUP = 4101;
+     private static final int REQ_IMPORT_BACKUP = 4102;
+     private static final int REQ_EXPORT_JPG = 4103;
+-    private static final String APP_VERSION = "0.5.10";
++    private static final String APP_VERSION = "0.6.0";
+ 
+     private static final class FoundDevice {
+         final DeviceConfig config;
+@@ -87,6 +91,18 @@
+         }
+ 
+         String modeLabel() { return diyCandidate ? "possibile DIY" : "eWeLink"; }
++    }
++
++    private static final class LogGroup {
++        final String key;
++        final ArrayList<LogEntry> entries = new ArrayList<>();
++
++        LogGroup(String key) { this.key = key; }
++        LogEntry latest() { return entries.get(0); }
++        boolean hasFavorite() {
++            for (LogEntry e : entries) if (e.favorite) return true;
++            return false;
++        }
+     }
+ 
+     private TextView deviceStatus;
+@@ -114,7 +130,9 @@
+     private Button logFilterAllButton;
+     private Button logFilter35Button;
+     private Button logFilter66Button;
++    private Button logFavoritesButton;
+     private String logFilter = "ALL";
++    private boolean logFavoritesOnly = false;
+ 
+     private SonoffDiscovery discovery;
+     private DeviceConfig device;
+@@ -173,6 +191,7 @@
+         SharedPreferences p = getSharedPreferences("ui", MODE_PRIVATE);
+         darkroomMode = p.getBoolean("darkroomMode", false);
+         feedbackBeep = p.getBoolean("feedbackBeep", true);
++        darkroomProtection = p.getBoolean("darkroomProtection", true);
+         configurePalette();
+         applyDarkroomWindow();
+         mode = p.getInt("mode", MODE_PRINT);
+@@ -224,6 +243,17 @@
+         // A cycle may have completed while the screen/activity was stopped.
+         // Re-read the service's durable state instead of relying on a missed broadcast.
+         restoreRuntimeState();
++
++        if (pendingDarkroomAfterDndPermission) {
++            pendingDarkroomAfterDndPermission = false;
++            if (hasDndAccess()) {
++                getSharedPreferences("ui", MODE_PRIVATE).edit().putBoolean("darkroomMode", true).apply();
++                recreate();
++                return;
++            }
++            Toast.makeText(this, "Protezione notifiche non autorizzata", Toast.LENGTH_SHORT).show();
++        }
++        syncDarkroomProtection();
+     }
+ 
+     @Override protected void onStop() {
+@@ -570,11 +600,14 @@
+         add.setOnClickListener(v -> showLogEditor(newEntryFromSession(), true));
+         intro.addView(add, lp(-1, dp(50)));
+ 
++        LinearLayout searchRow = new LinearLayout(this);
++        searchRow.setOrientation(LinearLayout.HORIZONTAL);
++        searchRow.setGravity(Gravity.CENTER_VERTICAL);
+         logSearchField = editField("Cerca per titolo, carta o note…", "");
+         logSearchField.setTextSize(13);
+         if (darkroomMode) {
+             logSearchField.setFocusable(false);
+-            logSearchField.setHint("Ricerca testuale disponibile fuori modalità camera oscura");
++            logSearchField.setHint("Ricerca disponibile fuori modalità camera oscura");
+         } else {
+             logSearchField.addTextChangedListener(new TextWatcher() {
+                 @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+@@ -582,7 +615,18 @@
+                 @Override public void afterTextChanged(Editable s) {}
+             });
+         }
+-        intro.addView(logSearchField, margin(lp(-1, dp(48)), 0, 10, 0, 8));
++        searchRow.addView(logSearchField, margin(lp(0, dp(48), 1f), 0, 0, dp(6), 0));
++        logFavoritesButton = compactButton("☆");
++        logFavoritesButton.setTextSize(21);
++        logFavoritesButton.setContentDescription("Mostra solo preferite");
++        logFavoritesButton.setOnClickListener(v -> {
++            logFavoritesOnly = !logFavoritesOnly;
++            updateLogFavoriteButton();
++            refreshLogList();
++        });
++        searchRow.addView(logFavoritesButton, lp(dp(50), dp(48)));
++        intro.addView(searchRow, margin(lp(-1, -2), 0, 10, 0, 8));
++        updateLogFavoriteButton();
+ 
+         LinearLayout filterRow = new LinearLayout(this);
+         filterRow.setOrientation(LinearLayout.HORIZONTAL);
+@@ -629,6 +673,15 @@
+         styleLogFilterButton(logFilter66Button, "6x6".equals(logFilter));
+     }
+ 
++    private void updateLogFavoriteButton() {
++        if (logFavoritesButton == null) return;
++        int accent = darkroomMode ? RED : AMBER;
++        logFavoritesButton.setText(logFavoritesOnly ? "★" : "☆");
++        logFavoritesButton.setTextColor(logFavoritesOnly ? Color.BLACK : MUTED);
++        logFavoritesButton.setBackground(roundRect(logFavoritesOnly ? accent : BUTTON, 8, logFavoritesOnly ? 0 : 1, BORDER));
++        logFavoritesButton.setContentDescription(logFavoritesOnly ? "Mostra tutte le schede" : "Mostra solo preferite");
++    }
++
+     private void styleLogFilterButton(Button b, boolean selected) {
+         int accent = darkroomMode ? RED : LOG_ACCENT;
+         b.setBackground(roundRect(selected ? accent : BUTTON, 8, selected ? 0 : 1, BORDER));

@@ -1,0 +1,187 @@
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1604,6 +1869,147 @@
+         }
+     }
+ 
++    private NotificationManager notificationManager() {
++        return (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
++    }
++
++    private boolean hasDndAccess() {
++        if (Build.VERSION.SDK_INT < 23) return true;
++        try {
++            NotificationManager nm = notificationManager();
++            return nm != null && nm.isNotificationPolicyAccessGranted();
++        } catch (Exception ignored) {
++            return false;
++        }
++    }
++
++    private void openDndAccessSettings() {
++        try {
++            startActivity(new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS));
++        } catch (Exception e) {
++            Toast.makeText(this, "Apri Android > Non disturbare e autorizza Darkroom Timer", Toast.LENGTH_LONG).show();
++        }
++    }
++
++    private int darkroomSuppressedVisualEffects() {
++        if (Build.VERSION.SDK_INT >= 28) {
++            return NotificationManager.Policy.SUPPRESSED_EFFECT_FULL_SCREEN_INTENT
++                    | NotificationManager.Policy.SUPPRESSED_EFFECT_LIGHTS
++                    | NotificationManager.Policy.SUPPRESSED_EFFECT_PEEK
++                    | NotificationManager.Policy.SUPPRESSED_EFFECT_STATUS_BAR
++                    | NotificationManager.Policy.SUPPRESSED_EFFECT_BADGE
++                    | NotificationManager.Policy.SUPPRESSED_EFFECT_AMBIENT
++                    | NotificationManager.Policy.SUPPRESSED_EFFECT_NOTIFICATION_LIST;
++        }
++        return NotificationManager.Policy.SUPPRESSED_EFFECT_SCREEN_ON
++                | NotificationManager.Policy.SUPPRESSED_EFFECT_SCREEN_OFF;
++    }
++
++    private NotificationManager.Policy darkroomNotificationPolicy() {
++        int effects = darkroomSuppressedVisualEffects();
++        if (Build.VERSION.SDK_INT >= 30) {
++            return new NotificationManager.Policy(
++                    0,
++                    NotificationManager.Policy.PRIORITY_SENDERS_ANY,
++                    NotificationManager.Policy.PRIORITY_SENDERS_ANY,
++                    effects,
++                    NotificationManager.Policy.CONVERSATION_SENDERS_NONE);
++        }
++        return new NotificationManager.Policy(
++                0,
++                NotificationManager.Policy.PRIORITY_SENDERS_ANY,
++                NotificationManager.Policy.PRIORITY_SENDERS_ANY,
++                effects);
++    }
++
++    private void enableDarkroomProtection() {
++        if (!darkroomProtection || !darkroomMode || !hasDndAccess()) return;
++        try {
++            NotificationManager nm = notificationManager();
++            if (nm == null) return;
++            SharedPreferences state = getSharedPreferences("darkroom_dnd", MODE_PRIVATE);
++            if (!state.getBoolean("applied", false)) {
++                NotificationManager.Policy old = nm.getNotificationPolicy();
++                SharedPreferences.Editor ed = state.edit()
++                        .putInt("previousFilter", nm.getCurrentInterruptionFilter())
++                        .putInt("priorityCategories", old.priorityCategories)
++                        .putInt("priorityCallSenders", old.priorityCallSenders)
++                        .putInt("priorityMessageSenders", old.priorityMessageSenders)
++                        .putInt("suppressedVisualEffects", old.suppressedVisualEffects);
++                if (Build.VERSION.SDK_INT >= 30) {
++                    ed.putInt("priorityConversationSenders", old.priorityConversationSenders);
++                }
++                ed.apply();
++            }
++            nm.setNotificationPolicy(darkroomNotificationPolicy());
++            nm.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_PRIORITY);
++            state.edit().putBoolean("applied", true).apply();
++        } catch (Exception e) {
++            Toast.makeText(this, "Protezione notifiche non attivabile: controlla l'autorizzazione Non disturbare", Toast.LENGTH_LONG).show();
++        }
++    }
++
++    private void restoreDarkroomProtection() {
++        SharedPreferences state = getSharedPreferences("darkroom_dnd", MODE_PRIVATE);
++        if (!state.getBoolean("applied", false) || !hasDndAccess()) return;
++        try {
++            NotificationManager nm = notificationManager();
++            if (nm == null) return;
++            int categories = state.getInt("priorityCategories", 0);
++            int calls = state.getInt("priorityCallSenders", NotificationManager.Policy.PRIORITY_SENDERS_ANY);
++            int messages = state.getInt("priorityMessageSenders", NotificationManager.Policy.PRIORITY_SENDERS_ANY);
++            int effects = state.getInt("suppressedVisualEffects", 0);
++            NotificationManager.Policy old;
++            if (Build.VERSION.SDK_INT >= 30) {
++                int conversations = state.getInt("priorityConversationSenders", NotificationManager.Policy.CONVERSATION_SENDERS_ANYONE);
++                old = new NotificationManager.Policy(categories, calls, messages, effects, conversations);
++            } else {
++                old = new NotificationManager.Policy(categories, calls, messages, effects);
++            }
++            nm.setNotificationPolicy(old);
++            int previousFilter = state.getInt("previousFilter", NotificationManager.INTERRUPTION_FILTER_ALL);
++            if (previousFilter == NotificationManager.INTERRUPTION_FILTER_UNKNOWN) previousFilter = NotificationManager.INTERRUPTION_FILTER_ALL;
++            nm.setInterruptionFilter(previousFilter);
++            state.edit().clear().apply();
++        } catch (Exception ignored) {}
++    }
++
++    private void syncDarkroomProtection() {
++        if (darkroomMode && darkroomProtection) enableDarkroomProtection();
++        else restoreDarkroomProtection();
++    }
++
++    private void setDarkroomModeFromSettings(boolean enabled, Dialog settingsDialog) {
++        if (!enabled) {
++            restoreDarkroomProtection();
++            getSharedPreferences("ui", MODE_PRIVATE).edit().putBoolean("darkroomMode", false).apply();
++            if (settingsDialog != null) settingsDialog.dismiss();
++            recreate();
++            return;
++        }
++        if (darkroomProtection && !hasDndAccess()) {
++            new AlertDialog.Builder(this)
++                    .setTitle("Protezione camera oscura")
++                    .setMessage("Per evitare che notifiche e chiamate illuminino il telefono, Darkroom Timer deve poter gestire Non disturbare. Android aprirà una schermata di sistema: autorizza Darkroom Timer e tornando indietro entrerai automaticamente in modalità camera oscura.\n\nPuoi anche entrare senza protezione.")
++                    .setPositiveButton("AUTORIZZA", (d, w) -> {
++                        pendingDarkroomAfterDndPermission = true;
++                        if (settingsDialog != null) settingsDialog.dismiss();
++                        openDndAccessSettings();
++                    })
++                    .setNeutralButton("ENTRA SENZA PROTEZIONE", (d, w) -> {
++                        getSharedPreferences("ui", MODE_PRIVATE).edit().putBoolean("darkroomMode", true).apply();
++                        if (settingsDialog != null) settingsDialog.dismiss();
++                        recreate();
++                    })
++                    .setNegativeButton("ANNULLA", null)
++                    .show();
++            return;
++        }
++        getSharedPreferences("ui", MODE_PRIVATE).edit().putBoolean("darkroomMode", true).apply();
++        if (settingsDialog != null) settingsDialog.dismiss();
++        recreate();
++    }
++
+     private String cumulativeTimes() {
+         StringBuilder b = new StringBuilder("TEMPI CUMULATIVI  ");
+         for (int i = 1; i <= testCount; i++) {
+@@ -1629,12 +2035,31 @@
+         panel.addView(title, margin(lp(-1, -2), 0, 0, 0, 14));
+ 
+         Button dark = compactButton("MODALITÀ CAMERA OSCURA: " + (darkroomMode ? "ON" : "OFF"));
+-        dark.setOnClickListener(v -> {
+-            getSharedPreferences("ui", MODE_PRIVATE).edit().putBoolean("darkroomMode", !darkroomMode).apply();
+-            dialog.dismiss();
+-            recreate();
++        dark.setOnClickListener(v -> setDarkroomModeFromSettings(!darkroomMode, dialog));
++        panel.addView(dark, margin(lp(-1, dp(50)), 0, 0, 0, 8));
++
++        Button protection = compactButton("PROTEZIONE NOTIFICHE: " + (darkroomProtection ? "ON" : "OFF"));
++        protection.setOnClickListener(v -> {
++            darkroomProtection = !darkroomProtection;
++            getSharedPreferences("ui", MODE_PRIVATE).edit().putBoolean("darkroomProtection", darkroomProtection).apply();
++            protection.setText("PROTEZIONE NOTIFICHE: " + (darkroomProtection ? "ON" : "OFF"));
++            syncDarkroomProtection();
+         });
+-        panel.addView(dark, margin(lp(-1, dp(50)), 0, 0, 0, 8));
++        panel.addView(protection, margin(lp(-1, dp(50)), 0, 0, 0, 8));
++
++        if (darkroomProtection && !hasDndAccess()) {
++            Button authorizeDnd = compactButton("AUTORIZZA NON DISTURBARE");
++            authorizeDnd.setTextColor(AMBER);
++            authorizeDnd.setOnClickListener(v -> {
++                dialog.dismiss();
++                openDndAccessSettings();
++            });
++            panel.addView(authorizeDnd, margin(lp(-1, dp(48)), 0, 0, 0, 8));
++        }
++
++        TextView protectionNote = text("La protezione usa Non disturbare per bloccare chiamate/notifiche e sopprimere gli avvisi visivi mentre la modalità camera oscura è attiva; al ritorno alla modalità normale ripristina le impostazioni precedenti.", 11, MUTED, false);
++        protectionNote.setPadding(dp(4), 0, dp(4), dp(8));
++        panel.addView(protectionNote, lp(-1, -2));
+ 
+         Button beep = compactButton("BEEP FINE CICLO: " + (feedbackBeep ? "ON" : "OFF"));
+         beep.setOnClickListener(v -> {

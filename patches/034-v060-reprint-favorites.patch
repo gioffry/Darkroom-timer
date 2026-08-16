@@ -1,0 +1,113 @@
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -773,6 +965,7 @@
+         e.yellow = "0";
+         e.density = "0";
+         e.paper = "Fomaspeed Variant 311 RC lucida";
++        applyReprintTemplate(e);
+         return e;
+     }
+ 
+@@ -788,6 +981,49 @@
+         if (cycle > 0 && e.timestamp == cycle) {
+             getSharedPreferences("ui", MODE_PRIVATE).edit().putLong("lastSavedCycleAt", cycle).apply();
+         }
++        SharedPreferences template = getSharedPreferences("log_reprint", MODE_PRIVATE);
++        long activatedAt = template.getLong("activatedAt", Long.MAX_VALUE);
++        if (template.getBoolean("active", false) && e.exposureMs > 0 && e.timestamp >= activatedAt) {
++            template.edit().clear().apply();
++        }
++    }
++
++    private void useLogEntryForPrint(LogEntry entry) {
++        if (entry == null || entry.exposureMs <= 0) return;
++        setPrintTime(entry.exposureMs);
++        getSharedPreferences("log_reprint", MODE_PRIVATE).edit()
++                .clear()
++                .putBoolean("active", true)
++                .putLong("activatedAt", System.currentTimeMillis())
++                .putString("title", entry.title == null ? "" : entry.title)
++                .putString("negative", entry.negative == null ? "" : entry.negative)
++                .putString("aperture", entry.aperture == null ? "" : entry.aperture)
++                .putString("columnHeight", entry.columnHeight == null ? "" : entry.columnHeight)
++                .putString("magenta", entry.magenta == null ? "" : entry.magenta)
++                .putString("yellow", entry.yellow == null ? "" : entry.yellow)
++                .putString("density", entry.density == null ? "" : entry.density)
++                .putString("paper", entry.paper == null ? "" : entry.paper)
++                .putString("notes", entry.notes == null ? "" : entry.notes)
++                .apply();
++        setMode(MODE_PRINT);
++        Toast.makeText(this, "Tempo " + formatTime(entry.exposureMs) + " caricato in STAMPA", Toast.LENGTH_SHORT).show();
++    }
++
++    private void applyReprintTemplate(LogEntry entry) {
++        if (entry == null || entry.exposureMs <= 0) return;
++        SharedPreferences template = getSharedPreferences("log_reprint", MODE_PRIVATE);
++        if (!template.getBoolean("active", false)) return;
++        long activatedAt = template.getLong("activatedAt", Long.MAX_VALUE);
++        if (entry.timestamp < activatedAt) return;
++        entry.title = template.getString("title", "");
++        entry.negative = template.getString("negative", "");
++        entry.aperture = template.getString("aperture", entry.aperture);
++        entry.columnHeight = template.getString("columnHeight", "");
++        entry.magenta = template.getString("magenta", entry.magenta);
++        entry.yellow = template.getString("yellow", entry.yellow);
++        entry.density = template.getString("density", entry.density);
++        entry.paper = template.getString("paper", entry.paper);
++        entry.notes = template.getString("notes", "");
+     }
+ 
+     private void showLogEditor(final LogEntry entry, final boolean isNew) {
+@@ -810,8 +1046,25 @@
+         panel.setBackground(roundRect(CARD, 14, 1, BORDER));
+         sc.addView(panel, new ScrollView.LayoutParams(-1, -2));
+ 
++        LinearLayout headingRow = new LinearLayout(this);
++        headingRow.setOrientation(LinearLayout.HORIZONTAL);
++        headingRow.setGravity(Gravity.CENTER_VERTICAL);
+         TextView heading = text(isNew ? "NUOVA SCHEDA DI STAMPA" : "SCHEDA DI STAMPA", 19, TEXT_PRIMARY, true);
+-        panel.addView(heading, margin(lp(-1, -2), 0, 0, 0, 12));
++        headingRow.addView(heading, lp(0, -2, 1f));
++        final boolean[] favorite = {entry.favorite};
++        final Button favoriteButton = compactButton(favorite[0] ? "★" : "☆");
++        favoriteButton.setTextSize(22);
++        favoriteButton.setContentDescription(favorite[0] ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti");
++        favoriteButton.setTextColor(favorite[0] ? AMBER : MUTED);
++        favoriteButton.setBackground(roundRect(BUTTON, 8, 1, BORDER));
++        favoriteButton.setOnClickListener(v -> {
++            favorite[0] = !favorite[0];
++            favoriteButton.setText(favorite[0] ? "★" : "☆");
++            favoriteButton.setTextColor(favorite[0] ? AMBER : MUTED);
++            favoriteButton.setContentDescription(favorite[0] ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti");
++        });
++        headingRow.addView(favoriteButton, lp(dp(48), dp(46)));
++        panel.addView(headingRow, margin(lp(-1, -2), 0, 0, 0, 12));
+ 
+         LinearLayout auto = card();
+         auto.addView(text("DATI AUTOMATICI", 13, MUTED, true));
+@@ -889,6 +1142,7 @@
+             entry.density = density.getText().toString().trim();
+             entry.paper = paper.getText().toString().trim();
+             entry.notes = trimNotes(notes.getText().toString().trim());
++            entry.favorite = favorite[0];
+             if (entry.id <= 0) entry.id = System.currentTimeMillis();
+             if (entry.timestamp <= 0) entry.timestamp = System.currentTimeMillis();
+             LogStore.save(this, entry);
+@@ -901,6 +1155,17 @@
+         panel.addView(save, lp(-1, dp(52)));
+ 
+         if (!isNew) {
++            if (entry.exposureMs > 0) {
++                Button useForPrint = compactButton("USA PER STAMPA  •  " + formatTime(entry.exposureMs));
++                useForPrint.setBackground(roundRect(GREEN, 9, 0, 0));
++                useForPrint.setTextColor(Color.BLACK);
++                useForPrint.setOnClickListener(v -> {
++                    useLogEntryForPrint(entry);
++                    dialog.dismiss();
++                });
++                panel.addView(useForPrint, margin(lp(-1, dp(50)), 0, 8, 0, 0));
++            }
++
+             Button exportJpg = compactButton("ESPORTA SCHEDA JPG 9:16");
+             exportJpg.setOnClickListener(v -> {
+                 entry.title = title.getText().toString().trim();

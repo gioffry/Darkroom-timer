@@ -1,0 +1,239 @@
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -680,51 +729,194 @@
+             return;
+         }
+ 
++        for (LogGroup group : visible) addLogGroupCard(group);
++    }
++
++    private List<LogGroup> buildLogGroups(List<LogEntry> entries) {
++        LinkedHashMap<String, LogGroup> byKey = new LinkedHashMap<>();
++        if (entries == null) return new ArrayList<>();
+         for (LogEntry e : entries) {
+-            LinearLayout row = card();
+-            row.setPadding(dp(16), dp(12), dp(14), dp(12));
+-            row.setClickable(true);
+-            row.setFocusable(true);
+-            row.setOnClickListener(v -> showLogEditor(e, false));
+-
+-            LinearLayout head = new LinearLayout(this);
+-            head.setOrientation(LinearLayout.HORIZONTAL);
+-            head.setGravity(Gravity.CENTER_VERTICAL);
+-            String name = e.title == null || e.title.trim().isEmpty() ? "Scheda senza titolo" : e.title.trim();
+-            TextView nameView = text(name, 16, TEXT_PRIMARY, true);
+-            head.addView(nameView, lp(0, -2, 1f));
+-            TextView arrow = text("›", 30, darkroomMode ? RED : LOG_ACCENT, false);
+-            arrow.setGravity(Gravity.CENTER);
+-            head.addView(arrow, lp(dp(34), dp(40)));
+-            row.addView(head, lp(-1, -2));
+-
+-            TextView date = text(formatDate(e.timestamp) + "  •  " + formatClock(e.timestamp), 11, MUTED, false);
+-            row.addView(date, margin(lp(-1, -2), 0, 1, 0, 5));
+-
+-            ArrayList<String> mainBits = new ArrayList<>();
+-            if (e.exposureMs > 0) mainBits.add(formatTime(e.exposureMs));
+-            if (e.aperture != null && !e.aperture.trim().isEmpty()) mainBits.add("f/" + e.aperture.trim());
+-            if (e.negative != null && !e.negative.trim().isEmpty()) mainBits.add("6x6".equals(e.negative) ? "6×6" : e.negative);
+-            TextView summary = text(joinBits(mainBits), 14, e.exposureMs > 0 ? GREEN : TEXT_PRIMARY, true);
+-            row.addView(summary, lp(-1, -2));
+-
+-            ArrayList<String> filterBits = new ArrayList<>();
+-            if (e.magenta != null && !e.magenta.trim().isEmpty()) filterBits.add("M " + e.magenta.trim());
+-            if (e.yellow != null && !e.yellow.trim().isEmpty()) filterBits.add("Y " + e.yellow.trim());
+-            if (e.density != null && !e.density.trim().isEmpty()) filterBits.add("D " + e.density.trim());
+-            if (!filterBits.isEmpty()) {
+-                TextView filters = text(joinBits(filterBits), 11, MUTED, false);
+-                filters.setPadding(0, dp(3), 0, 0);
+-                row.addView(filters, lp(-1, -2));
++            String key = logGroupKey(e);
++            LogGroup group = byKey.get(key);
++            if (group == null) {
++                group = new LogGroup(key);
++                byKey.put(key, group);
+             }
+-            if (e.testMs > 0) {
+-                String provino = "Provino " + formatTime(e.testMs) + (e.testCount > 0 ? " × " + e.testCount : "");
+-                TextView test = text(provino, 11, BLUE, false);
+-                test.setPadding(0, dp(3), 0, 0);
+-                row.addView(test, lp(-1, -2));
++            group.entries.add(e);
++        }
++        return new ArrayList<>(byKey.values());
++    }
++
++    private String logGroupKey(LogEntry e) {
++        String title = e == null || e.title == null ? "" : e.title.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ITALY);
++        if (title.isEmpty()) return "single:" + (e == null ? System.nanoTime() : e.id);
++        String day = new SimpleDateFormat("yyyyMMdd", Locale.ITALY).format(new Date(e.timestamp));
++        return day + ":" + title;
++    }
++
++    private boolean groupMatchesFormat(LogGroup group) {
++        if ("ALL".equals(logFilter)) return true;
++        for (LogEntry e : group.entries) {
++            String neg = e.negative == null ? "" : e.negative.trim();
++            if ("35mm".equals(logFilter) && "35mm".equalsIgnoreCase(neg)) return true;
++            if ("6x6".equals(logFilter) && "6x6".equalsIgnoreCase(neg)) return true;
++        }
++        return false;
++    }
++
++    private boolean groupMatchesQuery(LogGroup group, String query) {
++        for (LogEntry e : group.entries) {
++            String neg = e.negative == null ? "" : e.negative.trim();
++            String hay = ((e.title == null ? "" : e.title) + " "
++                    + (e.paper == null ? "" : e.paper) + " "
++                    + (e.notes == null ? "" : e.notes) + " "
++                    + neg).toLowerCase(Locale.ITALY);
++            if (hay.contains(query)) return true;
++        }
++        return false;
++    }
++
++    private void addLogGroupCard(final LogGroup group) {
++        final LogEntry e = group.latest();
++        final boolean grouped = group.entries.size() > 1;
++        LinearLayout row = card();
++        row.setPadding(dp(16), dp(12), dp(14), dp(12));
++        row.setClickable(true);
++        row.setFocusable(true);
++        row.setOnClickListener(v -> {
++            if (grouped) showLogGroup(group);
++            else showLogEditor(e, false);
++        });
++
++        LinearLayout head = new LinearLayout(this);
++        head.setOrientation(LinearLayout.HORIZONTAL);
++        head.setGravity(Gravity.CENTER_VERTICAL);
++        String name = e.title == null || e.title.trim().isEmpty() ? "Scheda senza titolo" : e.title.trim();
++        TextView nameView = text(name, 16, TEXT_PRIMARY, true);
++        head.addView(nameView, lp(0, -2, 1f));
++        if (group.hasFavorite()) {
++            TextView star = text("★", 18, darkroomMode ? RED : AMBER, true);
++            star.setGravity(Gravity.CENTER);
++            head.addView(star, lp(dp(28), dp(40)));
++        }
++        TextView arrow = text("›", 30, darkroomMode ? RED : LOG_ACCENT, false);
++        arrow.setGravity(Gravity.CENTER);
++        head.addView(arrow, lp(dp(34), dp(40)));
++        row.addView(head, lp(-1, -2));
++
++        String when = grouped
++                ? formatDate(e.timestamp) + "  •  " + group.entries.size() + " lavorazioni"
++                : formatDate(e.timestamp) + "  •  " + formatClock(e.timestamp);
++        TextView date = text(when, 11, MUTED, false);
++        row.addView(date, margin(lp(-1, -2), 0, 1, 0, 5));
++
++        ArrayList<String> mainBits = new ArrayList<>();
++        if (e.exposureMs > 0) mainBits.add(formatTime(e.exposureMs));
++        if (e.aperture != null && !e.aperture.trim().isEmpty()) mainBits.add("f/" + e.aperture.trim());
++        if (e.negative != null && !e.negative.trim().isEmpty()) mainBits.add("6x6".equals(e.negative) ? "6×6" : e.negative);
++        TextView summary = text(joinBits(mainBits), 14, e.exposureMs > 0 ? GREEN : TEXT_PRIMARY, true);
++        row.addView(summary, lp(-1, -2));
++
++        ArrayList<String> filterBits = new ArrayList<>();
++        if (e.magenta != null && !e.magenta.trim().isEmpty()) filterBits.add("M " + e.magenta.trim());
++        if (e.yellow != null && !e.yellow.trim().isEmpty()) filterBits.add("Y " + e.yellow.trim());
++        if (e.density != null && !e.density.trim().isEmpty()) filterBits.add("D " + e.density.trim());
++        if (!filterBits.isEmpty()) {
++            TextView filters = text(joinBits(filterBits), 11, MUTED, false);
++            filters.setPadding(0, dp(3), 0, 0);
++            row.addView(filters, lp(-1, -2));
++        }
++
++        if (grouped) {
++            int prints = 0;
++            int tests = 0;
++            for (LogEntry item : group.entries) {
++                if (item.exposureMs > 0) prints++;
++                else if (item.testMs > 0) tests++;
+             }
+-            logListContainer.addView(row, margin(lp(-1, -2), 0, 0, 0, 8));
+-        }
++            ArrayList<String> bits = new ArrayList<>();
++            if (tests > 0) bits.add(tests + (tests == 1 ? " provino" : " provini"));
++            if (prints > 0) bits.add(prints + (prints == 1 ? " stampa" : " stampe"));
++            bits.add("ultima " + formatClock(e.timestamp));
++            TextView history = text(joinBits(bits), 11, darkroomMode ? RED : LOG_ACCENT, false);
++            history.setPadding(0, dp(4), 0, 0);
++            row.addView(history, lp(-1, -2));
++        } else if (e.testMs > 0) {
++            String provino = "Provino " + formatTime(e.testMs) + (e.testCount > 0 ? " × " + e.testCount : "");
++            TextView test = text(provino, 11, BLUE, false);
++            test.setPadding(0, dp(3), 0, 0);
++            row.addView(test, lp(-1, -2));
++        }
++        logListContainer.addView(row, margin(lp(-1, -2), 0, 0, 0, 8));
++    }
++
++    private void showLogGroup(final LogGroup group) {
++        final Dialog dialog = new Dialog(this);
++        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
++        ScrollView sc = new ScrollView(this);
++        LinearLayout panel = new LinearLayout(this);
++        panel.setOrientation(LinearLayout.VERTICAL);
++        panel.setPadding(dp(18), dp(16), dp(18), dp(18));
++        panel.setBackground(roundRect(darkroomMode ? Color.BLACK : CARD, 14, 1, BORDER));
++        sc.addView(panel, new ScrollView.LayoutParams(-1, -2));
++
++        LogEntry latest = group.latest();
++        String name = latest.title == null || latest.title.trim().isEmpty() ? "Scheda senza titolo" : latest.title.trim();
++        TextView heading = text("SESSIONE — " + name, 18, TEXT_PRIMARY, true);
++        panel.addView(heading, lp(-1, -2));
++        TextView sub = text(formatDate(latest.timestamp) + "  •  " + group.entries.size() + " lavorazioni", 12, MUTED, false);
++        sub.setPadding(0, dp(4), 0, dp(10));
++        panel.addView(sub, lp(-1, -2));
++
++        // Storia dal primo passaggio all'ultimo: provino -> stampe successive.
++        for (int i = group.entries.size() - 1; i >= 0; i--) {
++            final LogEntry item = group.entries.get(i);
++            LinearLayout step = card();
++            step.setPadding(dp(14), dp(10), dp(12), dp(10));
++            String kind;
++            int accent;
++            if (item.exposureMs > 0) {
++                kind = "STAMPA  " + formatTime(item.exposureMs);
++                accent = GREEN;
++            } else if (item.testMs > 0) {
++                kind = "PROVINO  " + formatTime(item.testMs) + (item.testCount > 0 ? " × " + item.testCount : "");
++                accent = BLUE;
++            } else {
++                kind = "SCHEDA";
++                accent = TEXT_PRIMARY;
++            }
++            String top = (item.favorite ? "★  " : "") + formatClock(item.timestamp) + "  •  " + kind;
++            step.addView(text(top, 14, item.favorite ? (darkroomMode ? RED : AMBER) : accent, true), lp(-1, -2));
++            ArrayList<String> details = new ArrayList<>();
++            if (item.aperture != null && !item.aperture.trim().isEmpty()) details.add("f/" + item.aperture.trim());
++            if (item.negative != null && !item.negative.trim().isEmpty()) details.add("6x6".equals(item.negative) ? "6×6" : item.negative);
++            if (!details.isEmpty()) {
++                TextView d = text(joinBits(details), 11, MUTED, false);
++                d.setPadding(0, dp(3), 0, 0);
++                step.addView(d, lp(-1, -2));
++            }
++            step.setClickable(true);
++            step.setFocusable(true);
++            step.setOnClickListener(v -> {
++                dialog.dismiss();
++                showLogEditor(item, false);
++            });
++            panel.addView(step, margin(lp(-1, -2), 0, 0, 0, 7));
++        }
++
++        TextView note = text("Le lavorazioni vengono raggruppate automaticamente solo quando titolo e data coincidono.", 11, MUTED, false);
++        note.setGravity(Gravity.CENTER);
++        panel.addView(note, margin(lp(-1, -2), 0, 4, 0, 8));
++
++        Button close = compactButton("CHIUDI");
++        close.setOnClickListener(v -> dialog.dismiss());
++        panel.addView(close, lp(-1, dp(48)));
++
++        dialog.setContentView(sc);
++        Window w = dialog.getWindow();
++        if (w != null) w.setBackgroundDrawableResource(android.R.color.transparent);
++        dialog.show();
++        if (w != null) w.setLayout((int)(getResources().getDisplayMetrics().widthPixels * 0.94f), (int)(getResources().getDisplayMetrics().heightPixels * 0.82f));
+     }
+ 
+     private static String joinBits(List<String> bits) {
