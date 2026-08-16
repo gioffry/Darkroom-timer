@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-apk:
@@ -21,17 +21,35 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf work
-          mkdir -p work/source
-          unzip -o DarkroomTimer-v0.5.8-BUILD.zip -d work/package
-          unzip -o work/package/DarkroomTimer-source-v0.5.8-WIP.zip -d work/source
-          mv work/source/v058src work/project
-          cp work/package/build_darkroom_v058.py work/build_darkroom.py
+          mkdir -p work
 
-          if [ -d patches ]; then
+          if [ -d base/v0.6.0/project ] && [ -f base/v0.6.0/build_darkroom.py ]; then
+            echo "Uso base consolidata v0.6.0"
+            cp -a base/v0.6.0/project work/project
+            cp base/v0.6.0/build_darkroom.py work/build_darkroom.py
+            echo "BOOTSTRAP_V060=0" >> "$GITHUB_ENV"
+          else
+            echo "Base v0.6.0 non ancora consolidata: la genero dalla catena storica"
+            mkdir -p work/source
+            unzip -o DarkroomTimer-v0.5.8-BUILD.zip -d work/package
+            unzip -o work/package/DarkroomTimer-source-v0.5.8-WIP.zip -d work/source
+            mv work/source/v058src work/project
+            cp work/package/build_darkroom_v058.py work/build_darkroom.py
+
+            if [ -d patches ]; then
+              while IFS= read -r patch_file; do
+                echo "Applico $patch_file"
+                patch -d work -p1 < "$patch_file"
+              done < <(find patches -maxdepth 1 -type f -name '*.patch' | sort)
+            fi
+            echo "BOOTSTRAP_V060=1" >> "$GITHUB_ENV"
+          fi
+
+          if [ -d patches/active ]; then
             while IFS= read -r patch_file; do
-              echo "Applico $patch_file"
+              echo "Applico patch attiva $patch_file"
               patch -d work -p1 < "$patch_file"
-            done < <(find patches -maxdepth 1 -type f -name '*.patch' | sort)
+            done < <(find patches/active -maxdepth 1 -type f -name '*.patch' | sort)
           fi
 
       - name: Leggi versione risultante
@@ -96,6 +114,34 @@ jobs:
             --alias "$KEY_ALIAS" \
             --storepass "$KEYSTORE_PASSWORD" \
             --keypass "$KEY_PASSWORD"
+
+      - name: Consolida base sorgente v0.6.0
+        if: env.BOOTSTRAP_V060 == '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p base/v0.6.0
+          rm -rf base/v0.6.0/project
+          cp -a work/project base/v0.6.0/project
+          cp work/build_darkroom.py base/v0.6.0/build_darkroom.py
+          find base/v0.6.0 -type f -name '*.orig' -delete
+
+          mkdir -p patches/archive-v05 patches/active
+          shopt -s nullglob
+          for patch_file in patches/*.patch; do
+            git mv "$patch_file" patches/archive-v05/
+          done
+          cat > patches/active/README.md <<'EOF'
+          # Patch attive
+
+          Le nuove patch successive alla base consolidata v0.6.0 vanno inserite qui e vengono applicate in ordine alfabetico dal workflow.
+          EOF
+
+          git config user.name "Darkroom Timer Build"
+          git config user.email "actions@users.noreply.github.com"
+          git add base/v0.6.0 patches
+          git commit -m "Consolidate source base v0.6.0"
+          git push origin HEAD:main
 
       - name: Salva APK
         uses: actions/upload-artifact@v4
