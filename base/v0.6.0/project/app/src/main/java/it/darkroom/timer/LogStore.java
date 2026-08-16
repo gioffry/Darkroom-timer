@@ -1,0 +1,131 @@
+package it.darkroom.timer;
+
+import android.content.Context;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public final class LogStore {
+    private static final String PREFS = "print_log";
+    private static final String KEY = "entries_v1";
+
+    private LogStore() {}
+
+    public static List<LogEntry> load(Context context) {
+        String raw = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY, "");
+        return parsePayload(raw);
+    }
+
+    public static String exportPayload(Context context) {
+        String raw = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY, "");
+        return raw == null ? "" : raw;
+    }
+
+    public static List<LogEntry> parsePayload(String raw) {
+        ArrayList<LogEntry> result = new ArrayList<>();
+        if (raw == null || raw.isEmpty()) return result;
+        String[] rows = raw.split("\n");
+        for (String row : rows) {
+            try {
+                String[] f = row.split("\t", -1);
+                if (f.length < 13) continue;
+                LogEntry e = new LogEntry();
+                e.id = Long.parseLong(f[0]);
+                e.timestamp = Long.parseLong(f[1]);
+                e.exposureMs = Integer.parseInt(f[2]);
+                e.testMs = Integer.parseInt(f[3]);
+                e.testCount = Integer.parseInt(f[4]);
+                e.title = dec(f[5]);
+                e.negative = dec(f[6]);
+                e.aperture = dec(f[7]);
+                e.columnHeight = dec(f[8]);
+                e.magenta = dec(f[9]);
+                e.yellow = dec(f[10]);
+                e.density = dec(f[11]);
+                if (f.length >= 14) {
+                    e.paper = dec(f[12]);
+                    e.notes = dec(f[13]);
+                } else {
+                    e.paper = "Fomaspeed Variant 311 RC lucida";
+                    e.notes = dec(f[12]);
+                }
+                if (e.paper == null || e.paper.trim().isEmpty()) e.paper = "Fomaspeed Variant 311 RC lucida";
+                e.favorite = f.length >= 15 && "1".equals(f[14]);
+                result.add(e);
+            } catch (Exception ignored) {}
+        }
+        result.sort((a, b) -> Long.compare(b.timestamp, a.timestamp));
+        return result;
+    }
+
+    public static void save(Context context, LogEntry entry) {
+        List<LogEntry> list = load(context);
+        boolean replaced = false;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).id == entry.id) {
+                list.set(i, entry);
+                replaced = true;
+                break;
+            }
+        }
+        if (!replaced) list.add(entry);
+        write(context, list);
+    }
+
+    public static void delete(Context context, long id) {
+        List<LogEntry> list = load(context);
+        for (int i = list.size() - 1; i >= 0; i--) {
+            if (list.get(i).id == id) list.remove(i);
+        }
+        write(context, list);
+    }
+
+    public static void replaceAll(Context context, List<LogEntry> entries) {
+        write(context, entries == null ? new ArrayList<>() : new ArrayList<>(entries));
+    }
+
+    public static void merge(Context context, List<LogEntry> imported) {
+        Map<Long, LogEntry> byId = new LinkedHashMap<>();
+        for (LogEntry e : load(context)) byId.put(e.id, e);
+        if (imported != null) for (LogEntry e : imported) byId.put(e.id, e);
+        write(context, new ArrayList<>(byId.values()));
+    }
+
+    private static void write(Context context, List<LogEntry> list) {
+        list.sort((a, b) -> Long.compare(b.timestamp, a.timestamp));
+        StringBuilder out = new StringBuilder();
+        for (LogEntry e : list) {
+            if (out.length() > 0) out.append('\n');
+            out.append(e.id).append('\t')
+                    .append(e.timestamp).append('\t')
+                    .append(e.exposureMs).append('\t')
+                    .append(e.testMs).append('\t')
+                    .append(e.testCount).append('\t')
+                    .append(enc(e.title)).append('\t')
+                    .append(enc(e.negative)).append('\t')
+                    .append(enc(e.aperture)).append('\t')
+                    .append(enc(e.columnHeight)).append('\t')
+                    .append(enc(e.magenta)).append('\t')
+                    .append(enc(e.yellow)).append('\t')
+                    .append(enc(e.density)).append('\t')
+                    .append(enc(e.paper)).append('\t')
+                    .append(enc(e.notes)).append('\t')
+                    .append(e.favorite ? "1" : "0");
+        }
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY, out.toString()).apply();
+    }
+
+    private static String enc(String value) {
+        String v = value == null ? "" : value;
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(v.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static String dec(String value) {
+        if (value == null || value.isEmpty()) return "";
+        return new String(Base64.getUrlDecoder().decode(value), StandardCharsets.UTF_8);
+    }
+}
