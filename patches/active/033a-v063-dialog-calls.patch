@@ -23,7 +23,7 @@
 -                        .setTitle("Importa backup LOG")
 -                        .setMessage("Trovate " + imported.size() + " schede. Vuoi unirle al LOG attuale oppure sostituire completamente il LOG?")
 -                        .setPositiveButton("UNISCI", (d, w) -> {
-+                showAppThreeActionDialog("IMPORTA BACKUP LOG",
++                ThreeActionDialog.show(this, darkroomMode, "IMPORTA BACKUP LOG",
 +                        "Trovate " + imported.size() + " schede. Vuoi unirle al LOG attuale oppure sostituire completamente il LOG?",
 +                        "UNISCI", () -> {
                              LogStore.merge(this, imported);
