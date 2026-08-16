@@ -1,0 +1,224 @@
+--- a/build_darkroom.py
++++ b/build_darkroom.py
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env python3
+ """
+-Darkroom Timer v0.5.8 - build APK senza Gradle.
++Darkroom Timer v0.5.9 - build APK senza Gradle.
+ 
+ Dipendenze: SOLO Python 3 standard library + JDK (javac/jar/keytool)
+ e Android SDK già presente sul PC (platform android-34 + build-tools 34.0.0 o compatibili).
+@@ -30,8 +30,8 @@
+ import zipfile
+ 
+ PACKAGE_ID = "it.darkroom.timer"
+-VERSION_NAME = "0.5.8"
+-VERSION_CODE = "23"
++VERSION_NAME = "0.5.9"
++VERSION_CODE = "24"
+ MIN_SDK = "26"
+ TARGET_SDK = "34"
+ COMPILE_SDK = "34"
+@@ -39,7 +39,7 @@
+ 
+ 
+ def log(msg: str) -> None:
+-    print(f"[Darkroom v0.5.8] {msg}", flush=True)
++    print(f"[Darkroom v0.5.9] {msg}", flush=True)
+ 
+ 
+ def fail(msg: str, code: int = 2) -> "None":
+@@ -234,9 +234,9 @@
+         fail("Preflight manifest fallito. Mancano/sono errati: " + ", ".join(missing))
+     if gradle.is_file():
+         g = read_text(gradle)
+-        if not re.search(r"versionCode\s+23\b", g) or not re.search(r"versionName\s+['\"]0\.5\.8['\"]", g):
+-            fail("app/build.gradle non riporta versionCode 23 / versionName 0.5.8")
+-    log("Preflight v0.5.8 OK: manifest/versione/requisiti SONOFF invarianti verificati")
++        if not re.search(r"versionCode\s+24\b", g) or not re.search(r"versionName\s+['\"]0\.5\.9['\"]", g):
++            fail("app/build.gradle non riporta versionCode 24 / versionName 0.5.9")
++    log("Preflight v0.5.9 OK: manifest/versione/requisiti SONOFF invarianti verificati")
+ 
+ 
+ def write_sources_argfile(paths, out: Path):
+@@ -269,7 +269,7 @@
+ 
+     alphabet = string.ascii_letters + string.digits
+     password = "".join(secrets.choice(alphabet) for _ in range(24))
+-    log("Creo una nuova firma locale per la v0.5.8 (firma dedicata alla 0.5.8)")
++    log("Creo una nuova firma locale per la v0.5.9 (firma dedicata alla 0.5.9)")
+     run([
+         jdk_keytool, "-genkeypair", "-noprompt", "-v",
+         "-keystore", ks,
+@@ -442,7 +442,7 @@
+         print(out)
+     finally:
+         if args.keep_build:
+-            keep = out.parent / "DarkroomTimer-v058-build-debug"
++            keep = out.parent / "DarkroomTimer-v059-build-debug"
+             if keep.exists():
+                 shutil.rmtree(keep)
+             shutil.copytree(temp, keep)
+@@ -451,7 +451,7 @@
+ 
+ 
+ def default_source() -> str | None:
+-    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.5.8-WIP*.zip"))
++    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.5.9-WIP*.zip"))
+     if len(candidates) == 1:
+         return str(candidates[0])
+     return None
+@@ -459,10 +459,10 @@
+ 
+ def main():
+     p = argparse.ArgumentParser(
+-        description="Compila Darkroom Timer v0.5.8 in APK senza Gradle e senza download automatici."
++        description="Compila Darkroom Timer v0.5.9 in APK senza Gradle e senza download automatici."
+     )
+     p.add_argument("source", nargs="?", default=default_source(),
+-                   help="ZIP WIP v0.5.8 oppure cartella progetto Android")
++                   help="ZIP WIP v0.5.9 oppure cartella progetto Android")
+     p.add_argument("--output", "-o", help="Percorso APK finale")
+     p.add_argument("--sdk", help="Percorso Android SDK già installato")
+     p.add_argument("--keystore", help="Keystore esistente; se omesso ne crea uno locale nuovo")
+@@ -473,7 +473,7 @@
+     args = p.parse_args()
+     if not args.source:
+         p.print_help()
+-        fail("Indica lo ZIP WIP v0.5.8 come primo argomento.")
++        fail("Indica lo ZIP WIP v0.5.9 come primo argomento.")
+     build(args)
+ 
+ 
+--- a/project/README.md
++++ b/project/README.md
+@@ -1,4 +1,4 @@
+-# Darkroom Timer DIY — v0.5.8
++# Darkroom Timer DIY — v0.5.9
+ 
+ Build di correzione basata sulla v0.5.7.
+ 
+@@ -9,4 +9,4 @@
+ 
+ Invariati: controllo SONOFF/MINIR2, LOG, backup, modalità camera oscura e funzionalità della v0.5.7 non coinvolte dalle correzioni.
+ 
+-versionCode 23 / versionName 0.5.8.
++versionCode 24 / versionName 0.5.9.
+--- a/project/app/build.gradle
++++ b/project/app/build.gradle
+@@ -10,8 +10,8 @@
+         applicationId 'it.darkroom.timer'
+         minSdk 26
+         targetSdk 34
+-        versionCode 23
+-        versionName '0.5.8'
++        versionCode 24
++        versionName '0.5.9'
+     }
+ 
+     compileOptions {
+--- a/project/app/src/main/AndroidManifest.xml
++++ b/project/app/src/main/AndroidManifest.xml
+@@ -1,8 +1,8 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="it.darkroom.timer"
+-    android:versionCode="23"
+-    android:versionName="0.5.8">
++    android:versionCode="24"
++    android:versionName="0.5.9">
+ 
+     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
+ 
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -59,7 +59,7 @@
+     private int MUTED;
+     private int AMBER;
+     private int RED;
+-    private int PURPLE;
++    private int LOG_ACCENT;
+     private int TEXT_PRIMARY;
+     private boolean darkroomMode;
+     private boolean feedbackBeep;
+@@ -71,7 +71,7 @@
+     private static final int REQ_EXPORT_BACKUP = 4101;
+     private static final int REQ_IMPORT_BACKUP = 4102;
+     private static final int REQ_EXPORT_JPG = 4103;
+-    private static final String APP_VERSION = "0.5.8";
++    private static final String APP_VERSION = "0.5.9";
+ 
+     private static final class FoundDevice {
+         final DeviceConfig config;
+@@ -325,7 +325,7 @@
+         }
+         setStatusPresentation(title, detail, accent);
+         if (transientCompletion) {
+-            statusResetHandler.postDelayed(readyResetRunnable, 3000L);
++            statusResetHandler.postDelayed(readyResetRunnable, 6000L);
+         }
+ 
+         if (!busy && mode != MODE_LOG && shouldOfferQuickSave()) {
+@@ -420,8 +420,8 @@
+         saveLogButton.setTextSize(16);
+         saveLogButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+         saveLogButton.setAllCaps(false);
+-        saveLogButton.setTextColor(darkroomMode ? Color.BLACK : TEXT_PRIMARY);
+-        saveLogButton.setBackground(roundRect(darkroomMode ? RED : PURPLE, 10, 0, 0));
++        saveLogButton.setTextColor(Color.BLACK);
++        saveLogButton.setBackground(roundRect(darkroomMode ? RED : LOG_ACCENT, 10, 0, 0));
+         saveLogButton.setOnClickListener(v -> showLogEditor(newEntryFromSession(), true));
+         saveLogButton.setVisibility(View.GONE);
+         root.addView(saveLogButton, margin(lp(-1, dp(56)), 0, 8, 0, 0));
+@@ -620,9 +620,9 @@
+     }
+ 
+     private void styleLogFilterButton(Button b, boolean selected) {
+-        int accent = darkroomMode ? RED : PURPLE;
++        int accent = darkroomMode ? RED : LOG_ACCENT;
+         b.setBackground(roundRect(selected ? accent : BUTTON, 8, selected ? 0 : 1, BORDER));
+-        b.setTextColor(selected && darkroomMode ? Color.BLACK : (selected ? Color.WHITE : MUTED));
++        b.setTextColor(selected ? Color.BLACK : MUTED);
+     }
+ 
+     private void refreshLogList() {
+@@ -683,7 +683,7 @@
+             String name = e.title == null || e.title.trim().isEmpty() ? "Scheda senza titolo" : e.title.trim();
+             TextView nameView = text(name, 16, TEXT_PRIMARY, true);
+             head.addView(nameView, lp(0, -2, 1f));
+-            TextView arrow = text("›", 30, darkroomMode ? RED : PURPLE, false);
++            TextView arrow = text("›", 30, darkroomMode ? RED : LOG_ACCENT, false);
+             arrow.setGravity(Gravity.CENTER);
+             head.addView(arrow, lp(dp(34), dp(40)));
+             row.addView(head, lp(-1, -2));
+@@ -1154,10 +1154,10 @@
+         } else {
+             printModeButton.setTextColor(print ? TEXT_PRIMARY : MUTED);
+             testModeButton.setTextColor(test ? TEXT_PRIMARY : MUTED);
+-            logModeButton.setTextColor(log ? TEXT_PRIMARY : MUTED);
++            logModeButton.setTextColor(log ? Color.BLACK : MUTED);
+             printModeButton.setBackground(roundRect(print ? GREEN : BUTTON, 9, print ? 0 : 1, BORDER));
+             testModeButton.setBackground(roundRect(test ? BLUE : BUTTON, 9, test ? 0 : 1, BORDER));
+-            logModeButton.setBackground(roundRect(log ? PURPLE : BUTTON, 9, log ? 0 : 1, BORDER));
++            logModeButton.setBackground(roundRect(log ? LOG_ACCENT : BUTTON, 9, log ? 0 : 1, BORDER));
+             actionButton.setTextColor(TEXT_PRIMARY);
+         }
+         if (!log) {
+@@ -1548,7 +1548,7 @@
+             MUTED = Color.rgb(190, 0, 0);
+             AMBER = Color.rgb(235, 0, 0);
+             RED = Color.rgb(255, 0, 0);
+-            PURPLE = RED;
++            LOG_ACCENT = RED;
+             TEXT_PRIMARY = Color.rgb(255, 0, 0);
+         } else {
+             GREEN = Color.rgb(80, 207, 70);
+@@ -1559,7 +1559,7 @@
+             MUTED = Color.rgb(169, 176, 184);
+             AMBER = Color.rgb(255, 181, 71);
+             RED = Color.rgb(255, 92, 92);
+-            PURPLE = Color.rgb(136, 83, 178);
++            LOG_ACCENT = Color.rgb(255, 159, 67);
+             TEXT_PRIMARY = Color.WHITE;
+         }
+         try { getWindow().getClass().getMethod("setStatusBarColor", int.class).invoke(getWindow(), Color.BLACK); } catch (Exception ignored) {}
