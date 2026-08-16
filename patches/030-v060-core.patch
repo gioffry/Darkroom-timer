@@ -1,0 +1,203 @@
+--- a/build_darkroom.py
++++ b/build_darkroom.py
+@@ -1,16 +1,16 @@
+ #!/usr/bin/env python3
+ """
+-Darkroom Timer v0.5.9 - build APK senza Gradle.
++Darkroom Timer v0.6.0 - build APK senza Gradle.
+ 
+ Dipendenze: SOLO Python 3 standard library + JDK (javac/jar/keytool)
+ e Android SDK già presente sul PC (platform android-34 + build-tools 34.0.0 o compatibili).
+ NON scarica nulla e NON usa Gradle.
+ 
+ Uso minimo:
+-    python build_darkroom_v058.py DarkroomTimer-source-v0.5.8-WIP.zip
++    python build_darkroom.py DarkroomTimer-source-v0.6.0-WIP.zip
+ 
+ Opzionale:
+-    python build_darkroom_v058.py SOURCE.zip --sdk "C:\\Users\\NOME\\AppData\\Local\\Android\\Sdk"
++    python build_darkroom.py SOURCE.zip --sdk "C:\\Users\\NOME\\AppData\\Local\\Android\\Sdk"
+ """
+ from __future__ import annotations
+ 
+@@ -30,8 +30,8 @@
+ import zipfile
+ 
+ PACKAGE_ID = "it.darkroom.timer"
+-VERSION_NAME = "0.5.10"
+-VERSION_CODE = "25"
++VERSION_NAME = "0.6.0"
++VERSION_CODE = "26"
+ MIN_SDK = "26"
+ TARGET_SDK = "34"
+ COMPILE_SDK = "34"
+@@ -39,7 +39,7 @@
+ 
+ 
+ def log(msg: str) -> None:
+-    print(f"[Darkroom v0.5.9] {msg}", flush=True)
++    print(f"[Darkroom v0.6.0] {msg}", flush=True)
+ 
+ 
+ def fail(msg: str, code: int = 2) -> "None":
+@@ -202,8 +202,8 @@
+                 matches.append(project)
+     if not matches:
+         fail("Non trovo un progetto Android con app/src/main/AndroidManifest.xml nei sorgenti.")
+-    # Prefer the v0.5.8 project if nested copies exist.
+-    matches = sorted(set(matches), key=lambda p: ("v058" not in str(p).lower(), len(str(p))))
++    # Prefer the current Android project if nested copies exist.
++    matches = sorted(set(matches), key=lambda p: ("v060" not in str(p).lower(), len(str(p))))
+     project = matches[0]
+     log(f"Progetto: {project}")
+     return project
+@@ -234,9 +234,9 @@
+         fail("Preflight manifest fallito. Mancano/sono errati: " + ", ".join(missing))
+     if gradle.is_file():
+         g = read_text(gradle)
+-        if not re.search(r"versionCode\s+25\b", g) or not re.search(r"versionName\s+['\"]0\.5\.10['\"]", g):
+-            fail("app/build.gradle non riporta versionCode 25 / versionName 0.5.10")
+-    log("Preflight v0.5.10 OK: manifest/versione/requisiti SONOFF invarianti verificati")
++        if not re.search(r"versionCode\s+26\b", g) or not re.search(r"versionName\s+['\"]0\.6\.0['\"]", g):
++            fail("app/build.gradle non riporta versionCode 26 / versionName 0.6.0")
++    log("Preflight v0.6.0 OK: manifest/versione/requisiti SONOFF invarianti verificati")
+ 
+ 
+ def write_sources_argfile(paths, out: Path):
+@@ -269,7 +269,7 @@
+ 
+     alphabet = string.ascii_letters + string.digits
+     password = "".join(secrets.choice(alphabet) for _ in range(24))
+-    log("Creo una nuova firma locale per la v0.5.9 (firma dedicata alla 0.5.9)")
++    log("Creo una nuova firma locale per la v0.6.0 (firma dedicata alla 0.6.0)")
+     run([
+         jdk_keytool, "-genkeypair", "-noprompt", "-v",
+         "-keystore", ks,
+@@ -442,7 +442,7 @@
+         print(out)
+     finally:
+         if args.keep_build:
+-            keep = out.parent / "DarkroomTimer-v059-build-debug"
++            keep = out.parent / "DarkroomTimer-v060-build-debug"
+             if keep.exists():
+                 shutil.rmtree(keep)
+             shutil.copytree(temp, keep)
+@@ -451,7 +451,7 @@
+ 
+ 
+ def default_source() -> str | None:
+-    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.5.9-WIP*.zip"))
++    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.6.0-WIP*.zip"))
+     if len(candidates) == 1:
+         return str(candidates[0])
+     return None
+@@ -459,10 +459,10 @@
+ 
+ def main():
+     p = argparse.ArgumentParser(
+-        description="Compila Darkroom Timer v0.5.9 in APK senza Gradle e senza download automatici."
++        description="Compila Darkroom Timer v0.6.0 in APK senza Gradle e senza download automatici."
+     )
+     p.add_argument("source", nargs="?", default=default_source(),
+-                   help="ZIP WIP v0.5.9 oppure cartella progetto Android")
++                   help="ZIP WIP v0.6.0 oppure cartella progetto Android")
+     p.add_argument("--output", "-o", help="Percorso APK finale")
+     p.add_argument("--sdk", help="Percorso Android SDK già installato")
+     p.add_argument("--keystore", help="Keystore esistente; se omesso ne crea uno locale nuovo")
+@@ -473,7 +473,7 @@
+     args = p.parse_args()
+     if not args.source:
+         p.print_help()
+-        fail("Indica lo ZIP WIP v0.5.9 come primo argomento.")
++        fail("Indica lo ZIP WIP v0.6.0 come primo argomento.")
+     build(args)
+ 
+ 
+--- a/project/README.md
++++ b/project/README.md
+@@ -1,12 +1,15 @@
+-# Darkroom Timer DIY — v0.5.9
++# Darkroom Timer DIY — v0.6.0
+ 
+-Build di correzione basata sulla v0.5.7.
++Versione consolidata del progetto Darkroom Timer per SONOFF MINIR2 in modalità DIY.
+ 
+-Correzioni principali:
+-- messaggi di fine ciclo temporanei: dopo circa 3 s torna PRONTO e il messaggio non viene riproposto al riavvio dell’app;
+-- selettore “Provino completato” corretto: mostra realmente le strisce/tempi cumulativi e permette di trasferire il tempo scelto a STAMPA;
+-- protezione contro letture OFF premature/stale durante il provino, per evitare che l’ultima esposizione venga troncata e che il disarmo parta troppo presto.
++Novità principali v0.6.0:
++- dal LOG una scheda con tempo finale può essere caricata direttamente in STAMPA; i dati tecnici della scheda vengono riproposti automaticamente al salvataggio della nuova stampa;
++- preferiti nel LOG con stellina e filtro rapido;
++- raggruppamento automatico e discreto delle lavorazioni con stesso titolo e stessa data, con cronologia provino → stampe successive;
++- protezione camera oscura tramite Non disturbare Android: quando autorizzata, sopprime chiamate/notifiche e avvisi visivi durante la modalità camera oscura e ripristina le impostazioni precedenti all'uscita;
++- messaggi di fine ciclo mantenuti realmente per circa 6 secondi prima del ritorno a PRONTO;
++- LOG con accento grigio acciaio fuori dalla modalità camera oscura.
+ 
+-Invariati: controllo SONOFF/MINIR2, LOG, backup, modalità camera oscura e funzionalità della v0.5.7 non coinvolte dalle correzioni.
++Restano invariati il controllo SONOFF/MINIR2, il provino automatico, il selettore della striscia migliore, il backup LOG, la cronologia tecnica e la modalità rossa inattinica.
+ 
+-versionCode 24 / versionName 0.5.9.
++versionCode 26 / versionName 0.6.0.
+--- a/project/app/build.gradle
++++ b/project/app/build.gradle
+@@ -10,8 +10,8 @@
+         applicationId 'it.darkroom.timer'
+         minSdk 26
+         targetSdk 34
+-        versionCode 25
+-        versionName '0.5.10'
++        versionCode 26
++        versionName '0.6.0'
+     }
+ 
+     compileOptions {
+--- a/project/app/src/main/AndroidManifest.xml
++++ b/project/app/src/main/AndroidManifest.xml
+@@ -1,8 +1,8 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="it.darkroom.timer"
+-    android:versionCode="25"
+-    android:versionName="0.5.10">
++    android:versionCode="26"
++    android:versionName="0.6.0">
+ 
+     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
+ 
+@@ -12,6 +12,7 @@
+     <uses-permission android:name="android.permission.WAKE_LOCK" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
++    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+ 
+     <application
+         android:allowBackup="false"
+--- a/project/app/src/main/java/it/darkroom/timer/LogEntry.java
++++ b/project/app/src/main/java/it/darkroom/timer/LogEntry.java
+@@ -15,4 +15,5 @@
+     public int exposureMs = 0;
+     public int testMs = 0;
+     public int testCount = 0;
++    public boolean favorite = false;
+ }
+--- a/project/app/src/main/java/it/darkroom/timer/LogStore.java
++++ b/project/app/src/main/java/it/darkroom/timer/LogStore.java
+@@ -54,6 +54,7 @@
+                     e.notes = dec(f[12]);
+                 }
+                 if (e.paper == null || e.paper.trim().isEmpty()) e.paper = "Fomaspeed Variant 311 RC lucida";
++                e.favorite = f.length >= 15 && "1".equals(f[14]);
+                 result.add(e);
+             } catch (Exception ignored) {}
+         }
+@@ -112,7 +113,8 @@
+                     .append(enc(e.yellow)).append('\t')
+                     .append(enc(e.density)).append('\t')
+                     .append(enc(e.paper)).append('\t')
+-                    .append(enc(e.notes));
++                    .append(enc(e.notes)).append('\t')
++                    .append(e.favorite ? "1" : "0");
+         }
+         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY, out.toString()).apply();
+     }
