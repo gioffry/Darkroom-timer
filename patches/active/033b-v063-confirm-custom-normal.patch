@@ -27,10 +27,12 @@
 +        TextView heading = text(title, 19, darkroomMode ? RED : TEXT_PRIMARY, true);
 --- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
 +++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
-@@ -1,2 +1,3 @@
+@@ -1,2 +1,5 @@
              Button positive = compactButton(positiveLabel);
 -            positive.setBackground(roundRect(RED, 9, 0, 0));
-+            int positiveAccent = darkroomMode ? RED : dialogAccent(positiveLabel);
++            String positiveKey = positiveLabel == null ? "" : positiveLabel.toUpperCase(Locale.ITALY);
++            boolean destructive = positiveKey.contains("ELIMINA") || positiveKey.contains("AZZERA") || positiveKey.contains("ANNULLA CICLO");
++            int positiveAccent = darkroomMode ? RED : (destructive ? RED : BLUE);
 +            positive.setBackground(roundRect(positiveAccent, 9, 0, 0));
 --- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
 +++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
