@@ -1,123 +1,34 @@
 --- a/build_darkroom.py
 +++ b/build_darkroom.py
-@@ -1,13 +1,13 @@
- #!/usr/bin/env python3
- """
--Darkroom Timer v0.6.1 - build APK senza Gradle.
-+Darkroom Timer v0.6.2 - build APK senza Gradle.
- 
- Dipendenze: SOLO Python 3 standard library + JDK (javac/jar/keytool)
- e Android SDK già presente sul PC (platform android-34 + build-tools 34.0.0 o compatibili).
- NON scarica nulla e NON usa Gradle.
- 
- Uso minimo:
--    python build_darkroom.py DarkroomTimer-source-v0.6.1-WIP.zip
-+    python build_darkroom.py DarkroomTimer-source-v0.6.2-WIP.zip
- 
- Opzionale:
-     python build_darkroom.py SOURCE.zip --sdk "C:\\Users\\NOME\\AppData\\Local\\Android\\Sdk"
-@@ -30,8 +30,8 @@
- import zipfile
- 
- PACKAGE_ID = "it.darkroom.timer"
+@@ -33,2 +33,2 @@
 -VERSION_NAME = "0.6.1"
 -VERSION_CODE = "27"
 +VERSION_NAME = "0.6.2"
 +VERSION_CODE = "28"
- MIN_SDK = "26"
- TARGET_SDK = "34"
- COMPILE_SDK = "34"
-@@ -39,4 +39,4 @@
- 
- 
- def log(msg: str) -> None:
+@@ -42 +42 @@
 -    print(f"[Darkroom v0.6.1] {msg}", flush=True)
 +    print(f"[Darkroom v0.6.2] {msg}", flush=True)
-@@ -234,6 +234,6 @@
-         fail("Preflight manifest fallito. Mancano/sono errati: " + ", ".join(missing))
-     if gradle.is_file():
-         g = read_text(gradle)
+@@ -237,3 +237,3 @@
 -        if not re.search(r"versionCode\s+27\b", g) or not re.search(r"versionName\s+['\"]0\.6\.1['\"]", g):
 -            fail("app/build.gradle non riporta versionCode 27 / versionName 0.6.1")
 -    log("Preflight v0.6.1 OK: manifest/versione/requisiti SONOFF invarianti verificati")
 +        if not re.search(r"versionCode\s+28\b", g) or not re.search(r"versionName\s+['\"]0\.6\.2['\"]", g):
 +            fail("app/build.gradle non riporta versionCode 28 / versionName 0.6.2")
 +    log("Preflight v0.6.2 OK: manifest/versione/requisiti SONOFF invarianti verificati")
-@@ -269,4 +269,4 @@
- 
-     alphabet = string.ascii_letters + string.digits
-     password = "".join(secrets.choice(alphabet) for _ in range(24))
--    log("Creo una nuova firma locale per la v0.6.1 (firma dedicata alla 0.6.1)")
-+    log("Creo una nuova firma locale per la v0.6.2 (firma dedicata alla 0.6.2)")
-@@ -451,4 +451,4 @@
- 
- 
- def default_source() -> str | None:
--    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.6.1-WIP*.zip"))
-+    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.6.2-WIP*.zip"))
-@@ -459,7 +459,7 @@
- 
- def main():
-     p = argparse.ArgumentParser(
--        description="Compila Darkroom Timer v0.6.1 in APK senza Gradle e senza download automatici."
-+        description="Compila Darkroom Timer v0.6.2 in APK senza Gradle e senza download automatici."
-     )
-     p.add_argument("source", nargs="?", default=default_source(),
--                   help="ZIP WIP v0.6.1 oppure cartella progetto Android")
-+                   help="ZIP WIP v0.6.2 oppure cartella progetto Android")
-@@ -473,6 +473,6 @@
-     args = p.parse_args()
-     if not args.source:
-         p.print_help()
--        fail("Indica lo ZIP WIP v0.6.1 come primo argomento.")
-+        fail("Indica lo ZIP WIP v0.6.2 come primo argomento.")
-     build(args)
- 
---- a/project/README.md
-+++ b/project/README.md
-@@ -1,7 +1,11 @@
--# Darkroom Timer DIY — v0.6.1
-+# Darkroom Timer DIY — v0.6.2
- 
- Versione consolidata del progetto Darkroom Timer per SONOFF MINIR2 in modalità DIY.
- 
--Base v0.6.0 + correzioni v0.6.1:
-+Base v0.6.0 + aggiornamenti v0.6.1/v0.6.2:
-+- Darkroom Safety realmente red-only anche per pulsanti selezionati, azioni LOG e dialoghi interni;
-+- popup interni personalizzati in rosso/nero quando la modalità camera oscura è attiva;
-+- navigazione principale STAMPA / PROVINO / LOG più alta, paritaria e riconoscibile come barra primaria;
-+- SALVA SCHEDA usa l'accento del LOG, distinto dall'azione verde USA PER STAMPA;
- - raggruppamento automatico del LOG attivabile/disattivabile direttamente dal pannello;
- - dialogo di protezione camera oscura ridisegnato con pulsanti verticali a larghezza piena;
-@@ -14,4 +18,4 @@
- 
- Restano invariati il controllo SONOFF/MINIR2, il provino automatico, il selettore della striscia migliore, il backup LOG, la cronologia tecnica e la modalità rossa inattinica.
- 
--versionCode 27 / versionName 0.6.1.
-+versionCode 28 / versionName 0.6.2.
 --- a/project/app/build.gradle
 +++ b/project/app/build.gradle
-@@ -10,7 +10,7 @@
-         applicationId 'it.darkroom.timer'
-         minSdk 26
-         targetSdk 34
+@@ -13,2 +13,2 @@
 -        versionCode 27
 -        versionName '0.6.1'
 +        versionCode 28
 +        versionName '0.6.2'
-     }
 --- a/project/app/src/main/AndroidManifest.xml
 +++ b/project/app/src/main/AndroidManifest.xml
-@@ -1,7 +1,7 @@
- <?xml version="1.0" encoding="utf-8"?>
- <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-     package="it.darkroom.timer"
+@@ -4,2 +4,2 @@
 -    android:versionCode="27"
 -    android:versionName="0.6.1">
 +    android:versionCode="28"
 +    android:versionName="0.6.2">
- 
-     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
 --- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
 +++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
 @@ -75,6 +75,6 @@
@@ -322,7 +233,7 @@
 -                .show();
 +                }, "CONTINUA");
      }
-@@ -1470,14 +1549,10 @@
+@@ -1535,14 +1621,10 @@
              int cumulative = step * (i + 1);
              choices[i] = (i + 1) + "ª striscia   —   " + formatTime(cumulative);
          }
