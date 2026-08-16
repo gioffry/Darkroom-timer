@@ -12,12 +12,18 @@
 +            fail("app/build.gradle non riporta versionCode 31 / versionName 0.6.4")
 --- a/v064_assets.py
 +++ b/v064_assets.py
-@@ -1,2 +1,5 @@
+@@ -7,7 +7,10 @@
+     drawable_root = project / "app" / "src" / "main" / "res" / "drawable-nodpi"
+     drawable_root.mkdir(parents=True, exist_ok=True)
+ 
 -    for stem, out_name in (("splash", "splash_v064.jpg"), ("icon", "app_icon_v064.jpg")):
 +    old_icon = drawable_root / "ic_launcher.png"
 +    if old_icon.exists():
 +        old_icon.unlink()
 +    for stem, out_name in (("splash", "splash_v064.jpg"), ("icon", "ic_launcher.jpg")):
+         parts = sorted(asset_root.glob(f"{stem}_*.b64"))
+         if not parts:
+             raise RuntimeError(f"Asset v0.6.4 mancante: {stem}")
 --- a/project/app/build.gradle
 +++ b/project/app/build.gradle
 @@ -1 +1 @@
