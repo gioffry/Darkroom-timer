@@ -2,7 +2,7 @@ name: Build Darkroom Timer APK
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, experiment-v070-proposta2-final ]
   workflow_dispatch:
 
 permissions:
