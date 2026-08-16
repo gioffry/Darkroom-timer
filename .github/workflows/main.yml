@@ -1,0 +1,40 @@
+name: Build Darkroom Timer APK
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Scarica repository
+        uses: actions/checkout@v4
+
+      - name: Configura Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepara Android SDK
+        shell: bash
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER="$(command -v sdkmanager)"
+          fi
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Compila APK
+        run: |
+          python3 build_darkroom_v057.py \
+            DarkroomTimer-source-v0.5.7-WIP.zip \
+            --output DarkroomTimer-DIY-v0.5.7.apk
+
+      - name: Salva APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DarkroomTimer-DIY-v0.5.7
+          path: DarkroomTimer-DIY-v0.5.7.apk
