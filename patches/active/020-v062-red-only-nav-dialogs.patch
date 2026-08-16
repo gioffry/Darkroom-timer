@@ -95,7 +95,7 @@
 +        save.setBackground(roundRect(darkroomMode ? RED : LOG_ACCENT, 9, 0, 0));
 +        save.setTextColor(darkroomMode ? Color.BLACK : Color.WHITE);
          save.setOnClickListener(v -> {
-@@ -1310,4 +1307,57 @@
+@@ -1310,4 +1307,59 @@
          return v.isEmpty() ? "scheda" : v;
      }
  
