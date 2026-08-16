@@ -1,0 +1,79 @@
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1,12 +1,12 @@
+         LinearLayout modeRow = new LinearLayout(this);
+         modeRow.setOrientation(LinearLayout.HORIZONTAL);
+-        printModeButton = modeButton("◉\nSTAMPA");
+-        testModeButton = modeButton("▦\nPROVINO");
+-        logModeButton = modeButton("≡\nLOG");
++        printModeButton = navButton("STAMPA", PrimaryNavButton.ICON_TIMER);
++        testModeButton = navButton("PROVINO", PrimaryNavButton.ICON_TEST);
++        logModeButton = navButton("LOG", PrimaryNavButton.ICON_LOG);
+         printModeButton.setOnClickListener(v -> setMode(MODE_PRINT));
+         testModeButton.setOnClickListener(v -> setMode(MODE_TEST));
+         logModeButton.setOnClickListener(v -> setMode(MODE_LOG));
+-        modeRow.addView(printModeButton, margin(lp(0, dp(68), 1f), 0, 0, dp(4), 0));
+-        modeRow.addView(testModeButton, margin(lp(0, dp(68), 1f), dp(4), 0, dp(4), 0));
+-        modeRow.addView(logModeButton, margin(lp(0, dp(68), 1f), dp(4), 0, 0, 0));
+-        root.addView(modeRow, margin(lp(-1, -2), 0, 0, 0, 12));
++        modeRow.addView(printModeButton, margin(lp(0, dp(88), 1f), 0, 0, dp(5), 0));
++        modeRow.addView(testModeButton, margin(lp(0, dp(88), 1f), dp(5), 0, dp(5), 0));
++        modeRow.addView(logModeButton, margin(lp(0, dp(88), 1f), dp(5), 0, 0, 0));
++        root.addView(modeRow, margin(lp(-1, -2), 0, 0, 0, 14));
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1,17 +1,4 @@
+-        if (darkroomMode) {
+-            printModeButton.setTextColor(print ? Color.BLACK : TEXT_PRIMARY);
+-            testModeButton.setTextColor(test ? Color.BLACK : TEXT_PRIMARY);
+-            logModeButton.setTextColor(log ? Color.BLACK : TEXT_PRIMARY);
+-            printModeButton.setBackground(roundRect(print ? GREEN : BUTTON, 9, 1, BORDER));
+-            testModeButton.setBackground(roundRect(test ? BLUE : BUTTON, 9, 1, BORDER));
+-            logModeButton.setBackground(roundRect(log ? RED : BUTTON, 9, 1, BORDER));
+-            actionButton.setTextColor(Color.BLACK);
+-        } else {
+-            printModeButton.setTextColor(print ? TEXT_PRIMARY : MUTED);
+-            testModeButton.setTextColor(test ? TEXT_PRIMARY : MUTED);
+-            logModeButton.setTextColor(log ? Color.WHITE : MUTED);
+-            printModeButton.setBackground(roundRect(print ? GREEN : BUTTON, 9, print ? 0 : 1, BORDER));
+-            testModeButton.setBackground(roundRect(test ? BLUE : BUTTON, 9, test ? 0 : 1, BORDER));
+-            logModeButton.setBackground(roundRect(log ? LOG_ACCENT : BUTTON, 9, log ? 0 : 1, BORDER));
+-            actionButton.setTextColor(TEXT_PRIMARY);
+-        }
++        styleNavButton(printModeButton, print, GREEN);
++        styleNavButton(testModeButton, test, BLUE);
++        styleNavButton(logModeButton, log, LOG_ACCENT);
++        actionButton.setTextColor(darkroomMode ? Color.BLACK : TEXT_PRIMARY);
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1,11 +1,20 @@
+-    private Button modeButton(String s) {
+-        Button b = new Button(this);
+-        b.setText(s);
+-        b.setTextSize(13);
+-        b.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+-        b.setAllCaps(false);
+-        b.setGravity(Gravity.CENTER);
+-        b.setLineSpacing(0, 0.94f);
+-        b.setPadding(dp(2), dp(3), dp(2), dp(3));
+-        return b;
++    private Button navButton(String label, int iconKind) {
++        return new PrimaryNavButton(this, label, iconKind);
+     }
++
++    private void styleNavButton(Button button, boolean selected, int normalAccent) {
++        int foreground;
++        int background;
++        if (darkroomMode) {
++            foreground = selected ? Color.BLACK : RED;
++            background = selected ? RED : BUTTON;
++        } else {
++            foreground = selected ? Color.WHITE : MUTED;
++            background = selected ? normalAccent : BUTTON;
++        }
++        button.setTextColor(foreground);
++        button.setBackground(roundRect(background, 12, selected ? 0 : 1, BORDER));
++        if (button instanceof PrimaryNavButton) {
++            ((PrimaryNavButton) button).setIconColor(foreground);
++        }
++    }
