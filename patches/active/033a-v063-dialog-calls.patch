@@ -1,0 +1,65 @@
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1,12 +1,8 @@
+             Button delete = compactButton("ELIMINA SCHEDA");
+             delete.setTextColor(RED);
+-            delete.setOnClickListener(v -> new AlertDialog.Builder(this)
+-                    .setTitle("Eliminare questa scheda?")
+-                    .setMessage("L’operazione non può essere annullata.")
+-                    .setPositiveButton("ELIMINA", (d, w) -> {
++            delete.setOnClickListener(v -> showAppConfirmDialog("ELIMINARE QUESTA SCHEDA?",
++                    "L’operazione non può essere annullata.", "ELIMINA", () -> {
+                         LogStore.delete(this, entry.id);
+                         dialog.dismiss();
+                         refreshLogList();
+-                    })
+-                    .setNegativeButton("ANNULLA", null)
+-                    .show());
++                    }, "ANNULLA"));
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1,15 +1,11 @@
+-                new AlertDialog.Builder(this)
+-                        .setTitle("Importa backup LOG")
+-                        .setMessage("Trovate " + imported.size() + " schede. Vuoi unirle al LOG attuale oppure sostituire completamente il LOG?")
+-                        .setPositiveButton("UNISCI", (d, w) -> {
++                showAppThreeActionDialog("IMPORTA BACKUP LOG",
++                        "Trovate " + imported.size() + " schede. Vuoi unirle al LOG attuale oppure sostituire completamente il LOG?",
++                        "UNISCI", () -> {
+                             LogStore.merge(this, imported);
+                             refreshLogList();
+                             Toast.makeText(this, "Backup unito al LOG", Toast.LENGTH_SHORT).show();
+-                        })
+-                        .setNeutralButton("SOSTITUISCI", (d, w) -> {
++                        }, "SOSTITUISCI", () -> {
+                             LogStore.replaceAll(this, imported);
+                             refreshLogList();
+                             Toast.makeText(this, "LOG ripristinato dal backup", Toast.LENGTH_SHORT).show();
+-                        })
+-                        .setNegativeButton("ANNULLA", null)
+-                        .show();
++                        }, "ANNULLA");
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1,8 +1,6 @@
+         if (foundDevices.isEmpty()) {
+-            new AlertDialog.Builder(this)
+-                    .setTitle("Nessun SONOFF trovato")
+-                    .setMessage("Attendi qualche secondo con il telefono collegato alla stessa rete Wi‑Fi dei SONOFF, poi riprova.")
+-                    .setPositiveButton("OK", null)
+-                    .show();
++            showAppConfirmDialog("NESSUN SONOFF TROVATO",
++                    "Attendi qualche secondo con il telefono collegato alla stessa rete Wi‑Fi dei SONOFF, poi riprova.",
++                    "OK", null, null);
+             return;
+         }
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1,5 +1,2 @@
+-        new AlertDialog.Builder(this)
+-                .setTitle("Scegli il SONOFF dell’ingranditore")
+-                .setItems(labels, (dialog, which) -> selectDevice(list.get(which)))
+-                .setNegativeButton("ANNULLA", null)
+-                .show();
++        showAppChoiceDialog("SCEGLI IL SONOFF DELL’INGRANDITORE", labels,
++                which -> selectDevice(list.get(which)), "ANNULLA");
