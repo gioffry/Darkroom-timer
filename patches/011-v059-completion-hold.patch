@@ -1,0 +1,36 @@
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -127,6 +127,7 @@
+     private int testPauseMs = 2000;
+     private boolean armed = false;
+     private LogEntry pendingJpegEntry;
++    private long transientCompletionUntilMs = 0L;
+ 
+     private final ExecutorService io = Executors.newSingleThreadExecutor();
+     private final Map<String, FoundDevice> foundDevices = new LinkedHashMap<>();
+@@ -247,8 +248,16 @@
+     }
+ 
+     private void applyRuntimeState(String state, String message) {
+-        statusResetHandler.removeCallbacks(readyResetRunnable);
+         if (state == null || state.trim().isEmpty()) state = SonoffArmService.STATE_NORMAL;
++
++        boolean blankNormalRefresh = SonoffArmService.STATE_NORMAL.equals(state)
++                && (message == null || message.trim().isEmpty());
++        if (blankNormalRefresh && android.os.SystemClock.uptimeMillis() < transientCompletionUntilMs) {
++            return;
++        }
++
++        statusResetHandler.removeCallbacks(readyResetRunnable);
++        if (!SonoffArmService.STATE_NORMAL.equals(state)) transientCompletionUntilMs = 0L;
+ 
+         boolean cancellable = SonoffArmService.STATE_ARMED.equals(state)
+                 || SonoffArmService.STATE_ARMING.equals(state)
+@@ -325,6 +334,7 @@
+         }
+         setStatusPresentation(title, detail, accent);
+         if (transientCompletion) {
++            transientCompletionUntilMs = android.os.SystemClock.uptimeMillis() + 6000L;
+             statusResetHandler.postDelayed(readyResetRunnable, 6000L);
+         }
+ 
