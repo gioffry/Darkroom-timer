@@ -2,7 +2,11 @@ name: Build Darkroom Timer APK
 
 on:
   push:
+    branches: [ main ]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build-apk:
@@ -12,15 +16,43 @@ jobs:
       - name: Scarica repository
         uses: actions/checkout@v4
 
-      - name: Estrai pacchetto v0.5.8
+      - name: Prepara sorgenti base e applica aggiornamenti
         shell: bash
         run: |
-          unzip -o DarkroomTimer-v0.5.8-BUILD.zip
-          test -f DarkroomTimer-source-v0.5.8-WIP.zip
-          test -f build_darkroom_v058.py
+          set -euo pipefail
+          rm -rf work
+          mkdir -p work/source
+          unzip -o DarkroomTimer-v0.5.8-BUILD.zip -d work/package
+          unzip -o work/package/DarkroomTimer-source-v0.5.8-WIP.zip -d work/source
+          mv work/source/v058src work/project
+          cp work/package/build_darkroom_v058.py work/build_darkroom.py
+
+          if [ -d patches ]; then
+            while IFS= read -r patch_file; do
+              echo "Applico $patch_file"
+              patch -d work -p1 < "$patch_file"
+            done < <(find patches -maxdepth 1 -type f -name '*.patch' | sort)
+          fi
+
+      - name: Leggi versione risultante
+        id: version
+        shell: bash
+        run: |
+          VERSION_NAME=$(python3 - <<'PY'
+          import re
+          from pathlib import Path
+          text = Path('work/project/app/src/main/AndroidManifest.xml').read_text(encoding='utf-8')
+          m = re.search(r'android:versionName="([^"]+)"', text)
+          if not m:
+              raise SystemExit('versionName non trovato')
+          print(m.group(1))
+          PY
+          )
+          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "Versione da compilare: $VERSION_NAME"
 
       - name: Configura Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -42,22 +74,24 @@ jobs:
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          test -n "$KEYSTORE_B64" || exit 1
-          test -n "$KEYSTORE_PASSWORD" || exit 1
-          test -n "$KEY_ALIAS" || exit 1
-          test -n "$KEY_PASSWORD" || exit 1
+          set -euo pipefail
+          test -n "$KEYSTORE_B64"
+          test -n "$KEYSTORE_PASSWORD"
+          test -n "$KEY_ALIAS"
+          test -n "$KEY_PASSWORD"
           printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
 
-      - name: Compila APK v0.5.8
+      - name: Compila APK
         shell: bash
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
         run: |
-          python3 build_darkroom_v058.py \
-            DarkroomTimer-source-v0.5.8-WIP.zip \
-            --output DarkroomTimer-DIY-v0.5.8.apk \
+          python3 work/build_darkroom.py \
+            work/project \
+            --output "DarkroomTimer-DIY-v${VERSION_NAME}.apk" \
             --keystore "$RUNNER_TEMP/darkroom-signing.p12" \
             --alias "$KEY_ALIAS" \
             --storepass "$KEYSTORE_PASSWORD" \
@@ -66,5 +100,5 @@ jobs:
       - name: Salva APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomTimer-DIY-v0.5.8
-          path: DarkroomTimer-DIY-v0.5.8.apk
+          name: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}
+          path: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}.apk
