@@ -1,0 +1,44 @@
+--- a/build_darkroom.py
++++ b/build_darkroom.py
+@@ -1 +1 @@
+-VERSION_CODE = "30"
++VERSION_CODE = "31"
+--- a/build_darkroom.py
++++ b/build_darkroom.py
+@@ -1,2 +1,2 @@
+-        if not re.search(r"versionCode\s+30\b", g) or not re.search(r"versionName\s+['\"]0\.6\.4['\"]", g):
+-            fail("app/build.gradle non riporta versionCode 30 / versionName 0.6.4")
++        if not re.search(r"versionCode\s+31\b", g) or not re.search(r"versionName\s+['\"]0\.6\.4['\"]", g):
++            fail("app/build.gradle non riporta versionCode 31 / versionName 0.6.4")
+--- a/v064_assets.py
++++ b/v064_assets.py
+@@ -1,2 +1,5 @@
+-    for stem, out_name in (("splash", "splash_v064.jpg"), ("icon", "app_icon_v064.jpg")):
++    old_icon = drawable_root / "ic_launcher.png"
++    if old_icon.exists():
++        old_icon.unlink()
++    for stem, out_name in (("splash", "splash_v064.jpg"), ("icon", "ic_launcher.jpg")):
+--- a/project/app/build.gradle
++++ b/project/app/build.gradle
+@@ -1 +1 @@
+-        versionCode 30
++        versionCode 31
+--- a/project/app/src/main/AndroidManifest.xml
++++ b/project/app/src/main/AndroidManifest.xml
+@@ -1 +1 @@
+-    android:versionCode="30"
++    android:versionCode="31"
+--- a/project/app/src/main/AndroidManifest.xml
++++ b/project/app/src/main/AndroidManifest.xml
+@@ -1,2 +1,2 @@
+-        android:icon="@drawable/app_icon_v064"
+-        android:roundIcon="@drawable/app_icon_v064"
++        android:icon="@drawable/ic_launcher"
++        android:roundIcon="@drawable/ic_launcher"
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -1,3 +1,2 @@
+     private void showLaunchSplash() {
+-        if (darkroomMode) return;
+-
+         final View decor = getWindow().getDecorView();
