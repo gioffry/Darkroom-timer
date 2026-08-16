@@ -12,6 +12,13 @@ jobs:
       - name: Scarica repository
         uses: actions/checkout@v4
 
+      - name: Estrai pacchetto v0.5.8
+        shell: bash
+        run: |
+          unzip -o DarkroomTimer-v0.5.8-BUILD.zip
+          test -f DarkroomTimer-source-v0.5.8-WIP.zip
+          test -f build_darkroom_v058.py
+
       - name: Configura Java 17
         uses: actions/setup-java@v4
         with:
@@ -27,14 +34,37 @@ jobs:
           fi
           "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
 
-      - name: Compila APK
+      - name: Prepara firma stabile
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          python3 build_darkroom_v057.py \
-            DarkroomTimer-source-v0.5.7-WIP.zip \
-            --output DarkroomTimer-DIY-v0.5.7.apk
+          test -n "$KEYSTORE_B64" || exit 1
+          test -n "$KEYSTORE_PASSWORD" || exit 1
+          test -n "$KEY_ALIAS" || exit 1
+          test -n "$KEY_PASSWORD" || exit 1
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
+
+      - name: Compila APK v0.5.8
+        shell: bash
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          python3 build_darkroom_v058.py \
+            DarkroomTimer-source-v0.5.8-WIP.zip \
+            --output DarkroomTimer-DIY-v0.5.8.apk \
+            --keystore "$RUNNER_TEMP/darkroom-signing.p12" \
+            --alias "$KEY_ALIAS" \
+            --storepass "$KEYSTORE_PASSWORD" \
+            --keypass "$KEY_PASSWORD"
 
       - name: Salva APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomTimer-DIY-v0.5.7
-          path: DarkroomTimer-DIY-v0.5.7.apk
+          name: DarkroomTimer-DIY-v0.5.8
+          path: DarkroomTimer-DIY-v0.5.8.apk
