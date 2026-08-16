@@ -1,0 +1,46 @@
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -640,19 +693,14 @@
+         logListContainer.removeAllViews();
+         List<LogEntry> all = LogStore.load(this);
+         String query = logSearchField == null ? "" : logSearchField.getText().toString().trim().toLowerCase(Locale.ITALY);
+-        List<LogEntry> entries = new ArrayList<>();
+-        for (LogEntry e : all) {
+-            String neg = e.negative == null ? "" : e.negative.trim();
+-            if ("35mm".equals(logFilter) && !"35mm".equalsIgnoreCase(neg)) continue;
+-            if ("6x6".equals(logFilter) && !"6x6".equalsIgnoreCase(neg)) continue;
+-            if (!query.isEmpty()) {
+-                String hay = ((e.title == null ? "" : e.title) + " "
+-                        + (e.paper == null ? "" : e.paper) + " "
+-                        + (e.notes == null ? "" : e.notes) + " "
+-                        + neg).toLowerCase(Locale.ITALY);
+-                if (!hay.contains(query)) continue;
+-            }
+-            entries.add(e);
++
++        List<LogGroup> groups = buildLogGroups(all);
++        List<LogGroup> visible = new ArrayList<>();
++        for (LogGroup group : groups) {
++            if (logFavoritesOnly && !group.hasFavorite()) continue;
++            if (!groupMatchesFormat(group)) continue;
++            if (!query.isEmpty() && !groupMatchesQuery(group, query)) continue;
++            visible.add(group);
+         }
+ 
+         if (all.isEmpty()) {
+@@ -667,12 +715,13 @@
+             logListContainer.addView(empty, lp(-1, -2));
+             return;
+         }
+-        if (entries.isEmpty()) {
++        if (visible.isEmpty()) {
+             LinearLayout empty = card();
+             TextView t = text("Nessun risultato", 15, MUTED, true);
+             t.setGravity(Gravity.CENTER);
+             empty.addView(t);
+-            TextView s = text("Modifica la ricerca o scegli un altro formato.", 12, MUTED, false);
++            String why = logFavoritesOnly ? "Nessuna scheda preferita con questi criteri." : "Modifica la ricerca o scegli un altro formato.";
++            TextView s = text(why, 12, MUTED, false);
+             s.setGravity(Gravity.CENTER);
+             s.setPadding(0, dp(6), 0, 0);
+             empty.addView(s);
