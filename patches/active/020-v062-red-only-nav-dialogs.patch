@@ -1,0 +1,356 @@
+--- a/build_darkroom.py
++++ b/build_darkroom.py
+@@ -1,13 +1,13 @@
+ #!/usr/bin/env python3
+ """
+-Darkroom Timer v0.6.1 - build APK senza Gradle.
++Darkroom Timer v0.6.2 - build APK senza Gradle.
+ 
+ Dipendenze: SOLO Python 3 standard library + JDK (javac/jar/keytool)
+ e Android SDK già presente sul PC (platform android-34 + build-tools 34.0.0 o compatibili).
+ NON scarica nulla e NON usa Gradle.
+ 
+ Uso minimo:
+-    python build_darkroom.py DarkroomTimer-source-v0.6.1-WIP.zip
++    python build_darkroom.py DarkroomTimer-source-v0.6.2-WIP.zip
+ 
+ Opzionale:
+     python build_darkroom.py SOURCE.zip --sdk "C:\\Users\\NOME\\AppData\\Local\\Android\\Sdk"
+@@ -30,8 +30,8 @@
+ import zipfile
+ 
+ PACKAGE_ID = "it.darkroom.timer"
+-VERSION_NAME = "0.6.1"
+-VERSION_CODE = "27"
++VERSION_NAME = "0.6.2"
++VERSION_CODE = "28"
+ MIN_SDK = "26"
+ TARGET_SDK = "34"
+ COMPILE_SDK = "34"
+@@ -39,7 +39,7 @@
+ 
+ 
+ def log(msg: str) -> None:
+-    print(f"[Darkroom v0.6.1] {msg}", flush=True)
++    print(f"[Darkroom v0.6.2] {msg}", flush=True)
+@@ -234,9 +234,9 @@
+         fail("Preflight manifest fallito. Mancano/sono errati: " + ", ".join(missing))
+     if gradle.is_file():
+         g = read_text(gradle)
+-        if not re.search(r"versionCode\s+27\b", g) or not re.search(r"versionName\s+['\"]0\.6\.1['\"]", g):
+-            fail("app/build.gradle non riporta versionCode 27 / versionName 0.6.1")
+-    log("Preflight v0.6.1 OK: manifest/versione/requisiti SONOFF invarianti verificati")
++        if not re.search(r"versionCode\s+28\b", g) or not re.search(r"versionName\s+['\"]0\.6\.2['\"]", g):
++            fail("app/build.gradle non riporta versionCode 28 / versionName 0.6.2")
++    log("Preflight v0.6.2 OK: manifest/versione/requisiti SONOFF invarianti verificati")
+@@ -269,7 +269,7 @@
+ 
+     alphabet = string.ascii_letters + string.digits
+     password = "".join(secrets.choice(alphabet) for _ in range(24))
+-    log("Creo una nuova firma locale per la v0.6.1 (firma dedicata alla 0.6.1)")
++    log("Creo una nuova firma locale per la v0.6.2 (firma dedicata alla 0.6.2)")
+@@ -451,7 +451,7 @@
+ 
+ 
+ def default_source() -> str | None:
+-    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.6.1-WIP*.zip"))
++    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.6.2-WIP*.zip"))
+@@ -459,10 +459,10 @@
+ 
+ def main():
+     p = argparse.ArgumentParser(
+-        description="Compila Darkroom Timer v0.6.1 in APK senza Gradle e senza download automatici."
++        description="Compila Darkroom Timer v0.6.2 in APK senza Gradle e senza download automatici."
+     )
+     p.add_argument("source", nargs="?", default=default_source(),
+-                   help="ZIP WIP v0.6.1 oppure cartella progetto Android")
++                   help="ZIP WIP v0.6.2 oppure cartella progetto Android")
+@@ -473,7 +473,7 @@
+     args = p.parse_args()
+     if not args.source:
+         p.print_help()
+-        fail("Indica lo ZIP WIP v0.6.1 come primo argomento.")
++        fail("Indica lo ZIP WIP v0.6.2 come primo argomento.")
+     build(args)
+ 
+--- a/project/README.md
++++ b/project/README.md
+@@ -1,8 +1,14 @@
+-# Darkroom Timer DIY — v0.6.1
++# Darkroom Timer DIY — v0.6.2
+ 
+ Versione consolidata del progetto Darkroom Timer per SONOFF MINIR2 in modalità DIY.
+ 
+-Base v0.6.0 + correzioni v0.6.1:
++Base v0.6.0 + aggiornamenti v0.6.1/v0.6.2:
++- Darkroom Safety realmente red-only anche per pulsanti selezionati, azioni LOG e dialoghi interni;
++- popup interni personalizzati in rosso/nero quando la modalità camera oscura è attiva;
++- navigazione principale STAMPA / PROVINO / LOG più alta, paritaria e riconoscibile come barra primaria;
++- SALVA SCHEDA usa l'accento del LOG, distinto dall'azione verde USA PER STAMPA;
+ - raggruppamento automatico del LOG attivabile/disattivabile direttamente dal pannello;
+ - dialogo di protezione camera oscura ridisegnato con pulsanti verticali a larghezza piena;
+@@ -14,4 +20,4 @@
+ 
+ Restano invariati il controllo SONOFF/MINIR2, il provino automatico, il selettore della striscia migliore, il backup LOG, la cronologia tecnica e la modalità rossa inattinica.
+ 
+-versionCode 27 / versionName 0.6.1.
++versionCode 28 / versionName 0.6.2.
+--- a/project/app/build.gradle
++++ b/project/app/build.gradle
+@@ -10,8 +10,8 @@
+         applicationId 'it.darkroom.timer'
+         minSdk 26
+         targetSdk 34
+-        versionCode 27
+-        versionName '0.6.1'
++        versionCode 28
++        versionName '0.6.2'
+     }
+ 
+--- a/project/app/src/main/AndroidManifest.xml
++++ b/project/app/src/main/AndroidManifest.xml
+@@ -1,8 +1,8 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="it.darkroom.timer"
+-    android:versionCode="27"
+-    android:versionName="0.6.1">
++    android:versionCode="28"
++    android:versionName="0.6.2">
+ 
+     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -75,7 +75,7 @@
+     private static final int REQ_EXPORT_BACKUP = 4101;
+     private static final int REQ_IMPORT_BACKUP = 4102;
+     private static final int REQ_EXPORT_JPG = 4103;
+-    private static final String APP_VERSION = "0.6.1";
++    private static final String APP_VERSION = "0.6.2";
+ 
+     private static final class FoundDevice {
+@@ -103,6 +103,10 @@
+         }
+     }
+ 
++    private interface ChoiceAction {
++        void choose(int index);
++    }
++
+     private TextView deviceStatus;
+@@ -420,18 +424,18 @@
+ 
+         LinearLayout modeRow = new LinearLayout(this);
+         modeRow.setOrientation(LinearLayout.HORIZONTAL);
+-        printModeButton = modeButton("STAMPA");
+-        testModeButton = modeButton("PROVINO");
+-        logModeButton = modeButton("LOG");
++        printModeButton = modeButton("◉\nSTAMPA");
++        testModeButton = modeButton("▦\nPROVINO");
++        logModeButton = modeButton("≡\nLOG");
+         printModeButton.setOnClickListener(v -> setMode(MODE_PRINT));
+         testModeButton.setOnClickListener(v -> setMode(MODE_TEST));
+         logModeButton.setOnClickListener(v -> setMode(MODE_LOG));
+-        modeRow.addView(printModeButton, margin(lp(0, dp(52), 1f), 0, 0, dp(4), 0));
+-        modeRow.addView(testModeButton, margin(lp(0, dp(52), 1f), dp(4), 0, dp(4), 0));
+-        modeRow.addView(logModeButton, margin(lp(0, dp(52), 0.72f), dp(4), 0, 0, 0));
++        modeRow.addView(printModeButton, margin(lp(0, dp(68), 1f), 0, 0, dp(4), 0));
++        modeRow.addView(testModeButton, margin(lp(0, dp(68), 1f), dp(4), 0, dp(4), 0));
++        modeRow.addView(logModeButton, margin(lp(0, dp(68), 1f), dp(4), 0, 0, 0));
+         root.addView(modeRow, margin(lp(-1, -2), 0, 0, 0, 12));
+@@ -464,7 +468,7 @@
+         saveLogButton.setTextSize(16);
+         saveLogButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+         saveLogButton.setAllCaps(false);
+-        saveLogButton.setTextColor(Color.WHITE);
++        saveLogButton.setTextColor(darkroomMode ? Color.BLACK : Color.WHITE);
+         saveLogButton.setBackground(roundRect(darkroomMode ? RED : LOG_ACCENT, 10, 0, 0));
+@@ -713,7 +717,7 @@
+     private void styleLogFilterButton(Button b, boolean selected) {
+         int accent = darkroomMode ? RED : LOG_ACCENT;
+         b.setBackground(roundRect(selected ? accent : BUTTON, 8, selected ? 0 : 1, BORDER));
+-        b.setTextColor(selected ? Color.WHITE : MUTED);
++        b.setTextColor(selected ? (darkroomMode ? Color.BLACK : Color.WHITE) : MUTED);
+     }
+@@ -944,11 +948,10 @@
+     private void showLogEditor(final LogEntry entry, final boolean isNew) {
+         if (darkroomMode) {
+-            new AlertDialog.Builder(this)
+-                    .setTitle("Compilazione scheda")
+-                    .setMessage("Per scrivere nei campi manuali è meglio uscire dalla modalità camera oscura: la tastiera di Android non è inattinica. Puoi comunque consultare il LOG in rosso.")
+-                    .setPositiveButton("VAI ALLE IMPOSTAZIONI", (d, w) -> showSettingsDialog())
+-                    .setNegativeButton("ANNULLA", null)
+-                    .show();
++            showAppConfirmDialog("COMPILAZIONE SCHEDA",
++                    "Per scrivere nei campi manuali è meglio uscire dalla modalità camera oscura: la tastiera di Android non è inattinica. Puoi comunque consultare il LOG in rosso.",
++                    "VAI ALLE IMPOSTAZIONI", this::showSettingsDialog, "ANNULLA");
+             return;
+         }
+@@ -1073,8 +1076,8 @@
+ 
+         Button save = compactButton("SALVA SCHEDA");
+-        save.setBackground(roundRect(GREEN, 9, 0, 0));
+-        save.setTextColor(Color.BLACK);
++        save.setBackground(roundRect(darkroomMode ? RED : LOG_ACCENT, 9, 0, 0));
++        save.setTextColor(darkroomMode ? Color.BLACK : Color.WHITE);
+         save.setOnClickListener(v -> {
+@@ -1310,6 +1313,95 @@
+         return v.isEmpty() ? "scheda" : v;
+     }
+ 
++    private void showAppConfirmDialog(String title, String message, String positiveLabel,
++                                      Runnable positiveAction, String negativeLabel) {
++        if (!darkroomMode) {
++            AlertDialog.Builder builder = new AlertDialog.Builder(this)
++                    .setTitle(title)
++                    .setMessage(message);
++            if (positiveLabel != null) {
++                builder.setPositiveButton(positiveLabel, (d, w) -> {
++                    if (positiveAction != null) positiveAction.run();
++                });
++            }
++            if (negativeLabel != null) builder.setNegativeButton(negativeLabel, null);
++            builder.show();
++            return;
++        }
++
++        final Dialog dialog = new Dialog(this);
++        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
++        LinearLayout panel = new LinearLayout(this);
++        panel.setOrientation(LinearLayout.VERTICAL);
++        panel.setPadding(dp(20), dp(18), dp(20), dp(18));
++        panel.setBackground(roundRect(Color.BLACK, 14, 1, BORDER));
++
++        TextView heading = text(title, 19, RED, true);
++        panel.addView(heading, margin(lp(-1, -2), 0, 0, 0, 12));
++        if (message != null && !message.trim().isEmpty()) {
++            TextView body = text(message, 14, MUTED, false);
++            body.setLineSpacing(0, 1.08f);
++            panel.addView(body, margin(lp(-1, -2), 0, 0, 0, 16));
++        }
++
++        if (positiveLabel != null) {
++            Button positive = compactButton(positiveLabel);
++            positive.setBackground(roundRect(RED, 9, 0, 0));
++            positive.setTextColor(Color.BLACK);
++            positive.setOnClickListener(v -> {
++                dialog.dismiss();
++                if (positiveAction != null) positiveAction.run();
++            });
++            panel.addView(positive, lp(-1, dp(52)));
++        }
++        if (negativeLabel != null) {
++            Button negative = compactButton(negativeLabel);
++            negative.setTextColor(RED);
++            negative.setOnClickListener(v -> dialog.dismiss());
++            panel.addView(negative, margin(lp(-1, dp(48)), 0, 8, 0, 0));
++        }
++
++        dialog.setContentView(panel);
++        Window w = dialog.getWindow();
++        if (w != null) w.setBackgroundDrawableResource(android.R.color.transparent);
++        dialog.show();
++        if (w != null) w.setLayout((int)(getResources().getDisplayMetrics().widthPixels * 0.92f), ViewGroup.LayoutParams.WRAP_CONTENT);
++    }
++
++    private void showAppChoiceDialog(String title, String[] choices, ChoiceAction action, String cancelLabel) {
++        if (!darkroomMode) {
++            new AlertDialog.Builder(this)
++                    .setTitle(title)
++                    .setItems(choices, (d, which) -> action.choose(which))
++                    .setNegativeButton(cancelLabel, null)
++                    .show();
++            return;
++        }
++
++        final Dialog dialog = new Dialog(this);
++        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
++        LinearLayout panel = new LinearLayout(this);
++        panel.setOrientation(LinearLayout.VERTICAL);
++        panel.setPadding(dp(18), dp(16), dp(18), dp(18));
++        panel.setBackground(roundRect(Color.BLACK, 14, 1, BORDER));
++        TextView heading = text(title, 18, RED, true);
++        panel.addView(heading, margin(lp(-1, -2), 0, 0, 0, 12));
++        for (int i = 0; i < choices.length; i++) {
++            final int index = i;
++            Button option = compactButton(choices[i]);
++            option.setTextColor(RED);
++            option.setOnClickListener(v -> { dialog.dismiss(); action.choose(index); });
++            panel.addView(option, margin(lp(-1, dp(48)), 0, 0, 0, 7));
++        }
++        Button cancel = compactButton(cancelLabel);
++        cancel.setTextColor(RED);
++        cancel.setOnClickListener(v -> dialog.dismiss());
++        panel.addView(cancel, margin(lp(-1, dp(48)), 0, 6, 0, 0));
++        dialog.setContentView(panel);
++        Window w = dialog.getWindow();
++        if (w != null) w.setBackgroundDrawableResource(android.R.color.transparent);
++        dialog.show();
++        if (w != null) w.setLayout((int)(getResources().getDisplayMetrics().widthPixels * 0.94f), ViewGroup.LayoutParams.WRAP_CONTENT);
++    }
++
+     private void showTechnicalLogDialog() {
+@@ -1342,14 +1434,11 @@
+         Button clear = compactButton("AZZERA CRONOLOGIA TECNICA");
+         clear.setTextColor(RED);
+-        clear.setOnClickListener(v -> new AlertDialog.Builder(this)
+-                .setTitle("Azzerare la cronologia tecnica?")
+-                .setPositiveButton("AZZERA", (d, w) -> {
++        clear.setOnClickListener(v -> showAppConfirmDialog("AZZERARE LA CRONOLOGIA TECNICA?", "",
++                "AZZERA", () -> {
+                     TechnicalLog.clear(this);
+                     body.setText("Nessun ciclo tecnico registrato.");
+-                })
+-                .setNegativeButton("ANNULLA", null)
+-                .show());
++                }, "ANNULLA"));
+@@ -1439,19 +1528,9 @@
+     private void cancelCurrentCycle() {
+         if (!armed) return;
+-        new AlertDialog.Builder(this)
+-                .setTitle("Annullare il ciclo?")
+-                .setMessage("L’uscita verrà spenta immediatamente e l’Inching verrà disattivato.")
+-                .setPositiveButton("ANNULLA CICLO", (d, w) -> {
++        showAppConfirmDialog("ANNULLARE IL CICLO?",
++                "L’uscita verrà spenta immediatamente e l’Inching verrà disattivato.",
++                "ANNULLA CICLO", () -> {
+                     setStatusPresentation("ANNULLAMENTO", "Spengo l’uscita e disattivo Inching…", RED);
+                     cancelCycleButton.setEnabled(false);
+                     Intent i = new Intent(this, SonoffArmService.class).setAction(SonoffArmService.ACTION_CANCEL);
+                     startServiceCompat(i);
+-                })
+-                .setNegativeButton("CONTINUA", null)
+-                .show();
++                }, "CONTINUA");
+     }
+@@ -1470,16 +1549,14 @@
+             int cumulative = step * (i + 1);
+             choices[i] = (i + 1) + "ª striscia   —   " + formatTime(cumulative);
+         }
+-        new AlertDialog.Builder(this)
+-                .setTitle("Provino completato — scegli la striscia")
+-                .setItems(choices, (dialog, which) -> {
++        showAppChoiceDialog("PROVINO COMPLETATO — SCEGLI LA STRISCIA", choices, which -> {
+                     int imported = step * (which + 1);
+                     setMode(MODE_PRINT);
+                     setPrintTime(imported);
+                     setStatusPresentation("DAL PROVINO — " + formatTime(imported),
+                             "Tempo precompilato e ancora modificabile con + / − o scorciatoie prima di armare.", GREEN);
+-                })
+-                .setNegativeButton("NON ORA", null)
+-                .show();
++                }, "NON ORA");
+@@ -1588,9 +1665,12 @@
+     private Button modeButton(String s) {
+         Button b = new Button(this);
+         b.setText(s);
+-        b.setTextSize(15);
++        b.setTextSize(13);
+         b.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+         b.setAllCaps(false);
+-        b.setPadding(0, 0, 0, 0);
++        b.setGravity(Gravity.CENTER);
++        b.setLineSpacing(0, 0.94f);
++        b.setPadding(dp(2), dp(3), dp(2), dp(3));
+         return b;
+     }
