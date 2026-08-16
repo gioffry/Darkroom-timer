@@ -27,13 +27,13 @@
  MIN_SDK = "26"
  TARGET_SDK = "34"
  COMPILE_SDK = "34"
-@@ -39,7 +39,7 @@
+@@ -39,4 +39,4 @@
  
  
  def log(msg: str) -> None:
 -    print(f"[Darkroom v0.6.1] {msg}", flush=True)
 +    print(f"[Darkroom v0.6.2] {msg}", flush=True)
-@@ -234,9 +234,9 @@
+@@ -234,6 +234,6 @@
          fail("Preflight manifest fallito. Mancano/sono errati: " + ", ".join(missing))
      if gradle.is_file():
          g = read_text(gradle)
@@ -43,19 +43,19 @@
 +        if not re.search(r"versionCode\s+28\b", g) or not re.search(r"versionName\s+['\"]0\.6\.2['\"]", g):
 +            fail("app/build.gradle non riporta versionCode 28 / versionName 0.6.2")
 +    log("Preflight v0.6.2 OK: manifest/versione/requisiti SONOFF invarianti verificati")
-@@ -269,7 +269,7 @@
+@@ -269,4 +269,4 @@
  
      alphabet = string.ascii_letters + string.digits
      password = "".join(secrets.choice(alphabet) for _ in range(24))
 -    log("Creo una nuova firma locale per la v0.6.1 (firma dedicata alla 0.6.1)")
 +    log("Creo una nuova firma locale per la v0.6.2 (firma dedicata alla 0.6.2)")
-@@ -451,7 +451,7 @@
+@@ -451,4 +451,4 @@
  
  
  def default_source() -> str | None:
 -    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.6.1-WIP*.zip"))
 +    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.6.2-WIP*.zip"))
-@@ -459,10 +459,10 @@
+@@ -459,7 +459,7 @@
  
  def main():
      p = argparse.ArgumentParser(
@@ -65,7 +65,7 @@
      p.add_argument("source", nargs="?", default=default_source(),
 -                   help="ZIP WIP v0.6.1 oppure cartella progetto Android")
 +                   help="ZIP WIP v0.6.2 oppure cartella progetto Android")
-@@ -473,7 +473,7 @@
+@@ -473,6 +473,6 @@
      args = p.parse_args()
      if not args.source:
          p.print_help()
@@ -75,7 +75,7 @@
  
 --- a/project/README.md
 +++ b/project/README.md
-@@ -1,8 +1,14 @@
+@@ -1,7 +1,11 @@
 -# Darkroom Timer DIY — v0.6.1
 +# Darkroom Timer DIY — v0.6.2
  
@@ -89,7 +89,7 @@
 +- SALVA SCHEDA usa l'accento del LOG, distinto dall'azione verde USA PER STAMPA;
  - raggruppamento automatico del LOG attivabile/disattivabile direttamente dal pannello;
  - dialogo di protezione camera oscura ridisegnato con pulsanti verticali a larghezza piena;
-@@ -14,4 +20,4 @@
+@@ -14,4 +18,4 @@
  
  Restano invariati il controllo SONOFF/MINIR2, il provino automatico, il selettore della striscia migliore, il backup LOG, la cronologia tecnica e la modalità rossa inattinica.
  
@@ -97,7 +97,7 @@
 +versionCode 28 / versionName 0.6.2.
 --- a/project/app/build.gradle
 +++ b/project/app/build.gradle
-@@ -10,8 +10,8 @@
+@@ -10,7 +10,7 @@
          applicationId 'it.darkroom.timer'
          minSdk 26
          targetSdk 34
@@ -106,10 +106,9 @@
 +        versionCode 28
 +        versionName '0.6.2'
      }
- 
 --- a/project/app/src/main/AndroidManifest.xml
 +++ b/project/app/src/main/AndroidManifest.xml
-@@ -1,8 +1,8 @@
+@@ -1,7 +1,7 @@
  <?xml version="1.0" encoding="utf-8"?>
  <manifest xmlns:android="http://schemas.android.com/apk/res/android"
      package="it.darkroom.timer"
@@ -121,7 +120,7 @@
      <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
 --- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
 +++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
-@@ -75,7 +75,7 @@
+@@ -75,6 +75,6 @@
      private static final int REQ_EXPORT_BACKUP = 4101;
      private static final int REQ_IMPORT_BACKUP = 4102;
      private static final int REQ_EXPORT_JPG = 4103;
@@ -129,7 +128,7 @@
 +    private static final String APP_VERSION = "0.6.2";
  
      private static final class FoundDevice {
-@@ -103,6 +103,10 @@
+@@ -103,4 +103,8 @@
          }
      }
  
@@ -138,7 +137,7 @@
 +    }
 +
      private TextView deviceStatus;
-@@ -420,18 +424,18 @@
+@@ -420,13 +424,13 @@
  
          LinearLayout modeRow = new LinearLayout(this);
          modeRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -158,21 +157,21 @@
 +        modeRow.addView(testModeButton, margin(lp(0, dp(68), 1f), dp(4), 0, dp(4), 0));
 +        modeRow.addView(logModeButton, margin(lp(0, dp(68), 1f), dp(4), 0, 0, 0));
          root.addView(modeRow, margin(lp(-1, -2), 0, 0, 0, 12));
-@@ -464,7 +468,7 @@
+@@ -464,5 +468,5 @@
          saveLogButton.setTextSize(16);
          saveLogButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
          saveLogButton.setAllCaps(false);
 -        saveLogButton.setTextColor(Color.WHITE);
 +        saveLogButton.setTextColor(darkroomMode ? Color.BLACK : Color.WHITE);
          saveLogButton.setBackground(roundRect(darkroomMode ? RED : LOG_ACCENT, 10, 0, 0));
-@@ -713,7 +717,7 @@
+@@ -713,5 +717,5 @@
      private void styleLogFilterButton(Button b, boolean selected) {
          int accent = darkroomMode ? RED : LOG_ACCENT;
          b.setBackground(roundRect(selected ? accent : BUTTON, 8, selected ? 0 : 1, BORDER));
 -        b.setTextColor(selected ? Color.WHITE : MUTED);
 +        b.setTextColor(selected ? (darkroomMode ? Color.BLACK : Color.WHITE) : MUTED);
      }
-@@ -944,11 +948,10 @@
+@@ -944,10 +948,7 @@
      private void showLogEditor(final LogEntry entry, final boolean isNew) {
          if (darkroomMode) {
 -            new AlertDialog.Builder(this)
@@ -186,7 +185,7 @@
 +                    "VAI ALLE IMPOSTAZIONI", this::showSettingsDialog, "ANNULLA");
              return;
          }
-@@ -1073,8 +1076,8 @@
+@@ -1073,5 +1076,5 @@
  
          Button save = compactButton("SALVA SCHEDA");
 -        save.setBackground(roundRect(GREEN, 9, 0, 0));
@@ -194,7 +193,7 @@
 +        save.setBackground(roundRect(darkroomMode ? RED : LOG_ACCENT, 9, 0, 0));
 +        save.setTextColor(darkroomMode ? Color.BLACK : Color.WHITE);
          save.setOnClickListener(v -> {
-@@ -1310,6 +1313,95 @@
+@@ -1310,4 +1313,95 @@
          return v.isEmpty() ? "scheda" : v;
      }
  
@@ -290,7 +289,7 @@
 +    }
 +
      private void showTechnicalLogDialog() {
-@@ -1342,14 +1434,11 @@
+@@ -1342,10 +1434,7 @@
          Button clear = compactButton("AZZERA CRONOLOGIA TECNICA");
          clear.setTextColor(RED);
 -        clear.setOnClickListener(v -> new AlertDialog.Builder(this)
@@ -304,7 +303,7 @@
 -                .setNegativeButton("ANNULLA", null)
 -                .show());
 +                }, "ANNULLA"));
-@@ -1439,19 +1528,9 @@
+@@ -1439,14 +1528,11 @@
      private void cancelCurrentCycle() {
          if (!armed) return;
 -        new AlertDialog.Builder(this)
@@ -323,7 +322,7 @@
 -                .show();
 +                }, "CONTINUA");
      }
-@@ -1470,16 +1549,14 @@
+@@ -1470,14 +1549,10 @@
              int cumulative = step * (i + 1);
              choices[i] = (i + 1) + "ª striscia   —   " + formatTime(cumulative);
          }
@@ -340,7 +339,7 @@
 -                .setNegativeButton("NON ORA", null)
 -                .show();
 +                }, "NON ORA");
-@@ -1588,9 +1665,12 @@
+@@ -1588,9 +1665,11 @@
      private Button modeButton(String s) {
          Button b = new Button(this);
          b.setText(s);
