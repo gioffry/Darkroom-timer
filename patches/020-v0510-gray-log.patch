@@ -1,0 +1,82 @@
+--- a/build_darkroom.py
++++ b/build_darkroom.py
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env python3
+ """
+-Darkroom Timer v0.5.9 - build APK senza Gradle.
++Darkroom Timer v0.5.10 - build APK senza Gradle.
+@@ -30,8 +30,8 @@
+ PACKAGE_ID = "it.darkroom.timer"
+-VERSION_NAME = "0.5.9"
+-VERSION_CODE = "24"
++VERSION_NAME = "0.5.10"
++VERSION_CODE = "25"
+@@ -39,7 +39,7 @@
+ def log(msg: str) -> None:
+-    print(f"[Darkroom v0.5.9] {msg}", flush=True)
++    print(f"[Darkroom v0.5.10] {msg}", flush=True)
+@@ -234,9 +234,9 @@
+-        if not re.search(r"versionCode\s+24\b", g) or not re.search(r"versionName\s+['\"]0\.5\.9['\"]", g):
+-            fail("app/build.gradle non riporta versionCode 24 / versionName 0.5.9")
+-    log("Preflight v0.5.9 OK: manifest/versione/requisiti SONOFF invarianti verificati")
++        if not re.search(r"versionCode\s+25\b", g) or not re.search(r"versionName\s+['\"]0\.5\.10['\"]", g):
++            fail("app/build.gradle non riporta versionCode 25 / versionName 0.5.10")
++    log("Preflight v0.5.10 OK: manifest/versione/requisiti SONOFF invarianti verificati")
+@@ -269,7 +269,7 @@
+-    log("Creo una nuova firma locale per la v0.5.9 (firma dedicata alla 0.5.9)")
++    log("Creo una nuova firma locale per la v0.5.10 (firma dedicata alla 0.5.10)")
+@@ -442,7 +442,7 @@
+-            keep = out.parent / "DarkroomTimer-v059-build-debug"
++            keep = out.parent / "DarkroomTimer-v0510-build-debug"
+@@ -451,7 +451,7 @@
+-    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.5.9-WIP*.zip"))
++    candidates = list(Path.cwd().glob("DarkroomTimer-source-v0.5.10-WIP*.zip"))
+@@ -459,10 +459,10 @@
+-        description="Compila Darkroom Timer v0.5.9 in APK senza Gradle e senza download automatici."
++        description="Compila Darkroom Timer v0.5.10 in APK senza Gradle e senza download automatici."
+@@
+-                   help="ZIP WIP v0.5.9 oppure cartella progetto Android")
++                   help="ZIP WIP v0.5.10 oppure cartella progetto Android")
+@@
+-        fail("Indica lo ZIP WIP v0.5.9 come primo argomento.")
++        fail("Indica lo ZIP WIP v0.5.10 come primo argomento.")
+--- a/project/README.md
++++ b/project/README.md
+@@ -1,4 +1,4 @@
+-# Darkroom Timer DIY — v0.5.9
++# Darkroom Timer DIY — v0.5.10
+@@
+-versionCode 24 / versionName 0.5.9.
++versionCode 25 / versionName 0.5.10.
+--- a/project/app/build.gradle
++++ b/project/app/build.gradle
+@@ -10,8 +10,8 @@
+-        versionCode 24
+-        versionName '0.5.9'
++        versionCode 25
++        versionName '0.5.10'
+--- a/project/app/src/main/AndroidManifest.xml
++++ b/project/app/src/main/AndroidManifest.xml
+@@ -3,8 +3,8 @@
+     package="it.darkroom.timer"
+-    android:versionCode="24"
+-    android:versionName="0.5.9">
++    android:versionCode="25"
++    android:versionName="0.5.10">
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -71,7 +71,7 @@
+-    private static final String APP_VERSION = "0.5.9";
++    private static final String APP_VERSION = "0.5.10";
+@@ -420,7 +420,7 @@
+-        saveLogButton.setTextColor(Color.BLACK);
++        saveLogButton.setTextColor(Color.WHITE);
+@@ -622,7 +622,7 @@
+-        b.setTextColor(selected ? Color.BLACK : MUTED);
++        b.setTextColor(selected ? Color.WHITE : MUTED);
+@@ -1154,7 +1154,7 @@
+-            logModeButton.setTextColor(log ? Color.BLACK : MUTED);
++            logModeButton.setTextColor(log ? Color.WHITE : MUTED);
+@@ -1559,7 +1559,7 @@
+-            LOG_ACCENT = Color.rgb(255, 159, 67);
++            LOG_ACCENT = Color.rgb(107, 114, 128);
