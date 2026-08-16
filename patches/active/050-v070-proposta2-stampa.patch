@@ -1,0 +1,350 @@
+--- a/build_darkroom.py
++++ b/build_darkroom.py
+@@ -33,2 +33,2 @@
+-VERSION_NAME = "0.6.4"
+-VERSION_CODE = "32"
++VERSION_NAME = "0.7.0"
++VERSION_CODE = "33"
+@@ -42 +42 @@
+-    print(f"[Darkroom v0.6.4] {msg}", flush=True)
++    print(f"[Darkroom v0.7.0] {msg}", flush=True)
+@@ -237,3 +237,3 @@
+-        if not re.search(r"versionCode\s+32\b", g) or not re.search(r"versionName\s+['\"]0\.6\.4['\"]", g):
+-            fail("app/build.gradle non riporta versionCode 32 / versionName 0.6.4")
+-    log("Preflight v0.6.4 OK: manifest/versione/requisiti SONOFF invarianti verificati")
++        if not re.search(r"versionCode\s+33\b", g) or not re.search(r"versionName\s+['\"]0\.7\.0['\"]", g):
++            fail("app/build.gradle non riporta versionCode 33 / versionName 0.7.0")
++    log("Preflight v0.7.0 OK: manifest/versione/requisiti SONOFF invarianti verificati")
+--- a/project/app/build.gradle
++++ b/project/app/build.gradle
+@@ -13,2 +13,2 @@
+-        versionCode 32
+-        versionName '0.6.4'
++        versionCode 33
++        versionName '0.7.0'
+--- a/project/app/src/main/AndroidManifest.xml
++++ b/project/app/src/main/AndroidManifest.xml
+@@ -4,2 +4,2 @@
+-    android:versionCode="32"
+-    android:versionName="0.6.4">
++    android:versionCode="33"
++    android:versionName="0.7.0">
+--- a/project/app/src/main/java/it/darkroom/timer/MainActivity.java
++++ b/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+@@ -78 +78 @@
+-    private static final String APP_VERSION = "0.6.4";
++    private static final String APP_VERSION = "0.7.0";
+@@ -116,6 +116,9 @@
+     private Button saveLogButton;
+     private Button cancelCycleButton;
++    private Button printMinusButton;
++    private Button printPlusButton;
++    private final List<Button> printShortcutButtons = new ArrayList<>();
+     private LinearLayout printPanel;
+     private LinearLayout testPanel;
+     private LinearLayout logPanel;
+@@ -401,2 +404,3 @@
+-        TextView title = text("Darkroom Timer", 27, TEXT_PRIMARY, true);
++        TextView title = text("DARKROOM TIMER", 25, TEXT_PRIMARY, true);
++        if (!darkroomMode) title.setLetterSpacing(0.055f);
+         title.setGravity(Gravity.CENTER);
+@@ -414,2 +418,3 @@
+         LinearLayout deviceCard = card();
++        if (!darkroomMode) deviceCard.setBackground(new AnalogProposal2Drawable(this, AnalogProposal2Drawable.DEVICE));
+         LinearLayout deviceTop = new LinearLayout(this);
+@@ -497,2 +502,9 @@
+     private LinearLayout buildPrintPanel() {
+         LinearLayout box = card();
++        if (!darkroomMode) {
++            box.setPadding(dp(15), dp(15), dp(15), dp(15));
++            box.setBackground(new AnalogProposal2Drawable(this, AnalogProposal2Drawable.PANEL));
++        }
+         TextView prompt = text("Tempo di stampa", 16, TEXT_PRIMARY, true);
++        if (!darkroomMode) prompt.setTextColor(Color.rgb(232, 226, 214));
+         prompt.setGravity(Gravity.CENTER);
+@@ -501,2 +513,3 @@
+         TextView sub = text("Singola esposizione • passo 0,5 s", 12, MUTED, false);
++        if (!darkroomMode) sub.setTextColor(Color.rgb(177, 169, 157));
+         sub.setGravity(Gravity.CENTER);
+@@ -509,4 +522,4 @@
+-        Button minus = smallButton("−");
+-        Button plus = smallButton("+");
++        printMinusButton = smallButton("−");
++        printPlusButton = smallButton("+");
+         printTimeText = text(formatTime(printWidthMs), 48, GREEN, true);
+         printTimeText.setGravity(Gravity.CENTER);
+-        selector.addView(minus, lp(dp(62), dp(58)));
++        selector.addView(printMinusButton, lp(dp(62), dp(58)));
+         selector.addView(printTimeText, lp(0, dp(68), 1f));
+-        selector.addView(plus, lp(dp(62), dp(58)));
+-        minus.setOnClickListener(v -> setPrintTime(printWidthMs - 500));
+-        plus.setOnClickListener(v -> setPrintTime(printWidthMs + 500));
++        selector.addView(printPlusButton, lp(dp(62), dp(58)));
++        printMinusButton.setOnClickListener(v -> setPrintTime(printWidthMs - 500));
++        printPlusButton.setOnClickListener(v -> setPrintTime(printWidthMs + 500));
+@@ -523,2 +536,4 @@
+             Button b = shortcutButton(s + " s", GREEN);
++            b.setTag(s * 1000);
++            printShortcutButtons.add(b);
+             GridLayout.LayoutParams gp = new GridLayout.LayoutParams();
+@@ -529,2 +544,10 @@
+         }
+         box.addView(grid, lp(-1, -2));
++        if (!darkroomMode) {
++            printTimeText.setTextColor(Color.rgb(113, 190, 72));
++            printMinusButton.setTextColor(Color.rgb(221, 214, 201));
++            printPlusButton.setTextColor(Color.rgb(221, 214, 201));
++            printMinusButton.setBackground(new AnalogProposal2Drawable(this, AnalogProposal2Drawable.BUTTON));
++            printPlusButton.setBackground(new AnalogProposal2Drawable(this, AnalogProposal2Drawable.BUTTON));
++            updateProposal2PresetStyles();
++        }
+         return box;
+     }
+@@ -365,2 +365,7 @@
+-        if (stateCard != null) stateCard.setBackground(roundRect(CARD, 12, 1, accent));
++        if (stateCard != null) {
++            if (!darkroomMode && mode == MODE_PRINT) {
++                stateCard.setBackground(new AnalogProposal2Drawable(this, AnalogProposal2Drawable.STATE, accent));
++            } else {
++                stateCard.setBackground(roundRect(CARD, 12, 1, accent));
++            }
++        }
+     }
+@@ -1434,2 +1458,20 @@
+         if (!log) {
+             actionButton.setBackground(roundRect(print ? GREEN : BLUE, 10, 0, 0));
+             actionButton.setText(print ? "ARMA STAMPA • " + formatTime(printWidthMs)
+                     : "ARMA PROVINO • " + testCount + " × " + formatTime(testWidthMs));
+         }
++        if (!darkroomMode && print) {
++            actionButton.setBackground(new AnalogProposal2Drawable(this, AnalogProposal2Drawable.ACTION, GREEN));
++            actionButton.setTextColor(Color.rgb(238, 232, 220));
++            actionButton.setPadding(dp(30), 0, dp(14), 0);
++            saveLogButton.setBackground(new AnalogProposal2Drawable(this, AnalogProposal2Drawable.BUTTON));
++            saveLogButton.setTextColor(Color.rgb(232, 226, 214));
++            updateProposal2PresetStyles();
++        } else if (!darkroomMode) {
++            actionButton.setPadding(0, 0, 0, 0);
++            saveLogButton.setBackground(roundRect(LOG_ACCENT, 10, 0, 0));
++            saveLogButton.setTextColor(Color.WHITE);
++        }
+     }
++
++    private void updateProposal2PresetStyles() {
++        if (darkroomMode) return;
++        for (Button b : printShortcutButtons) {
++            Object tag = b.getTag();
++            boolean selected = tag instanceof Integer && ((Integer) tag) == printWidthMs;
++            b.setBackground(new AnalogProposal2Drawable(this,
++                    selected ? AnalogProposal2Drawable.PRESET_ACTIVE : AnalogProposal2Drawable.BUTTON));
++            b.setTextColor(selected ? Color.rgb(132, 207, 83) : Color.rgb(111, 184, 70));
++        }
++    }
+@@ -2280,2 +2322,12 @@
+     private void styleNavButton(Button button, boolean selected, int normalAccent) {
++        if (!darkroomMode && mode == MODE_PRINT) {
++            int foreground = selected ? Color.rgb(239, 235, 225) : Color.rgb(187, 180, 168);
++            button.setTextColor(foreground);
++            button.setBackground(new AnalogProposal2Drawable(this,
++                    selected ? AnalogProposal2Drawable.NAV_ACTIVE : AnalogProposal2Drawable.NAV_INACTIVE,
++                    selected ? normalAccent : 0));
++            if (button instanceof PrimaryNavButton) ((PrimaryNavButton) button).setIconColor(foreground);
++            return;
++        }
+         int foreground;
+         int background;
+--- /dev/null
++++ b/project/app/src/main/java/it/darkroom/timer/AnalogProposal2Drawable.java
+@@ -0,0 +1,194 @@
++package it.darkroom.timer;
++
++import android.content.Context;
++import android.graphics.Canvas;
++import android.graphics.Color;
++import android.graphics.ColorFilter;
++import android.graphics.LinearGradient;
++import android.graphics.Paint;
++import android.graphics.PixelFormat;
++import android.graphics.RadialGradient;
++import android.graphics.RectF;
++import android.graphics.Shader;
++import android.graphics.drawable.Drawable;
++
++public final class AnalogProposal2Drawable extends Drawable {
++    public static final int PANEL = 1;
++    public static final int BUTTON = 2;
++    public static final int NAV_ACTIVE = 3;
++    public static final int NAV_INACTIVE = 4;
++    public static final int ACTION = 5;
++    public static final int STATE = 6;
++    public static final int PRESET_ACTIVE = 7;
++    public static final int DEVICE = 8;
++
++    private final float d;
++    private final int kind;
++    private final int accent;
++    private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
++    private int alpha = 255;
++    private boolean pressed;
++
++    public AnalogProposal2Drawable(Context context, int kind) {
++        this(context, kind, 0);
++    }
++
++    public AnalogProposal2Drawable(Context context, int kind, int accent) {
++        this.d = context.getResources().getDisplayMetrics().density;
++        this.kind = kind;
++        this.accent = accent;
++    }
++
++    @Override public void draw(Canvas canvas) {
++        RectF r = new RectF(getBounds());
++        r.inset(d, d);
++        float radius = 10f * d;
++
++        int top;
++        int bottom;
++        int outer;
++        int inner;
++
++        if (kind == NAV_ACTIVE || kind == ACTION) {
++            int g = accent != 0 ? accent : Color.rgb(94, 177, 57);
++            top = mix(g, Color.WHITE, pressed ? 0.02f : 0.13f);
++            bottom = mix(g, Color.BLACK, pressed ? 0.36f : 0.23f);
++            outer = mix(g, Color.WHITE, 0.20f);
++            inner = mix(g, Color.BLACK, 0.42f);
++        } else if (kind == PRESET_ACTIVE) {
++            top = Color.rgb(48, 80, 36);
++            bottom = Color.rgb(24, 47, 20);
++            outer = Color.rgb(93, 142, 65);
++            inner = Color.rgb(15, 27, 13);
++        } else if (kind == STATE) {
++            top = Color.rgb(10, 11, 10);
++            bottom = Color.rgb(5, 6, 5);
++            outer = accent != 0 ? accent : Color.rgb(91, 169, 57);
++            inner = Color.rgb(16, 29, 14);
++        } else {
++            top = kind == DEVICE ? Color.rgb(31, 29, 26) : Color.rgb(34, 31, 27);
++            bottom = Color.rgb(13, 14, 13);
++            outer = Color.rgb(78, 72, 64);
++            inner = Color.rgb(17, 17, 16);
++        }
++
++        p.setStyle(Paint.Style.FILL);
++        p.setAlpha(alpha);
++        p.setShader(new LinearGradient(0, r.top, 0, r.bottom, top, bottom, Shader.TileMode.CLAMP));
++        canvas.drawRoundRect(r, radius, radius, p);
++        p.setShader(null);
++
++        p.setStyle(Paint.Style.STROKE);
++        p.setStrokeWidth(1.15f * d);
++        p.setColor(outer);
++        p.setAlpha(alpha);
++        canvas.drawRoundRect(r, radius, radius, p);
++
++        RectF innerRect = new RectF(r);
++        innerRect.inset(3.2f * d, 3.2f * d);
++        p.setStrokeWidth(0.9f * d);
++        p.setColor(inner);
++        canvas.drawRoundRect(innerRect, 7.4f * d, 7.4f * d, p);
++
++        RectF bevel = new RectF(innerRect);
++        bevel.inset(1.4f * d, 1.4f * d);
++        p.setStrokeWidth(0.55f * d);
++        p.setColor(kind == NAV_ACTIVE || kind == ACTION
++                ? Color.argb(120, 228, 245, 217)
++                : Color.argb(80, 183, 172, 153));
++        canvas.drawRoundRect(bevel, 6.2f * d, 6.2f * d, p);
++
++        p.setShader(null);
++        if (kind == PANEL) drawScrews(canvas, r);
++        if (kind == ACTION) drawLed(canvas, r);
++
++        if (pressed && kind != STATE) {
++            p.setStyle(Paint.Style.FILL);
++            p.setColor(Color.argb(28, 0, 0, 0));
++            canvas.drawRoundRect(r, radius, radius, p);
++        }
++    }
++
++    private void drawScrews(Canvas canvas, RectF r) {
++        float o = 11f * d;
++        screw(canvas, r.left + o, r.top + o);
++        screw(canvas, r.right - o, r.top + o);
++        screw(canvas, r.left + o, r.bottom - o);
++        screw(canvas, r.right - o, r.bottom - o);
++    }
++
++    private void screw(Canvas canvas, float x, float y) {
++        p.setShader(null);
++        p.setStyle(Paint.Style.FILL);
++        p.setColor(Color.rgb(7, 7, 7));
++        canvas.drawCircle(x, y, 4.1f * d, p);
++        p.setColor(Color.rgb(62, 58, 52));
++        canvas.drawCircle(x, y, 3.1f * d, p);
++        p.setColor(Color.rgb(104, 97, 86));
++        canvas.drawCircle(x - 0.8f * d, y - 0.9f * d, 1.0f * d, p);
++        p.setStyle(Paint.Style.STROKE);
++        p.setStrokeWidth(0.8f * d);
++        p.setColor(Color.rgb(20, 19, 18));
++        canvas.drawLine(x - 1.8f * d, y + 1.8f * d, x + 1.8f * d, y - 1.8f * d, p);
++    }
++
++    private void drawLed(Canvas canvas, RectF r) {
++        float x = r.left + 22f * d;
++        float y = r.centerY();
++        float radius = 6f * d;
++        p.setStyle(Paint.Style.FILL);
++        p.setShader(new RadialGradient(x, y, radius * 2.2f,
++                new int[] { Color.argb(170, 255, 70, 48), Color.argb(120, 164, 25, 17), Color.TRANSPARENT },
++                new float[] { 0f, 0.42f, 1f }, Shader.TileMode.CLAMP));
++        canvas.drawCircle(x, y, radius * 2.2f, p);
++        p.setShader(null);
++        p.setColor(Color.rgb(78, 9, 7));
++        canvas.drawCircle(x, y, 4.8f * d, p);
++        p.setColor(Color.rgb(236, 58, 43));
++        canvas.drawCircle(x, y, 3.3f * d, p);
++        p.setColor(Color.rgb(255, 183, 164));
++        canvas.drawCircle(x - 1.0f * d, y - 1.2f * d, 1.0f * d, p);
++    }
++
++    private static int mix(int a, int b, float t) {
++        t = Math.max(0f, Math.min(1f, t));
++        int ar = Color.red(a), ag = Color.green(a), ab = Color.blue(a);
++        int br = Color.red(b), bg = Color.green(b), bb = Color.blue(b);
++        return Color.rgb(
++                Math.round(ar + (br - ar) * t),
++                Math.round(ag + (bg - ag) * t),
++                Math.round(ab + (bb - ab) * t));
++    }
++
++    @Override public boolean isStateful() { return true; }
++
++    @Override protected boolean onStateChange(int[] state) {
++        boolean nowPressed = false;
++        for (int s : state) {
++            if (s == android.R.attr.state_pressed) {
++                nowPressed = true;
++                break;
++            }
++        }
++        if (nowPressed != pressed) {
++            pressed = nowPressed;
++            invalidateSelf();
++            return true;
++        }
++        return false;
++    }
++
++    @Override public void setAlpha(int alpha) {
++        this.alpha = alpha;
++        invalidateSelf();
++    }
++
++    @Override public void setColorFilter(ColorFilter colorFilter) {
++        p.setColorFilter(colorFilter);
++        invalidateSelf();
++    }
++
++    @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
++}
