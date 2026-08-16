@@ -40,6 +40,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('experiments/v071/apply_v071_fstop.py')
+          s = p.read_text(encoding='utf-8')
+          old = "new, n = re.subn(pattern, replacement, text, count=1, flags=flags)"
+          new = "new, n = re.subn(pattern, lambda _m: replacement, text, count=1, flags=flags)"
+          if old not in s:
+              raise SystemExit('helper regex_replace non trovato')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
           python3 experiments/v071/apply_v071_fstop.py work
 
       - name: Leggi versione risultante
