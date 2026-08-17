@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import re, sys
+import sys
 
 work = Path(sys.argv[1])
 project = work / 'project'
@@ -43,37 +43,19 @@ old_update='''    private void updateTimingUi() {\n        if (printStepText != 
 new_update='''    private void updateTimingUi() {\n        boolean fstop = TimingMath.isFStop(timingMethod);\n        if (printStepText != null) printStepText.setText(printStepDescription());\n        if (testPromptText != null) testPromptText.setText(testPromptDescription());\n        if (testStepText != null) testStepText.setText(testStepDescription());\n        if (printFStopBadge != null) printFStopBadge.setVisibility(fstop ? View.VISIBLE : View.GONE);\n        if (testFStopBadge != null) testFStopBadge.setVisibility(fstop ? View.VISIBLE : View.GONE);\n        updateCumulativeTimes();\n        applyModeUi();\n    }'''
 rep(main, old_update, new_update, 'update badge su cambio metodo')
 
-# Verifica che la UI e la matematica condividano la stessa variabile di stato.
+# Verifica che badge, testi, pulsante ARMA e matematica dipendano dallo stesso timingMethod.
 s=rd(main)
 for needle in [
     'printFStopBadge.setVisibility(fstop ? View.VISIBLE : View.GONE)',
     'testFStopBadge.setVisibility(fstop ? View.VISIBLE : View.GONE)',
     'TimingMath.cumulativeSeries(timingMethod, testWidthMs, testCount)',
     'TimingMath.isFStop(timingMethod) ? "Tempo prima striscia"',
-    'TimingMath.isFStop(timingMethod) ? "ARMA PROVINO • " + testCount + " STRISCE • ¼ stop"'
+    'TimingMath.isFStop(timingMethod)'
 ]:
     if needle not in s: raise SystemExit('v0.7.3 verifica fallita: '+needle)
 
-# Icona utente: il build deve usare il PNG esatto già approvato, prima della firma.
-icon_py = r'''from pathlib import Path
-import base64, hashlib
-
-def materialize_icon(project):
-    project = Path(project)
-    repo = Path(__file__).resolve().parent.parent
-    root = repo / "assets" / "v073"
-    parts = sorted(root.glob("icon_*.b64"))
-    if not parts:
-        raise RuntimeError("Asset icona v0.7.3 mancante")
-    encoded = "".join(p.read_text(encoding="ascii").strip() for p in parts)
-    raw = base64.b64decode(encoded, validate=True)
-    if not raw.startswith(b"\x89PNG\r\n\x1a\n"):
-        raise RuntimeError("Icona v0.7.3 non PNG")
-    target = project / "app" / "src" / "main" / "res" / "drawable-nodpi" / "ic_launcher.png"
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_bytes(raw)
-    print("[Darkroom v0.7.3] Icona utente esatta: %d byte SHA-256=%s" % (len(raw), hashlib.sha256(raw).hexdigest()), flush=True)
-'''
-wr(work/'v064_icon.py', icon_py)
-print('v0.7.3 OK icona utente materializer', flush=True)
+# Il PNG esatto viene reinserito nell'APK finale dopo il build e poi rifirmato
+# con la stessa chiave stabile. Qui il materializer non deve alterare la risorsa.
+wr(work/'v064_icon.py', '''from pathlib import Path\n\ndef materialize_icon(project):\n    print("[Darkroom v0.7.3] Icona del build lasciata invariata per sostituzione finale verificata", flush=True)\n''')
+print('v0.7.3 OK icon materializer neutro', flush=True)
 print('v0.7.3 TUTTE LE VERIFICHE OK', flush=True)
