@@ -2,7 +2,7 @@ name: Build Darkroom Timer APK
 
 on:
   push:
-    branches: [ main, feature-v071-fstop ]
+    branches: [ main, feature-v071-fstop, feature-v072-polish ]
   workflow_dispatch:
 
 permissions:
@@ -36,7 +36,7 @@ jobs:
           fi
 
       - name: Applica temporizzazione F-STOP coerente v0.7.1
-        if: github.ref == 'refs/heads/feature-v071-fstop'
+        if: github.ref == 'refs/heads/feature-v071-fstop' || github.ref == 'refs/heads/feature-v072-polish'
         shell: bash
         run: |
           set -euo pipefail
@@ -51,6 +51,13 @@ jobs:
           p.write_text(s.replace(old, new, 1), encoding='utf-8')
           PY
           python3 experiments/v071/apply_v071_fstop.py work
+
+      - name: Applica rifiniture v0.7.2
+        if: github.ref == 'refs/heads/feature-v072-polish'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v072/apply_v072_polish.py work
 
       - name: Leggi versione risultante
         id: version
