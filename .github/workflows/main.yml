@@ -57,7 +57,65 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('experiments/v072/apply_v072_polish.py')
+          s = p.read_text(encoding='utf-8')
+          start = s.index('# Stato SONOFF: PRONTO non è ammesso durante la riconnessione.')
+          end = s.index('# Badge F-STOP helper, red-only in camera oscura.')
+          replacement = '''# Stato SONOFF: gestito in modo robusto dal workflow dopo le altre rifiniture.\nprint('OK stato riconnessione rinviato al fix robusto')\n\n'''
+          p.write_text(s[:start] + replacement + s[end:], encoding='utf-8')
+          PY
+
           python3 experiments/v072/apply_v072_polish.py work
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          main = Path('work/project/app/src/main/java/it/darkroom/timer/MainActivity.java')
+          s = main.read_text(encoding='utf-8')
+
+          old_ready = '''    private final Runnable readyResetRunnable = () -> {\n        if (!armed && mode != MODE_LOG && stateCard != null) {\n            setStatusPresentation("PRONTO", "Scegli il tempo e premi ARMA",\n                    device != null && device.isValid() ? GREEN : MUTED);\n        }\n    };'''
+          new_ready = '''    private final Runnable readyResetRunnable = () -> {\n        if (!armed && mode != MODE_LOG && stateCard != null) {\n            if (device != null && device.isValid()) {\n                setStatusPresentation("PRONTO", "Scegli il tempo e premi ARMA", GREEN);\n            } else {\n                setStatusPresentation("ATTESA SONOFF",\n                        "RICONNESSIONE AUTOMATICA — attendo conferma dal SONOFF",\n                        darkroomMode ? RED : AMBER);\n            }\n        }\n    };'''
+          if old_ready not in s:
+              raise SystemExit('readyResetRunnable non trovato')
+          s = s.replace(old_ready, new_ready, 1)
+
+          old_normal = '''            } else {\n                if (detail.isEmpty() && device != null && device.isValid()) detail = "Scegli il tempo e premi ARMA";\n                accent = device != null && device.isValid() ? GREEN : MUTED;\n            }'''
+          new_normal = '''            } else {\n                if (device != null && device.isValid()) {\n                    title = "PRONTO";\n                    if (detail.isEmpty()) detail = "Scegli il tempo e premi ARMA";\n                    accent = GREEN;\n                } else {\n                    title = "ATTESA SONOFF";\n                    detail = "RICONNESSIONE AUTOMATICA — attendo conferma dal SONOFF";\n                    accent = darkroomMode ? RED : AMBER;\n                }\n            }'''
+          if old_normal not in s:
+              raise SystemExit('ramo STATE_NORMAL non trovato')
+          s = s.replace(old_normal, new_normal, 1)
+          main.write_text(s, encoding='utf-8')
+
+          # L'icona definitiva viene inserita dopo il download dell'APK usando
+          # l'immagine originale fornita dall'utente; qui lasciamo il launcher
+          # corrente solo per produrre un APK compilato e firmato di base.
+          build = Path('work/build_darkroom.py').read_text(encoding='utf-8')
+          m = re.search(r'from v064_icon import ([A-Za-z_][A-Za-z0-9_]*)', build)
+          if not m:
+              raise SystemExit('import v064_icon non trovato')
+          func = m.group(1)
+          Path('work/v064_icon.py').write_text(
+              'from pathlib import Path\n\n'
+              f'def {func}(project):\n'
+              '    print("[Darkroom v0.7.2] Icona provvisoria del build; sostituzione finale post-build", flush=True)\n',
+              encoding='utf-8')
+
+          checks = [
+              'ATTESA SONOFF',
+              'RICONNESSIONE AUTOMATICA — attendo conferma dal SONOFF',
+              'F-STOP  ·  ¼ stop',
+              '½ stop: indicare 0,5',
+              'private TextView fStopBadge'
+          ]
+          final = main.read_text(encoding='utf-8')
+          for needle in checks:
+              if needle not in final:
+                  raise SystemExit('verifica v0.7.2 fallita: ' + needle)
+          print('v0.7.2: fix SONOFF + F-STOP + editor verificati')
+          PY
 
       - name: Leggi versione risultante
         id: version
@@ -127,3 +185,20 @@ jobs:
         with:
           name: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}
           path: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}.apk
+
+      - name: Esporta strumenti firma APK
+        if: github.ref == 'refs/heads/feature-v072-polish'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p android-sign-tools
+          cp "$ANDROID_HOME/build-tools/34.0.0/lib/apksigner.jar" android-sign-tools/
+          cp "$ANDROID_HOME/build-tools/34.0.0/zipalign" android-sign-tools/
+          chmod +x android-sign-tools/zipalign
+
+      - name: Salva strumenti firma APK
+        if: github.ref == 'refs/heads/feature-v072-polish'
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-sign-tools-34
+          path: android-sign-tools/
