@@ -2,7 +2,7 @@ name: Build Darkroom Timer APK
 
 on:
   push:
-    branches: [ main, feature-v071-fstop, feature-v072-polish, feature-v073-fstop-badge-state ]
+    branches: [ main, feature-v071-fstop, feature-v072-polish, feature-v073-fstop-badge-state, feature-v074-fstop-badge-color ]
   workflow_dispatch:
 
 permissions:
@@ -34,7 +34,7 @@ jobs:
           fi
 
       - name: Applica temporizzazione F-STOP coerente v0.7.1
-        if: github.ref == 'refs/heads/feature-v071-fstop' || github.ref == 'refs/heads/feature-v072-polish' || github.ref == 'refs/heads/feature-v073-fstop-badge-state'
+        if: github.ref == 'refs/heads/feature-v071-fstop' || github.ref == 'refs/heads/feature-v072-polish' || github.ref == 'refs/heads/feature-v073-fstop-badge-state' || github.ref == 'refs/heads/feature-v074-fstop-badge-color'
         shell: bash
         run: |
           set -euo pipefail
@@ -51,7 +51,7 @@ jobs:
           python3 experiments/v071/apply_v071_fstop.py work
 
       - name: Applica rifiniture v0.7.2
-        if: github.ref == 'refs/heads/feature-v072-polish' || github.ref == 'refs/heads/feature-v073-fstop-badge-state'
+        if: github.ref == 'refs/heads/feature-v072-polish' || github.ref == 'refs/heads/feature-v073-fstop-badge-state' || github.ref == 'refs/heads/feature-v074-fstop-badge-color'
         shell: bash
         run: |
           set -euo pipefail
@@ -104,11 +104,18 @@ jobs:
           PY
 
       - name: Correggi stato dinamico badge F-STOP v0.7.3
-        if: github.ref == 'refs/heads/feature-v073-fstop-badge-state'
+        if: github.ref == 'refs/heads/feature-v073-fstop-badge-state' || github.ref == 'refs/heads/feature-v074-fstop-badge-color'
         shell: bash
         run: |
           set -euo pipefail
           python3 experiments/v073/apply_v073_badge_state.py work
+
+      - name: Rifinisci colore badge F-STOP v0.7.4
+        if: github.ref == 'refs/heads/feature-v074-fstop-badge-color'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v074/apply_v074_badge_color.py work
 
       - name: Leggi versione risultante
         id: version
