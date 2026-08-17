@@ -2,7 +2,7 @@ name: Build Darkroom Timer APK
 
 on:
   push:
-    branches: [ main, feature-v071-fstop, feature-v072-polish ]
+    branches: [ main, feature-v071-fstop, feature-v072-polish, feature-v073-fstop-badge-state ]
   workflow_dispatch:
 
 permissions:
@@ -24,10 +24,8 @@ jobs:
           mkdir -p work
           test -d base/v0.6.0/project
           test -f base/v0.6.0/build_darkroom.py
-          echo "Uso base consolidata v0.6.0"
           cp -a base/v0.6.0/project work/project
           cp base/v0.6.0/build_darkroom.py work/build_darkroom.py
-
           if [ -d patches/active ]; then
             while IFS= read -r patch_file; do
               echo "Applico patch attiva $patch_file"
@@ -36,7 +34,7 @@ jobs:
           fi
 
       - name: Applica temporizzazione F-STOP coerente v0.7.1
-        if: github.ref == 'refs/heads/feature-v071-fstop' || github.ref == 'refs/heads/feature-v072-polish'
+        if: github.ref == 'refs/heads/feature-v071-fstop' || github.ref == 'refs/heads/feature-v072-polish' || github.ref == 'refs/heads/feature-v073-fstop-badge-state'
         shell: bash
         run: |
           set -euo pipefail
@@ -53,7 +51,7 @@ jobs:
           python3 experiments/v071/apply_v071_fstop.py work
 
       - name: Applica rifiniture v0.7.2
-        if: github.ref == 'refs/heads/feature-v072-polish'
+        if: github.ref == 'refs/heads/feature-v072-polish' || github.ref == 'refs/heads/feature-v073-fstop-badge-state'
         shell: bash
         run: |
           set -euo pipefail
@@ -61,85 +59,56 @@ jobs:
           from pathlib import Path
           p = Path('experiments/v072/apply_v072_polish.py')
           s = p.read_text(encoding='utf-8')
-
-          # Questi tre blocchi vengono gestiti sotto con patch robuste sul sorgente
-          # effettivamente prodotto dalla v0.7.1.
           start = s.index('# Stato SONOFF: PRONTO non è ammesso durante la riconnessione.')
           end = s.index('# Badge F-STOP helper, red-only in camera oscura.')
           s = s[:start] + "# Stato SONOFF: fix robusto nel workflow\nprint('OK stato SONOFF rinviato')\n\n" + s[end:]
-
           start = s.index('# JPG: trasforma solo i valori che terminano esattamente in ,5/.5.')
           end = s.index('# Icona: sostituisce il vecchio preparatore v0.6.4, ma usa byte-per-byte l\'immagine fornita.')
           s = s[:start] + "# JPG: fix robusto nel workflow\nprint('OK JPG rinviato')\n\n" + s[end:]
-
           start = s.index('# Verifiche finali.')
           s = s[:start] + "# Verifiche finali eseguite dal workflow\nprint('v0.7.2: rifiniture principali applicate')\n"
           p.write_text(s, encoding='utf-8')
           PY
-
           python3 experiments/v072/apply_v072_polish.py work
-
           python3 - <<'PY'
           from pathlib import Path
           import re
-
           main = Path('work/project/app/src/main/java/it/darkroom/timer/MainActivity.java')
           s = main.read_text(encoding='utf-8')
-
           old_ready = '''    private final Runnable readyResetRunnable = () -> {\n        if (!armed && mode != MODE_LOG && stateCard != null) {\n            setStatusPresentation("PRONTO", "Scegli il tempo e premi ARMA",\n                    device != null && device.isValid() ? GREEN : MUTED);\n        }\n    };'''
           new_ready = '''    private final Runnable readyResetRunnable = () -> {\n        if (!armed && mode != MODE_LOG && stateCard != null) {\n            if (device != null && device.isValid()) {\n                setStatusPresentation("PRONTO", "Scegli il tempo e premi ARMA", GREEN);\n            } else {\n                setStatusPresentation("ATTESA SONOFF",\n                        "RICONNESSIONE AUTOMATICA — attendo conferma dal SONOFF",\n                        darkroomMode ? RED : AMBER);\n            }\n        }\n    };'''
-          if old_ready not in s:
-              raise SystemExit('readyResetRunnable non trovato')
+          if old_ready not in s: raise SystemExit('readyResetRunnable non trovato')
           s = s.replace(old_ready, new_ready, 1)
-
           old_normal = '''            } else {\n                if (detail.isEmpty() && device != null && device.isValid()) detail = "Scegli il tempo e premi ARMA";\n                accent = device != null && device.isValid() ? GREEN : MUTED;\n            }'''
           new_normal = '''            } else {\n                if (device != null && device.isValid()) {\n                    title = "PRONTO";\n                    if (detail.isEmpty()) detail = "Scegli il tempo e premi ARMA";\n                    accent = GREEN;\n                } else {\n                    title = "ATTESA SONOFF";\n                    detail = "RICONNESSIONE AUTOMATICA — attendo conferma dal SONOFF";\n                    accent = darkroomMode ? RED : AMBER;\n                }\n            }'''
-          if old_normal not in s:
-              raise SystemExit('ramo STATE_NORMAL non trovato')
-          s = s.replace(old_normal, new_normal, 1)
-          main.write_text(s, encoding='utf-8')
+          if old_normal not in s: raise SystemExit('ramo STATE_NORMAL non trovato')
+          main.write_text(s.replace(old_normal, new_normal, 1), encoding='utf-8')
 
           jpg = Path('work/project/app/src/main/java/it/darkroom/timer/JpegCardRenderer.java')
           j = jpg.read_text(encoding='utf-8')
           m = re.search(r'    private static String apertureLabel\(String [A-Za-z_][A-Za-z0-9_]*\) \{.*?\n    \}', j, re.S)
-          if not m:
-              raise SystemExit('apertureLabel non trovato nel renderer risultante')
-          aperture = '''    private static String apertureLabel(String value) {\n        String v = text(value, "—").trim();\n        if ("—".equals(v)) return v;\n        boolean hasPrefix = v.toLowerCase(Locale.ITALY).startsWith("f/");\n        String core = hasPrefix ? v.substring(2).trim() : v;\n        if (core.matches("^[0-9]+[,.]5$")) {\n            core = core.substring(0, core.length() - 2) + "½";\n        }\n        return "f/" + core;\n    }'''
+          if not m: raise SystemExit('apertureLabel non trovato')
+          aperture = '''    private static String apertureLabel(String value) {\n        String v = text(value, "—").trim();\n        if ("—".equals(v)) return v;\n        boolean hasPrefix = v.toLowerCase(Locale.ITALY).startsWith("f/");\n        String core = hasPrefix ? v.substring(2).trim() : v;\n        if (core.matches("^[0-9]+[,.]5$")) core = core.substring(0, core.length() - 2) + "½";\n        return "f/" + core;\n    }'''
           j = j[:m.start()] + aperture + j[m.end():]
-
           marker = '        return b;\n    }'
-          if marker not in j:
-              raise SystemExit('return b non trovato nel renderer')
+          if marker not in j: raise SystemExit('return b non trovato')
           badge = '''        if (TimingMath.isFStop(e.exposureMethod) || TimingMath.isFStop(e.testMethod)) {\n            Paint badgeFill = new Paint(Paint.ANTI_ALIAS_FLAG);\n            badgeFill.setColor(Color.rgb(80, 207, 70));\n            RectF badgeRect = new RectF(WIDTH - 350f, 48f, WIDTH - 64f, 112f);\n            c.drawRoundRect(badgeRect, 32f, 32f, badgeFill);\n            Paint badgeText = new Paint(Paint.ANTI_ALIAS_FLAG);\n            badgeText.setColor(Color.BLACK);\n            badgeText.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));\n            badgeText.setTextSize(27f);\n            badgeText.setTextAlign(Paint.Align.CENTER);\n            c.drawText("F-STOP  ·  ¼ stop", badgeRect.centerX(), badgeRect.centerY() + 10f, badgeText);\n        }\n\n''' + marker
-          j = j.replace(marker, badge, 1)
-          jpg.write_text(j, encoding='utf-8')
+          jpg.write_text(j.replace(marker, badge, 1), encoding='utf-8')
 
-          # Per il build GitHub il launcher resta provvisorio. La copia definitiva
-          # viene sostituita localmente con l'immagine originale e poi rifirmata.
           build_path = Path('work/build_darkroom.py')
           build = build_path.read_text(encoding='utf-8')
           m = re.search(r'from v064_icon import ([A-Za-z_][A-Za-z0-9_]*)', build)
-          if not m:
-              raise SystemExit('import v064_icon non trovato')
+          if not m: raise SystemExit('import v064_icon non trovato')
           func = m.group(1)
-          Path('work/v064_icon.py').write_text(
-              'from pathlib import Path\n\n'
-              f'def {func}(project):\n'
-              '    print("[Darkroom v0.7.2] Launcher provvisorio; sostituzione finale post-build", flush=True)\n',
-              encoding='utf-8')
-
-          checks = {
-              main: ['private static final String APP_VERSION = "0.7.2";', 'ATTESA SONOFF', 'RICONNESSIONE AUTOMATICA — attendo conferma dal SONOFF', 'F-STOP  ·  ¼ stop', '½ stop: indicare 0,5', 'private TextView fStopBadge'],
-              jpg: ['core.matches("^[0-9]+[,.]5$")', 'F-STOP  ·  ¼ stop', 'badgeRect'],
-              build_path: ['VERSION_NAME = "0.7.2"', 'VERSION_CODE = "35"'],
-          }
-          for path, needles in checks.items():
-              text = path.read_text(encoding='utf-8')
-              for needle in needles:
-                  if needle not in text:
-                      raise SystemExit(f'verifica v0.7.2 fallita: {needle} in {path}')
-          print('v0.7.2: SONOFF + badge + editor + JPG verificati')
+          Path('work/v064_icon.py').write_text('from pathlib import Path\n\n'+f'def {func}(project):\n'+'    print("[Darkroom v0.7.2] Launcher provvisorio; sostituzione finale post-build", flush=True)\n', encoding='utf-8')
           PY
+
+      - name: Correggi stato dinamico badge F-STOP v0.7.3
+        if: github.ref == 'refs/heads/feature-v073-fstop-badge-state'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v073/apply_v073_badge_state.py work
 
       - name: Leggi versione risultante
         id: version
@@ -150,8 +119,7 @@ jobs:
           from pathlib import Path
           text = Path('work/project/app/src/main/AndroidManifest.xml').read_text(encoding='utf-8')
           m = re.search(r'android:versionName="([^"]+)"', text)
-          if not m:
-              raise SystemExit('versionName non trovato')
+          if not m: raise SystemExit('versionName non trovato')
           print(m.group(1))
           PY
           )
@@ -168,9 +136,7 @@ jobs:
         shell: bash
         run: |
           SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          if [ ! -x "$SDKMANAGER" ]; then
-            SDKMANAGER="$(command -v sdkmanager)"
-          fi
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
           "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Prepara firma stabile
@@ -182,10 +148,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          test -n "$KEYSTORE_B64"
-          test -n "$KEYSTORE_PASSWORD"
-          test -n "$KEY_ALIAS"
-          test -n "$KEY_PASSWORD"
+          test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
           printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
 
       - name: Compila APK
@@ -196,34 +159,13 @@ jobs:
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           VERSION_NAME: ${{ steps.version.outputs.name }}
         run: |
-          python3 work/build_darkroom.py \
-            work/project \
+          python3 work/build_darkroom.py work/project \
             --output "DarkroomTimer-DIY-v${VERSION_NAME}.apk" \
             --keystore "$RUNNER_TEMP/darkroom-signing.p12" \
-            --alias "$KEY_ALIAS" \
-            --storepass "$KEYSTORE_PASSWORD" \
-            --keypass "$KEY_PASSWORD"
+            --alias "$KEY_ALIAS" --storepass "$KEYSTORE_PASSWORD" --keypass "$KEY_PASSWORD"
 
       - name: Salva APK
         uses: actions/upload-artifact@v4
         with:
           name: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}
           path: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}.apk
-
-      - name: Esporta strumenti APK
-        if: github.ref == 'refs/heads/feature-v072-polish'
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p android-sign-tools
-          cp "$ANDROID_HOME/build-tools/34.0.0/lib/apksigner.jar" android-sign-tools/
-          cp "$ANDROID_HOME/build-tools/34.0.0/zipalign" android-sign-tools/
-          cp "$ANDROID_HOME/build-tools/34.0.0/aapt2" android-sign-tools/
-          chmod +x android-sign-tools/zipalign android-sign-tools/aapt2
-
-      - name: Salva strumenti APK
-        if: github.ref == 'refs/heads/feature-v072-polish'
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-sign-tools-34
-          path: android-sign-tools/
