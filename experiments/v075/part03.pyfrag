@@ -39,8 +39,7 @@ rrep(service,
       '''    private void fail(String message) {\n        TechnicalLog.add(this, techSessionId, "ERRORE — " + message);\n        cancelTimers();\n        completing.set(true);\n        try {\n            if (device != null && device.isValid()) {\n                try { SonoffHttp.switchOff(device); } catch (Exception ignored) {}\n                try { SonoffHttp.pulseOff(device); } catch (Exception ignored) {}\n            }\n        } finally {\n            restoreSafelightBestEffort();\n        }\n        broadcast(STATE_ERROR, message);\n        updateNotification("ATTENZIONE — " + message);\n        releaseWakeLock();\n    }\n\n    private void stopCleanly''', 'service fail-safe')
 
 # Icona v0.7.2: stessa immagine, ricodificata solo per conservarla nel repo; conversione PNG PRIMA della firma.
-repo_root = Path(__file__).resolve().parent.parent.parent
-asset_dir = repo_root/'assets'/'v075'
+asset_dir = Path.cwd()/'assets'/'v075'
 parts = sorted(asset_dir.glob('icon_*.b64'))
 if not parts: raise SystemExit('v0.7.5 asset icona mancante')
 encoded=''.join(p.read_text(encoding='ascii').strip() for p in parts)
