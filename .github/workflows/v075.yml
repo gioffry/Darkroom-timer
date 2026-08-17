@@ -1,0 +1,190 @@
+name: Build Darkroom Timer v0.7.5
+
+on:
+  push:
+    branches: [ feature-v075-safelight ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica repository
+        uses: actions/checkout@v4
+
+      - name: Prepara base e patch attive
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf work && mkdir -p work
+          cp -a base/v0.6.0/project work/project
+          cp base/v0.6.0/build_darkroom.py work/build_darkroom.py
+          if [ -d patches/active ]; then
+            while IFS= read -r patch_file; do
+              echo "Applico $patch_file"
+              patch -d work -p1 < "$patch_file"
+            done < <(find patches/active -maxdepth 1 -type f -name '*.patch' | sort)
+          fi
+
+      - name: Applica v0.7.1 F-STOP
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('experiments/v071/apply_v071_fstop.py')
+          s=p.read_text(encoding='utf-8')
+          old="new, n = re.subn(pattern, replacement, text, count=1, flags=flags)"
+          new="new, n = re.subn(pattern, lambda _m: replacement, text, count=1, flags=flags)"
+          if old not in s: raise SystemExit('helper regex_replace non trovato')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+          python3 experiments/v071/apply_v071_fstop.py work
+
+      - name: Applica v0.7.2 polish
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('experiments/v072/apply_v072_polish.py')
+          s=p.read_text(encoding='utf-8')
+          start=s.index('# Stato SONOFF: PRONTO non è ammesso durante la riconnessione.')
+          end=s.index('# Badge F-STOP helper, red-only in camera oscura.')
+          s=s[:start]+"# Stato SONOFF: fix robusto nel workflow\nprint('OK stato SONOFF rinviato')\n\n"+s[end:]
+          start=s.index('# JPG: trasforma solo i valori che terminano esattamente in ,5/.5.')
+          end=s.index('# Icona: sostituisce il vecchio preparatore v0.6.4, ma usa byte-per-byte l\'immagine fornita.')
+          s=s[:start]+"# JPG: fix robusto nel workflow\nprint('OK JPG rinviato')\n\n"+s[end:]
+          start=s.index('# Verifiche finali.')
+          s=s[:start]+"# Verifiche finali eseguite dal workflow\nprint('v0.7.2: rifiniture principali applicate')\n"
+          p.write_text(s,encoding='utf-8')
+          PY
+          python3 experiments/v072/apply_v072_polish.py work
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          main=Path('work/project/app/src/main/java/it/darkroom/timer/MainActivity.java')
+          s=main.read_text(encoding='utf-8')
+          old_ready='''    private final Runnable readyResetRunnable = () -> {\n        if (!armed && mode != MODE_LOG && stateCard != null) {\n            setStatusPresentation("PRONTO", "Scegli il tempo e premi ARMA",\n                    device != null && device.isValid() ? GREEN : MUTED);\n        }\n    };'''
+          new_ready='''    private final Runnable readyResetRunnable = () -> {\n        if (!armed && mode != MODE_LOG && stateCard != null) {\n            if (device != null && device.isValid()) {\n                setStatusPresentation("PRONTO", "Scegli il tempo e premi ARMA", GREEN);\n            } else {\n                setStatusPresentation("ATTESA SONOFF",\n                        "RICONNESSIONE AUTOMATICA — attendo conferma dal SONOFF",\n                        darkroomMode ? RED : AMBER);\n            }\n        }\n    };'''
+          if old_ready not in s: raise SystemExit('readyResetRunnable non trovato')
+          s=s.replace(old_ready,new_ready,1)
+          old_normal='''            } else {\n                if (detail.isEmpty() && device != null && device.isValid()) detail = "Scegli il tempo e premi ARMA";\n                accent = device != null && device.isValid() ? GREEN : MUTED;\n            }'''
+          new_normal='''            } else {\n                if (device != null && device.isValid()) {\n                    title = "PRONTO";\n                    if (detail.isEmpty()) detail = "Scegli il tempo e premi ARMA";\n                    accent = GREEN;\n                } else {\n                    title = "ATTESA SONOFF";\n                    detail = "RICONNESSIONE AUTOMATICA — attendo conferma dal SONOFF";\n                    accent = darkroomMode ? RED : AMBER;\n                }\n            }'''
+          if old_normal not in s: raise SystemExit('ramo STATE_NORMAL non trovato')
+          main.write_text(s.replace(old_normal,new_normal,1),encoding='utf-8')
+
+          jpg=Path('work/project/app/src/main/java/it/darkroom/timer/JpegCardRenderer.java')
+          j=jpg.read_text(encoding='utf-8')
+          m=re.search(r'    private static String apertureLabel\(String [A-Za-z_][A-Za-z0-9_]*\) \{.*?\n    \}',j,re.S)
+          if not m: raise SystemExit('apertureLabel non trovato')
+          aperture='''    private static String apertureLabel(String value) {\n        String v = text(value, "—").trim();\n        if ("—".equals(v)) return v;\n        boolean hasPrefix = v.toLowerCase(Locale.ITALY).startsWith("f/");\n        String core = hasPrefix ? v.substring(2).trim() : v;\n        if (core.matches("^[0-9]+[,.]5$")) core = core.substring(0, core.length() - 2) + "½";\n        return "f/" + core;\n    }'''
+          j=j[:m.start()]+aperture+j[m.end():]
+          marker='        return b;\n    }'
+          if marker not in j: raise SystemExit('return b non trovato')
+          badge='''        if (TimingMath.isFStop(e.exposureMethod) || TimingMath.isFStop(e.testMethod)) {\n            Paint badgeFill = new Paint(Paint.ANTI_ALIAS_FLAG);\n            badgeFill.setColor(Color.rgb(80, 207, 70));\n            RectF badgeRect = new RectF(WIDTH - 350f, 48f, WIDTH - 64f, 112f);\n            c.drawRoundRect(badgeRect, 32f, 32f, badgeFill);\n            Paint badgeText = new Paint(Paint.ANTI_ALIAS_FLAG);\n            badgeText.setColor(Color.BLACK);\n            badgeText.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));\n            badgeText.setTextSize(27f);\n            badgeText.setTextAlign(Paint.Align.CENTER);\n            c.drawText("F-STOP  ·  ¼ stop", badgeRect.centerX(), badgeRect.centerY() + 10f, badgeText);\n        }\n\n'''+marker
+          jpg.write_text(j.replace(marker,badge,1),encoding='utf-8')
+          build=Path('work/build_darkroom.py').read_text(encoding='utf-8')
+          m=re.search(r'from v064_icon import ([A-Za-z_][A-Za-z0-9_]*)',build)
+          if not m: raise SystemExit('import v064_icon non trovato')
+          func=m.group(1)
+          Path('work/v064_icon.py').write_text('def '+func+'(project):\n    print("[Darkroom v0.7.2] launcher provvisorio", flush=True)\n',encoding='utf-8')
+          PY
+
+      - name: Applica v0.7.3 badge dinamico
+        run: python3 experiments/v073/apply_v073_badge_state.py work
+
+      - name: Applica v0.7.4 colore badge
+        run: python3 experiments/v074/apply_v074_badge_color.py work
+
+      - name: Applica v0.7.5 safelight e icona
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat experiments/v075/part00.pyfrag experiments/v075/part01.pyfrag experiments/v075/part02.pyfrag experiments/v075/part03.pyfrag > /tmp/apply_v075.py
+          python3 -m py_compile /tmp/apply_v075.py
+          python3 /tmp/apply_v075.py work
+
+      - name: Leggi versione
+        id: version
+        shell: bash
+        run: |
+          VERSION_NAME=$(python3 - <<'PY'
+          import re
+          from pathlib import Path
+          t=Path('work/project/app/src/main/AndroidManifest.xml').read_text(encoding='utf-8')
+          print(re.search(r'android:versionName="([^"]+)"',t).group(1))
+          PY
+          )
+          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Configura Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Ripristina icona v0.7.2 prima della firma
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/iconconvert" work/project/app/src/main/res/drawable-nodpi
+          cat > "$RUNNER_TEMP/iconconvert/IconConvert.java" <<'JAVA'
+          import java.io.File;
+          import java.awt.image.BufferedImage;
+          import javax.imageio.ImageIO;
+          public class IconConvert {
+            public static void main(String[] a) throws Exception {
+              BufferedImage im=ImageIO.read(new File(a[0]));
+              if(im==null) throw new Exception("Immagine icona non leggibile");
+              if(!ImageIO.write(im,"png",new File(a[1]))) throw new Exception("PNG non scritto");
+            }
+          }
+          JAVA
+          javac "$RUNNER_TEMP/iconconvert/IconConvert.java"
+          java -cp "$RUNNER_TEMP/iconconvert" IconConvert work/user_icon_v075.jpg work/project/app/src/main/res/drawable-nodpi/ic_launcher.png
+          file work/project/app/src/main/res/drawable-nodpi/ic_launcher.png
+          sha256sum work/project/app/src/main/res/drawable-nodpi/ic_launcher.png
+
+      - name: Prepara Android SDK
+        shell: bash
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Prepara firma stabile
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
+
+      - name: Compila e firma APK
+        shell: bash
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+        run: |
+          python3 work/build_darkroom.py work/project \
+            --output "DarkroomTimer-DIY-v${VERSION_NAME}.apk" \
+            --keystore "$RUNNER_TEMP/darkroom-signing.p12" \
+            --alias "$KEY_ALIAS" --storepass "$KEYSTORE_PASSWORD" --keypass "$KEY_PASSWORD"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "DarkroomTimer-DIY-v${VERSION_NAME}.apk"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging "DarkroomTimer-DIY-v${VERSION_NAME}.apk" | head -20
+
+      - name: Salva APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}
+          path: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}.apk
