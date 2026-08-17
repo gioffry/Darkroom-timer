@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import re, sys, base64, hashlib
+
+work = Path(sys.argv[1])
+project = work / 'project'
+java = project / 'app/src/main/java/it/darkroom/timer'
+main = java / 'MainActivity.java'
+service = java / 'SonoffArmService.java'
+build = work / 'build_darkroom.py'
+
+
+def rd(p): return Path(p).read_text(encoding='utf-8')
+def wr(p,s): Path(p).write_text(s, encoding='utf-8')
+def rep(p, old, new, label, count=1):
+    p=Path(p); s=rd(p); n=s.count(old)
+    if n < count: raise SystemExit(f'v0.7.5 {label}: atteso >= {count}, trovato {n}')
+    wr(p, s.replace(old,new,count)); print('v0.7.5 OK', label, flush=True)
+def rrep(p, pattern, replacement, label):
+    p=Path(p); s=rd(p); out,n=re.subn(pattern, lambda m: replacement(m) if callable(replacement) else replacement, s, count=1, flags=re.S)
+    if n != 1: raise SystemExit(f'v0.7.5 {label}: regex trovata {n} volte')
+    wr(p,out); print('v0.7.5 OK',label,flush=True)
+
+# Versione
+rep(build, 'VERSION_NAME = "0.7.4"\nVERSION_CODE = "37"', 'VERSION_NAME = "0.7.5"\nVERSION_CODE = "38"', 'version build')
+rep(build, '[Darkroom v0.7.4]', '[Darkroom v0.7.5]', 'tag build')
+rep(build, 'versionCode\\s+37\\b', 'versionCode\\s+38\\b', 'preflight code')
+rep(build, '0\\.7\\.4', '0\\.7\\.5', 'preflight name')
+rep(build, 'versionCode 37 / versionName 0.7.4', 'versionCode 38 / versionName 0.7.5', 'preflight msg')
+rep(build, 'Preflight v0.7.4 OK', 'Preflight v0.7.5 OK', 'preflight log')
+rep(project/'app/build.gradle', "versionCode 37\n        versionName '0.7.4'", "versionCode 38\n        versionName '0.7.5'", 'gradle')
+rep(project/'app/src/main/AndroidManifest.xml', 'android:versionCode="37"\n    android:versionName="0.7.4"', 'android:versionCode="38"\n    android:versionName="0.7.5"', 'manifest')
+rep(main, 'private static final String APP_VERSION = "0.7.4";', 'private static final String APP_VERSION = "0.7.5";', 'app version')
+
+# Configurazione separata del secondo SONOFF dedicato alla luce rossa.
+safelight_java = r'''package it.darkroom.timer;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+public final class SafelightConfig {
+    private static final String PREFS = "safelight_diy";
+    private SafelightConfig() {}
+
+    public static DeviceConfig load(Context c) {
+        SharedPreferences p = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        return new DeviceConfig(p.getString("host", ""), p.getInt("port", 0), p.getString("deviceId", ""));
+    }
+
+    public static void save(Context c, DeviceConfig d) {
+        if (d == null) { clear(c); return; }
+        c.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                .putString("host", d.host == null ? "" : d.host)
+                .putInt("port", d.port)
+                .putString("deviceId", d.deviceId == null ? "" : d.deviceId)
+                .apply();
+    }
+
+    public static void clear(Context c) {
+        c.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().clear().apply();
+    }
+}
+'''
+wr(java/'SafelightConfig.java', safelight_java)
+print('v0.7.5 OK SafelightConfig.java', flush=True)
+
+# MainActivity: stato e configurazione UI.
+rep(main,
+'''    private boolean darkroomProtection;\n    private String timingMethod = TimingMath.METHOD_SECONDS;''',
+'''    private boolean darkroomProtection;\n    private String timingMethod = TimingMath.METHOD_SECONDS;\n    private boolean safelightAuto = false;''', 'campo safelight auto')
+rep(main,
+'''    private TextView deviceStatus;\n    private TextView stateTitle;''',
+'''    private TextView deviceStatus;\n    private TextView safelightStatus;\n    private TextView stateTitle;''', 'campo stato safelight')
+rep(main,
+'''    private DeviceConfig device;\n    private String selectedDeviceId;''',
+'''    private DeviceConfig device;\n    private String selectedDeviceId;\n    private DeviceConfig safelightDevice;\n    private String selectedSafelightDeviceId = "";''', 'campi device safelight')
+rep(main,
+'''        timingMethod = TimingMath.normalizeMethod(p.getString("timingMethod", TimingMath.METHOD_SECONDS));''',
+'''        timingMethod = TimingMath.normalizeMethod(p.getString("timingMethod", TimingMath.METHOD_SECONDS));\n        safelightAuto = p.getBoolean("safelightAuto", false);''', 'load auto')
+rep(main,
+'''        DeviceConfig saved = DeviceConfig.load(this);\n        selectedDeviceId = saved.deviceId == null ? "" : saved.deviceId.trim();\n        device = null;''',
+'''        DeviceConfig saved = DeviceConfig.load(this);\n        selectedDeviceId = saved.deviceId == null ? "" : saved.deviceId.trim();\n        device = null;\n        DeviceConfig savedSafelight = SafelightConfig.load(this);\n        selectedSafelightDeviceId = savedSafelight.deviceId == null ? "" : savedSafelight.deviceId.trim();\n        safelightDevice = savedSafelight.isValid() ? savedSafelight : null;''', 'load secondo sonoff')
+rep(main,
+'''        reconnectHandler.removeCallbacks(reconnectRunnable);\n        reconnectHandler.postDelayed(reconnectRunnable, 3000L);''',
+'''        reconnectHandler.removeCallbacks(reconnectRunnable);\n        reconnectHandler.postDelayed(reconnectRunnable, 3000L);\n        ensureSafelightIdleOn();''', 'idle safelight on start')
+
+# Riga di stato non invasiva nel pannello SONOFF.
+rep(main,
+'''        deviceStatus.setPadding(0, dp(8), 0, 0);\n        deviceCard.addView(deviceStatus);''',
+'''        deviceStatus.setPadding(0, dp(8), 0, 0);\n        deviceCard.addView(deviceStatus);\n        safelightStatus = text("", 11, MUTED, false);\n        safelightStatus.setPadding(0, dp(4), 0, 0);\n        deviceCard.addView(safelightStatus);\n        updateSafelightStatus();''', 'status safelight main')
+
+# Settings: automazione ON/OFF e scelta secondo SONOFF.
+marker='''        Button dark = compactButton("MODALITÀ CAMERA OSCURA: " + (darkroomMode ? "ON" : "OFF"));'''
