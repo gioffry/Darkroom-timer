@@ -1,8 +1,8 @@
-name: Build Darkroom Timer v0.7.5
+name: Build Darkroom Timer v0.7.6
 
 on:
   push:
-    branches: [ feature-v075-safelight ]
+    branches: [ feature-v076-safelight-interlock ]
   workflow_dispatch:
 
 permissions:
@@ -107,6 +107,13 @@ jobs:
           cat experiments/v075/part00.pyfrag experiments/v075/part01.pyfrag experiments/v075/part02.pyfrag experiments/v075/part03.pyfrag > /tmp/apply_v075.py
           python3 -m py_compile /tmp/apply_v075.py
           python3 /tmp/apply_v075.py work
+
+      - name: Applica v0.7.6 interblocco safelight
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile experiments/v076/apply_v076_interlock.py
+          python3 experiments/v076/apply_v076_interlock.py work
 
       - name: Leggi versione
         id: version
