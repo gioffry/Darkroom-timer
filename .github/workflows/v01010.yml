@@ -94,6 +94,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 experiments/v01010/prepare_v01010_transform.py
           python3 -m py_compile experiments/v01010/apply_v01010_timer_splitgrade_provini.py
           python3 experiments/v01010/apply_v01010_timer_splitgrade_provini.py work
 
