@@ -111,6 +111,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 experiments/v0104/prepare_v0104_transform.py
           python3 -m py_compile experiments/v0104/apply_v0104_dodge_burn_voice.py
           python3 experiments/v0104/apply_v0104_dodge_burn_voice.py work
 
