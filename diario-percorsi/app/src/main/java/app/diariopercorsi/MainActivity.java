@@ -27,9 +27,13 @@ public class MainActivity extends Activity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 view.evaluateJavascript(
-                    "(function(){if(document.getElementById('diario-v13'))return;" +
+                    "(function(){" +
+                    "if(document.getElementById('diario-v13'))return;" +
                     "var s=document.createElement('script');s.id='diario-v13';" +
-                    "s.src='file:///android_asset/ui-v13.js';document.body.appendChild(s);})();",
+                    "s.src='file:///android_asset/ui-v13.js';" +
+                    "s.onload=function(){if(document.getElementById('diario-v14'))return;var n=document.createElement('script');n.id='diario-v14';n.src='file:///android_asset/ui-v14.js';document.body.appendChild(n);};" +
+                    "document.body.appendChild(s);" +
+                    "})();",
                     null
                 );
             }
