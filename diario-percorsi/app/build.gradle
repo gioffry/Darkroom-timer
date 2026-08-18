@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'app.diariopercorsi'
+    namespace 'app.diariopercorsigiallo'
     compileSdk 35
 
     defaultConfig {
-        applicationId 'app.diariopercorsi'
+        applicationId 'app.diariopercorsigiallo'
         minSdk 23
         targetSdk 35
         versionCode 2
