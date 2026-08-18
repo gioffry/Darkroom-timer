@@ -1,0 +1,264 @@
+name: Build Darkroom Timer v0.10.9
+
+on:
+  push:
+    branches: [ feature-v0109-darkroom-assistant-r4 ]
+    paths-ignore:
+      - 'experiments/v0109/latest_run.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feature-v0109-darkroom-assistant-r4
+
+      - name: Record run id
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/v0109
+          printf 'run_id=%s\ncommit=%s\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" > experiments/v0109/latest_run.txt
+          git config user.name "Darkroom Timer Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add experiments/v0109/latest_run.txt
+          git commit -m "Record v0.10.9 build run [skip ci]"
+          git push origin HEAD:feature-v0109-darkroom-assistant-r4
+
+      - name: Prepare clean Darkroom base
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d base/v0.7.7/project
+          rm -rf work && mkdir -p work
+          cp -a base/v0.7.7/project work/project
+          cp base/v0.7.7/build_darkroom.py work/build_darkroom.py
+          cp base/v0.7.7/v064_icon.py work/v064_icon.py
+
+      - name: Apply v0.8.0 through v0.10.5
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v080/prepare_v080_transform.py
+          python3 -m py_compile experiments/v080/apply_v080_print_sequence.py experiments/v080/apply_v080_fixups.py
+          python3 experiments/v080/apply_v080_print_sequence.py work
+          python3 experiments/v080/apply_v080_fixups.py work
+          python3 experiments/v081/prepare_v081_transform.py
+          python3 -m py_compile experiments/v081/apply_v081_print_plan_polish.py
+          python3 experiments/v081/apply_v081_print_plan_polish.py work
+          python3 experiments/v090/prepare_v090_transform.py
+          python3 -m py_compile experiments/v090/apply_v090_split_grade.py experiments/v090/apply_v090_fixups.py
+          python3 experiments/v090/apply_v090_split_grade.py work
+          python3 experiments/v090/apply_v090_fixups.py work
+          python3 experiments/v091/prepare_v091_transform.py
+          python3 -m py_compile experiments/v091/apply_v091_timing_voice_polish.py
+          python3 experiments/v091/apply_v091_timing_voice_polish.py work
+          python3 experiments/v0100/prepare_v0100_transform.py
+          python3 -m py_compile experiments/v0100/apply_v0100_pro_recipe.py
+          python3 experiments/v0100/apply_v0100_pro_recipe.py work
+          python3 experiments/v0101/prepare_v0101_transform.py
+          python3 -m py_compile experiments/v0101/apply_v0101_stability_ux.py
+          python3 experiments/v0101/apply_v0101_stability_ux.py work
+          python3 experiments/v0102/prepare_v0102_transform.py
+          python3 -m py_compile experiments/v0102/apply_v0102_test_fixes.py
+          python3 experiments/v0102/apply_v0102_test_fixes.py work
+          python3 experiments/v0103/prepare_v0103_transform.py
+          python3 -m py_compile experiments/v0103/apply_v0103_split_short_exposure.py
+          python3 experiments/v0103/apply_v0103_split_short_exposure.py work
+          python3 experiments/v0104/prepare_v0104_transform.py
+          python3 -m py_compile experiments/v0104/apply_v0104_dodge_burn_voice.py
+          python3 experiments/v0104/apply_v0104_dodge_burn_voice.py work
+          python3 -m py_compile experiments/v0105/apply_v0105_premature_off_failsafe.py
+          python3 experiments/v0105/apply_v0105_premature_off_failsafe.py work
+
+      - name: Apply Assistant releases 1 through 4
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile experiments/v0106/apply_v0106_darkroom_assistant_r1.py
+          python3 experiments/v0106/apply_v0106_darkroom_assistant_r1.py work
+          python3 -m py_compile experiments/v0107/apply_v0107_darkroom_assistant_r2.py
+          python3 experiments/v0107/apply_v0107_darkroom_assistant_r2.py work
+          python3 -m py_compile experiments/v0108/apply_v0108_darkroom_assistant_r3.py
+          python3 experiments/v0108/apply_v0108_darkroom_assistant_r3.py work
+          python3 -m py_compile experiments/v0109/apply_v0109_darkroom_assistant_r4.py
+          python3 experiments/v0109/apply_v0109_darkroom_assistant_r4.py work
+
+      - name: Test R2 and R3 calculation regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          CAT="work/project/app/src/main/java/it/darkroom/timer/assistant/development/DevelopmentCatalog.java"
+          CHEM="work/project/app/src/main/java/it/darkroom/timer/assistant/chemistry/ChemistryCalculator.java"
+          rm -rf /tmp/r4calc && mkdir -p /tmp/r4calc
+          javac -d /tmp/r4calc "$CAT" "$CHEM"
+          cat > /tmp/TestR4Calc.java <<'JAVA'
+          import it.darkroom.timer.assistant.development.DevelopmentCatalog;
+          import it.darkroom.timer.assistant.chemistry.ChemistryCalculator;
+          public final class TestR4Calc {
+            static void ok(boolean v,String m){if(!v)throw new AssertionError(m);} static void close(double a,double b){if(Math.abs(a-b)>.06)throw new AssertionError(a+" != "+b);}
+            public static void main(String[] a){
+              DevelopmentCatalog.Result direct=DevelopmentCatalog.calculate("KODAK TRI-X 400","35 mm",400,"KODAK D-76","stock",20.0); ok(direct.ok&&direct.finalSeconds==405&&direct.dataType.contains("DIRETTO"),"R2 direct regression");
+              DevelopmentCatalog.Result cross=DevelopmentCatalog.calculate("Fomapan 100 Classic","120",100,"KODAK D-76","stock",20.0); ok(cross.ok&&cross.dataType.contains("ADATTATO"),"R2 cross-brand regression");
+              DevelopmentCatalog.Result push=DevelopmentCatalog.calculate("ILFORD HP5 PLUS","120",1600,"KODAK D-76","stock",21.7); ok(push.ok&&push.calculation.contains("−15%"),"R2 temp/rotary regression");
+              ChemistryCalculator.Result c=ChemistryCalculator.calculate("FOMA Universal","1+3",340,"120",1); close(c.productMl,85);close(c.waterMl,255);ok(ChemistryCalculator.CAPACITY_VERIFIED.equals(c.capacityState),"R3 capacity regression");ok(ChemistryCalculator.CPE2_MAX_ML==600.0,"CPE2 limit regression");
+              ChemistryCalculator.Result stock=ChemistryCalculator.calculate("KODAK D-76","stock",340,"35 mm",1);close(stock.productMl,340);close(stock.waterMl,0);
+              ChemistryCalculator.Result nominal=ChemistryCalculator.calculate("KODAK HC-110","B",340,"120",1);ok(!nominal.dilutionKnown,"nominal dilution invented");
+              System.out.println("R2/R3 regression tests OK");
+            }
+          }
+          JAVA
+          javac -cp /tmp/r4calc -d /tmp/r4calc /tmp/TestR4Calc.java
+          java -cp /tmp/r4calc TestR4Calc
+
+      - name: Test R4 SQLite schema, immutability and persistence
+        shell: bash
+        run: |
+          set -euo pipefail
+          SCHEMA="work/project/app/src/main/java/it/darkroom/timer/assistant/data/AssistantDataSchema.java"
+          rm -rf /tmp/r4schema && mkdir -p /tmp/r4schema
+          javac -d /tmp/r4schema "$SCHEMA"
+          cat > /tmp/DumpSchema.java <<'JAVA'
+          import it.darkroom.timer.assistant.data.AssistantDataSchema;
+          public class DumpSchema { public static void main(String[] a){
+            System.out.println(AssistantDataSchema.CREATE_RECIPES+";");
+            System.out.println(AssistantDataSchema.CREATE_LOGS+";");
+            System.out.println(AssistantDataSchema.CREATE_FAVORITE_INDEX+";");
+            System.out.println(AssistantDataSchema.CREATE_LOG_COMBO_INDEX+";");
+            System.out.println(AssistantDataSchema.CREATE_ORIGINAL_IMMUTABLE_TRIGGER+";");
+          }}
+          JAVA
+          javac -cp /tmp/r4schema -d /tmp/r4schema /tmp/DumpSchema.java
+          java -cp /tmp/r4schema DumpSchema > /tmp/r4schema.sql
+          python3 - <<'PY'
+          import sqlite3, os
+          db='/tmp/darkroom_assistant_test.db'
+          try: os.remove(db)
+          except FileNotFoundError: pass
+          sql=open('/tmp/r4schema.sql',encoding='utf-8').read()
+          c=sqlite3.connect(db); c.executescript(sql)
+          combo='fomapan 100 classic|120|100|foma universal|1+3|jobo cpe2|rotazione continua'
+          src=(combo,'Fomapan 100 Classic','120',100,100,'FOMA Universal','1+3','JOBO CPE2','rotazione continua',21.7,217,'FOMA source','DATO ADATTATO / CALCOLATO','5 min @20','temp + rotary')
+          c.execute('INSERT INTO personal_recipes(combo_key,film,format,nominal_iso,exposed_iso,developer,dilution,processor,method,original_temp,original_seconds,source_name,data_type,source_data,calculation,personal_temp,personal_seconds,note,favorite,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',src+(21.7,220,'prima prova',1,1,1))
+          rid=c.execute('select id from personal_recipes').fetchone()[0]
+          # original immutable; personal time mutable
+          try:
+            c.execute('update personal_recipes set original_seconds=999 where id=?',(rid,)); raise AssertionError('original source was mutable')
+          except sqlite3.IntegrityError: pass
+          c.execute('update personal_recipes set personal_seconds=230,note=? where id=?',('ottima',rid)); row=c.execute('select original_seconds,personal_seconds,note from personal_recipes where id=?',(rid,)).fetchone(); assert row==(217,230,'ottima')
+          # max one preferred per combination
+          try:
+            c.execute('INSERT INTO personal_recipes(combo_key,film,format,nominal_iso,exposed_iso,developer,dilution,processor,method,original_temp,original_seconds,source_name,data_type,source_data,calculation,personal_temp,personal_seconds,note,favorite,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',src+(20.0,225,'seconda',1,2,2)); raise AssertionError('two favorites allowed')
+          except sqlite3.IntegrityError: pass
+          c.execute('update personal_recipes set favorite=0 where id=?',(rid,))
+          c.execute('INSERT INTO personal_recipes(combo_key,film,format,nominal_iso,exposed_iso,developer,dilution,processor,method,original_temp,original_seconds,source_name,data_type,source_data,calculation,personal_temp,personal_seconds,note,favorite,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',src+(20.0,225,'seconda',1,2,2)); assert c.execute('select count(*) from personal_recipes where combo_key=? and favorite=1',(combo,)).fetchone()[0]==1
+          # temperature mismatch must not be treated as same (app tolerance is 0.2 C)
+          assert abs(20.0-22.0)>0.2
+          # reset override without touching source
+          c.execute('update personal_recipes set personal_seconds=original_seconds,personal_temp=original_temp,note="" where id=?',(rid,)); assert c.execute('select original_seconds,personal_seconds from personal_recipes where id=?',(rid,)).fetchone()==(217,217)
+          # historical log snapshot: actual time differs from proposed/source; rating+notes preserved
+          c.execute('INSERT INTO development_logs(created_at,combo_key,film,format,nominal_iso,exposed_iso,developer,dilution,actual_temp,processor,method,actual_seconds,time_origin,source_seconds,source_temp,source_name,data_type,source_data,calculation,volume_ml,product_ml,water_ml,rolls,capacity_state,capacity_message,rating,notes) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(10,combo,'Fomapan 100 Classic','120',100,100,'FOMA Universal','1+3',21.7,'JOBO CPE2','rotazione continua',260,'RICETTA PREFERITA',217,21.7,'FOMA source','DATO ADATTATO / CALCOLATO','5 min @20','temp + rotary',340,85,255,1,'VERIFIED','Capacità verificata',5,'Negativo ottimo'))
+          log=c.execute('select actual_seconds,source_seconds,rating,notes,product_ml,water_ml from development_logs').fetchone(); assert log==(260,217,5,'Negativo ottimo',85.0,255.0)
+          # later recipe edit does not change log
+          c.execute('update personal_recipes set personal_seconds=300 where id=?',(rid,)); assert c.execute('select actual_seconds,source_seconds from development_logs').fetchone()==(260,217)
+          c.commit(); c.close()
+          # process/activity recreation equivalent: reopen same on-disk db and data remains
+          c=sqlite3.connect(db); assert c.execute('select count(*) from development_logs').fetchone()[0]==1; assert c.execute('select count(*) from personal_recipes').fetchone()[0]==2
+          # log -> personal recipe snapshot and comparison grouping
+          l=c.execute('select film,format,nominal_iso,exposed_iso,developer,dilution,processor,method,source_temp,source_seconds,source_name,data_type,source_data,calculation,actual_temp,actual_seconds,notes from development_logs').fetchone()
+          c.execute('update personal_recipes set favorite=0 where combo_key=?',(combo,)); c.execute('INSERT INTO personal_recipes(combo_key,film,format,nominal_iso,exposed_iso,developer,dilution,processor,method,original_temp,original_seconds,source_name,data_type,source_data,calculation,personal_temp,personal_seconds,note,favorite,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',(combo,)+l[:8]+l[8:14]+(l[14],l[15],l[16],1,20,20)); assert c.execute('select personal_seconds,favorite from personal_recipes order by id desc limit 1').fetchone()==(260,1)
+          c.execute('INSERT INTO development_logs(created_at,combo_key,film,format,nominal_iso,exposed_iso,developer,dilution,actual_temp,processor,method,actual_seconds,time_origin,source_seconds,source_temp,source_name,data_type,source_data,calculation,volume_ml,product_ml,water_ml,rolls,capacity_state,capacity_message,rating,notes) SELECT 30,combo_key,film,format,nominal_iso,exposed_iso,developer,dilution,22.0,processor,method,270,time_origin,source_seconds,source_temp,source_name,data_type,source_data,calculation,volume_ml,product_ml,water_ml,rolls,capacity_state,capacity_message,3,"seconda prova" FROM development_logs LIMIT 1')
+          rows=c.execute('select actual_temp,actual_seconds,rating,notes from development_logs where combo_key=? order by created_at',(combo,)).fetchall(); assert len(rows)==2 and rows[0][1]==260 and rows[1][1]==270
+          c.close(); print('R4 SQLite/persistence tests OK')
+          PY
+
+      - name: Verify R4 UI integration and non-destructive upgrade rules
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('work/project/app/src/main'); java=root/'java/it/darkroom/timer'
+          manifest=(root/'AndroidManifest.xml').read_text(encoding='utf-8'); main=(java/'MainActivity.java').read_text(encoding='utf-8'); home=(java/'home/HomeActivity.java').read_text(encoding='utf-8'); assistant=(java/'assistant/AssistantActivity.java').read_text(encoding='utf-8'); newdev=(java/'assistant/development/NewDevelopmentActivity.java').read_text(encoding='utf-8'); result=(java/'assistant/development/DevelopmentResultActivity.java').read_text(encoding='utf-8'); schema=(java/'assistant/data/AssistantDataSchema.java').read_text(encoding='utf-8'); db=(java/'assistant/data/AssistantDatabase.java').read_text(encoding='utf-8'); recipes=(java/'assistant/recipes/MyRecipesActivity.java').read_text(encoding='utf-8'); log=(java/'assistant/log/DevelopmentLogActivity.java').read_text(encoding='utf-8')
+          assert manifest.count('android.intent.action.MAIN')==1 and '.home.HomeActivity' in manifest and 'MainActivity.class' in home
+          assert 'homeButton.setText("←")' in main and '← HOME' not in main and 'Torna alla Home' in main
+          assert 'MyRecipesActivity.class' in assistant and 'DevelopmentLogActivity.class' in assistant
+          assert 'SALVA COME MIA RICETTA' in result and 'SALVA SVILUPPO NEL LOG' in result and 'ORIGINALE FONTE' in result and 'MIA RICETTA PREFERITA' in result
+          assert 'sameTemperature' in db and 'TEMP_MATCH_TOLERANCE_C = 0.2' in db
+          assert 'VEDI ORIGINALE' in recipes and 'RIPRISTINA ORIGINALE' in recipes and 'ELIMINA RICETTA PERSONALE' in recipes
+          assert 'RIPETI' in log and 'CONFRONTA SVILUPPI' in log and 'IMPOSTA COME RICETTA PREFERITA' in log
+          assert 'applyPrefill' in newdev and 'repeatTimeSeconds' in newdev and 'RICETTA DAL LOG' in newdev
+          assert 'DROP TABLE' not in schema and 'DROP TABLE' not in db and 'onUpgrade' in db and 'Never drop personal data' in db
+          assert 'darkroom_assistant.db' in schema and 'VERSION = 1' in schema
+          assert 'package="it.darkroom.timer"' in manifest
+          print('R4 UI/navigation/non-destructive upgrade checks OK')
+          PY
+
+      - name: Read version
+        id: version
+        shell: bash
+        run: |
+          VERSION_NAME=$(python3 - <<'PY'
+          import re
+          from pathlib import Path
+          t=Path('work/project/app/src/main/AndroidManifest.xml').read_text(encoding='utf-8')
+          print(re.search(r'android:versionName="([^"]+)"',t).group(1))
+          PY
+          )
+          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          test "$VERSION_NAME" = "0.10.9"
+
+      - name: Configure Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepare Android SDK
+        shell: bash
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Prepare stable signing
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
+
+      - name: Build and sign APK
+        shell: bash
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+        run: |
+          set -euo pipefail
+          python3 work/build_darkroom.py work/project \
+            --output "DarkroomTimer-DIY-v${VERSION_NAME}.apk" \
+            --keystore "$RUNNER_TEMP/darkroom-signing.p12" \
+            --alias "$KEY_ALIAS" --storepass "$KEYSTORE_PASSWORD" --keypass "$KEY_PASSWORD"
+          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -c -v 4 "DarkroomTimer-DIY-v${VERSION_NAME}.apk"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "DarkroomTimer-DIY-v${VERSION_NAME}.apk"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging "DarkroomTimer-DIY-v${VERSION_NAME}.apk" | head -30
+          sha256sum "DarkroomTimer-DIY-v${VERSION_NAME}.apk"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}
+          path: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}.apk
