@@ -3,10 +3,12 @@ name: Build Darkroom Timer v0.8.0
 on:
   push:
     branches: [ feature-v080-print-sequence ]
+    paths-ignore:
+      - 'experiments/v080/latest_run.txt'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-apk:
@@ -14,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: feature-v080-print-sequence
 
       - name: Prepare clean v0.7.7 base
         shell: bash
@@ -86,10 +90,28 @@ jobs:
           "$ANDROID_HOME/build-tools/34.0.0/zipalign" -c -v 4 "DarkroomTimer-DIY-v${VERSION_NAME}.apk"
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "DarkroomTimer-DIY-v${VERSION_NAME}.apk"
           "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging "DarkroomTimer-DIY-v${VERSION_NAME}.apk" | head -20
-          sha256sum "DarkroomTimer-DIY-v${VERSION_NAME}.apk"
+          sha256sum "DarkroomTimer-DIY-v${VERSION_NAME}.apk" | tee /tmp/apk.sha256
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}
           path: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}.apk
+
+      - name: Record successful run
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/v080
+          {
+            echo "run_id=${GITHUB_RUN_ID}"
+            echo "job=build-apk"
+            echo "version=${{ steps.version.outputs.name }}"
+            echo "commit=${GITHUB_SHA}"
+            cat /tmp/apk.sha256
+          } > experiments/v080/latest_run.txt
+          git config user.name "Darkroom Timer Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add experiments/v080/latest_run.txt
+          git commit -m "Record successful v0.8.0 build [skip ci]"
+          git push origin HEAD:feature-v080-print-sequence
