@@ -20,7 +20,7 @@ public final class AssistantDatabase extends SQLiteOpenHelper {
         public int nominalIso, exposedIso, originalSeconds;
         public double originalTemp;
         public String sourceName="", dataType="", sourceData="", calculation="";
-        public String comboKey(){ return comboKey(film,format,exposedIso,developer,dilution,processor,method); }
+        public String comboKey(){ return AssistantDatabase.comboKey(film,format,exposedIso,developer,dilution,processor,method); }
     }
 
     public static final class PersonalRecipe {
@@ -123,7 +123,6 @@ public final class AssistantDatabase extends SQLiteOpenHelper {
         v.put("volume_ml",l.volumeMl); v.put("product_ml",l.productMl); v.put("water_ml",l.waterMl); v.put("rolls",l.rolls);
         v.put("capacity_state",safe(l.capacityState)); v.put("capacity_message",safe(l.capacityMessage));
         v.put("rating",Math.max(0,Math.min(5,l.rating))); v.put("notes",safe(l.notes));
-        // remove recipe-only duplicate source columns and map originals to log source columns
         v.remove("original_temp"); v.remove("original_seconds"); v.remove("favorite"); v.remove("personal_temp"); v.remove("personal_seconds"); v.remove("note"); v.remove("updated_at");
         return getWritableDatabase().insertOrThrow("development_logs",null,v);
     }
