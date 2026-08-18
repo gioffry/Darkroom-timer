@@ -1,4 +1,4 @@
-package app.diariopercorsigiallo;
+package app.diariopercorsi.stabile;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
