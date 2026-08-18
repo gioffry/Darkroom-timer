@@ -95,6 +95,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 experiments/v0102/prepare_v0102_transform.py
           python3 -m py_compile experiments/v0102/apply_v0102_test_fixes.py
           python3 experiments/v0102/apply_v0102_test_fixes.py work
 
