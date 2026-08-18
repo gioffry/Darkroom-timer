@@ -68,7 +68,7 @@
          root.addView(footer, margin(lp(-1, dp(46)), 0, 10, 0, 0));
 --- /dev/null
 +++ b/project/app/src/main/java/it/darkroom/timer/assistant/AssistantActivity.java
-@@ -0,0 +1,153 @@
+@@ -0,0 +1,156 @@
 +package it.darkroom.timer.assistant;
 +
 +import android.app.Activity;
