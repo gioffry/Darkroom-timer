@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4a340">
+<title>Il mio diario dei percorsi</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+<section id="home" class="screen active">
+  <div class="top"><div><h1>Il mio diario dei percorsi</h1><div class="small">Fiat, macchina di papà, moto e camminate.</div></div></div>
+  <div class="stats">
+    <div class="stat"><b id="monthTrips">0</b><span class="small">uscite questo mese</span></div>
+    <div class="stat"><b id="monthKm">0</b><span class="small">km questo mese</span></div>
+    <div class="stat"><b id="allTrips">0</b><span class="small">uscite totali</span></div>
+  </div>
+  <div class="home-grid">
+    <button class="tile fiat" onclick="openCategory('fiat')"><span>🚙</span>Fiat</button>
+    <button class="tile papa" onclick="openCategory('papa')"><span>🚗</span>Macchina di papà</button>
+    <button class="tile moto" onclick="openCategory('moto')"><span>🏍️</span>Moto</button>
+    <button class="tile walk" onclick="openCategory('walk')"><span>🥾</span>Camminata</button>
+  </div>
+  <div class="section-title">Calendario generale</div>
+  <div class="legend">
+    <span class="chip"><i class="dot fiat"></i>Fiat</span><span class="chip"><i class="dot papa"></i>Papà</span><span class="chip"><i class="dot moto"></i>Moto</span><span class="chip"><i class="dot walk"></i>Camminata</span>
+  </div>
+  <div id="homeCalendar" class="card"></div>
+  <div id="homeDayEvents"></div>
+</section>
+
+<section id="category" class="screen">
+  <div class="top"><div style="flex:1"><h1 id="catTitle">Categoria</h1><div id="catSubtitle" class="small"></div></div></div>
+  <button class="back" onclick="goHome()">← Torna alla home</button>
+  <div class="tabs"><button id="tabDiary" class="tab active" onclick="showCatTab('diary')">Diario</button><button id="tabCalendar" class="tab" onclick="showCatTab('calendar')">Calendario</button></div>
+  <div id="catDiary"><button class="btn primary" style="width:100%" onclick="newEntry()">＋ Nuova registrazione</button><div id="catList"></div></div>
+  <div id="catCalendar" class="hidden"><div id="categoryCalendar" class="card"></div><div id="categoryDayEvents"></div></div>
+</section>
+
+<section id="entryForm" class="screen">
+  <div class="top"><div style="flex:1"><h1 id="formTitle">Nuova registrazione</h1></div></div>
+  <button class="back" onclick="returnToCategory()">← Torna alla sezione</button>
+  <div class="card">
+    <div class="row"><div><label>Data</label><input id="entryDate" type="date"></div><div><label>Ora</label><input id="entryTime" type="time"></div></div>
+    <label>Titolo</label><input id="entryTitle" placeholder="Es. Giro al parco">
+    <div class="row"><div><label>Distanza (km)</label><input id="entryKm" type="number" min="0" step="0.1" inputmode="decimal" placeholder="4,5"></div><div><label>Durata (min)</label><input id="entryMinutes" type="number" min="0" step="1" inputmode="numeric" placeholder="45"></div></div>
+    <label>Note</label><textarea id="entryNotes" placeholder="Scrivi quello che vuoi ricordare…"></textarea>
+  </div>
+  <div id="allRewardsCard" class="card">
+    <div class="section-title" style="margin-top:0">🎁 Premi da colorare</div>
+    <div class="rewardRule">Ogni <b>100 metri</b> ottieni 1 premio. Per esempio: 500 m = 5 premi, 1 km = 10 premi.</div>
+    <div class="row"><div><label>Colore dei premi</label><input id="rewardColor" type="color" value="#ffd86e"></div><div><label>Premi ottenuti</label><input id="rewardCountText" value="0" disabled></div></div>
+    <div class="small">Tocca un disegno per colorarlo. Tra i disegni c’è anche la <b>Vespa</b>.</div>
+    <div id="rewardGrid" class="rewardGrid"></div>
+  </div>
+  <div id="walkTools" class="hidden">
+    <div class="mapCard">
+      <div class="section-title" style="margin-top:0">Mappa del mondo</div>
+      <div class="hint"><b>La mappa è già pronta.</b> Non devi disegnare la mappa: cerca un posto oppure spostala e ingrandiscila, poi premi “Traccia percorso” e disegna soltanto il tragitto che hai fatto. Non usa il GPS.</div>
+      <div class="mapSearch">
+        <div class="mapSearchRow">
+          <label for="placeSearch">Cerca una città o un posto
+            <input id="placeSearch" type="search" placeholder="Es. Tarzana, Roma, Milano">
+          </label>
+          <button id="placeSearchBtn" type="button" class="btn primary mapSearchBtn" onclick="searchPlace()">🔎 Cerca</button>
+        </div>
+        <div id="placeSearchMsg" class="searchMsg">Scrivi un nome e premi Cerca. Non usa il GPS.</div>
+        <div id="placeSearchResults" class="searchResults"></div>
+      </div>
+      <div class="mapTools">
+        <button id="moveMapBtn" class="btn light modeOn" onclick="setMapMode('move')">🗺️ Muovi mappa</button>
+        <button id="drawRouteBtn" class="btn light" onclick="setMapMode('draw')">✏️ Traccia percorso</button>
+        <button class="btn light" onclick="undoRoute()">↶ Annulla tratto</button>
+        <button class="btn light" onclick="clearRoute()">🧽 Cancella percorso</button>
+      </div>
+      <div class="mapStatus">I premi compaiono sul percorso ogni <b>100 metri</b>.</div>
+      <div class="mapWrap">
+        <div id="walkMap" class="map"></div>
+        <canvas id="routeCanvas" class="routeCanvas"></canvas>
+        <div id="rewardLayer" class="rewardLayer"></div>
+      </div>
+      <div class="small">I premi ottenuti si vedono sia qui sulla mappa sia nella scheda “Premi da colorare” qui sopra.</div>
+    </div>
+  </div>
+  <div class="actions"><button class="btn light" onclick="returnToCategory()">Annulla</button><button class="btn primary" onclick="saveEntry()">Salva</button></div>
+</section>
+
+<section id="detail" class="screen">
+  <div class="top"><div style="flex:1"><h1 id="detailTitle">Dettaglio</h1><div id="detailMeta" class="small"></div></div></div>
+  <button class="back" onclick="closeDetail()">← Indietro</button>
+  <div id="detailBody" class="card"></div>
+  <div id="detailAllRewards" class="card">
+    <div class="section-title" style="margin-top:0">🎁 Premi</div>
+    <div id="detailRewardCount" class="small"></div>
+    <div id="detailAllRewardGrid" class="rewardGrid"></div>
+  </div>
+  <div id="detailWalk" class="hidden mapCard">
+    <div class="section-title" style="margin-top:0">Percorso e premi</div>
+    <div class="mapWrap"><div id="detailMap" class="map"></div><canvas id="detailCanvas" class="routeCanvas"></canvas><div id="detailRewards" class="rewardLayer"></div></div>
+    <div id="detailRewardSummary" class="rewardSummary"></div>
+  </div>
+  <button class="btn danger deleteWide" onclick="requestDelete(activeEntry && activeEntry.id, detailReturn)">🗑 Elimina questa registrazione</button>
+</section>
+
+<div id="deleteModal" class="modal hidden">
+  <div class="modalBox">
+    <h2>Eliminare?</h2>
+    <div>Vuoi davvero cancellare questa registrazione?</div>
+    <div class="modalActions"><button class="btn light" onclick="cancelDelete()">No, torna indietro</button><button class="btn danger" onclick="confirmDeleteNow()">Sì, elimina</button></div>
+  </div>
+</div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script src="map.js"></script>
+</body>
+</html>
