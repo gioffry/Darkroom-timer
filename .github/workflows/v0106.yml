@@ -1,0 +1,192 @@
+name: Build Darkroom Timer v0.10.6
+
+on:
+  push:
+    branches: [ feature-v0106-darkroom-assistant-r1 ]
+    paths-ignore:
+      - 'experiments/v0106/latest_run.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feature-v0106-darkroom-assistant-r1
+
+      - name: Record run id
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/v0106
+          printf 'run_id=%s\ncommit=%s\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" > experiments/v0106/latest_run.txt
+          git config user.name "Darkroom Timer Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add experiments/v0106/latest_run.txt
+          git commit -m "Record v0.10.6 build run [skip ci]"
+          git push origin HEAD:feature-v0106-darkroom-assistant-r1
+
+      - name: Prepare clean Darkroom base
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d base/v0.7.7/project
+          rm -rf work && mkdir -p work
+          cp -a base/v0.7.7/project work/project
+          cp base/v0.7.7/build_darkroom.py work/build_darkroom.py
+          cp base/v0.7.7/v064_icon.py work/v064_icon.py
+
+      - name: Apply v0.8.0 print sequence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v080/prepare_v080_transform.py
+          python3 -m py_compile experiments/v080/apply_v080_print_sequence.py experiments/v080/apply_v080_fixups.py
+          python3 experiments/v080/apply_v080_print_sequence.py work
+          python3 experiments/v080/apply_v080_fixups.py work
+
+      - name: Apply v0.8.1 print plan polish
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v081/prepare_v081_transform.py
+          python3 -m py_compile experiments/v081/apply_v081_print_plan_polish.py
+          python3 experiments/v081/apply_v081_print_plan_polish.py work
+
+      - name: Apply v0.9.0 Split Grade
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v090/prepare_v090_transform.py
+          python3 -m py_compile experiments/v090/apply_v090_split_grade.py experiments/v090/apply_v090_fixups.py
+          python3 experiments/v090/apply_v090_split_grade.py work
+          python3 experiments/v090/apply_v090_fixups.py work
+
+      - name: Apply v0.9.1 timing and voice polish
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v091/prepare_v091_transform.py
+          python3 -m py_compile experiments/v091/apply_v091_timing_voice_polish.py
+          python3 experiments/v091/apply_v091_timing_voice_polish.py work
+
+      - name: Apply v0.10.0 PRO recipe
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v0100/prepare_v0100_transform.py
+          python3 -m py_compile experiments/v0100/apply_v0100_pro_recipe.py
+          python3 experiments/v0100/apply_v0100_pro_recipe.py work
+
+      - name: Apply v0.10.1 stability and UX
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v0101/prepare_v0101_transform.py
+          python3 -m py_compile experiments/v0101/apply_v0101_stability_ux.py
+          python3 experiments/v0101/apply_v0101_stability_ux.py work
+
+      - name: Apply v0.10.2 test and safelight fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v0102/prepare_v0102_transform.py
+          python3 -m py_compile experiments/v0102/apply_v0102_test_fixes.py
+          python3 experiments/v0102/apply_v0102_test_fixes.py work
+
+      - name: Apply v0.10.3 split and short exposure fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v0103/prepare_v0103_transform.py
+          python3 -m py_compile experiments/v0103/apply_v0103_split_short_exposure.py
+          python3 experiments/v0103/apply_v0103_split_short_exposure.py work
+
+      - name: Apply v0.10.4 dodge burn voice
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v0104/prepare_v0104_transform.py
+          python3 -m py_compile experiments/v0104/apply_v0104_dodge_burn_voice.py
+          python3 experiments/v0104/apply_v0104_dodge_burn_voice.py work
+
+      - name: Apply v0.10.5 premature OFF fail-safe
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile experiments/v0105/apply_v0105_premature_off_failsafe.py
+          python3 experiments/v0105/apply_v0105_premature_off_failsafe.py work
+
+      - name: Apply v0.10.6 Darkroom Assistant release 1
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile experiments/v0106/apply_v0106_darkroom_assistant_r1.py
+          python3 experiments/v0106/apply_v0106_darkroom_assistant_r1.py work
+
+      - name: Read version
+        id: version
+        shell: bash
+        run: |
+          VERSION_NAME=$(python3 - <<'PY'
+          import re
+          from pathlib import Path
+          t=Path('work/project/app/src/main/AndroidManifest.xml').read_text(encoding='utf-8')
+          print(re.search(r'android:versionName="([^"]+)"',t).group(1))
+          PY
+          )
+          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Configure Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepare Android SDK
+        shell: bash
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Prepare stable signing
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
+
+      - name: Build and sign APK
+        shell: bash
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+        run: |
+          set -euo pipefail
+          python3 work/build_darkroom.py work/project \
+            --output "DarkroomTimer-DIY-v${VERSION_NAME}.apk" \
+            --keystore "$RUNNER_TEMP/darkroom-signing.p12" \
+            --alias "$KEY_ALIAS" --storepass "$KEYSTORE_PASSWORD" --keypass "$KEY_PASSWORD"
+          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -c -v 4 "DarkroomTimer-DIY-v${VERSION_NAME}.apk"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "DarkroomTimer-DIY-v${VERSION_NAME}.apk"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging "DarkroomTimer-DIY-v${VERSION_NAME}.apk" | head -20
+          sha256sum "DarkroomTimer-DIY-v${VERSION_NAME}.apk"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}
+          path: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}.apk
