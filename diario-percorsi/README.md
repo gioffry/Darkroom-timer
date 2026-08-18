@@ -35,4 +35,4 @@ L'APK viene creato in `app/build/outputs/apk/debug/app-debug.apk`.
 - `diario-percorsi`: Diario Percorsi.
 - Directory applicativa: `diario-percorsi/`.
 - Nessun merge automatico tra i due progetti.
-- Application ID Diario Percorsi: `app.diariopercorsi`.
+- Application ID Diario Percorsi: `app.diariopercorsigiallo`, mantenuto uguale alla versione installata precedente.
