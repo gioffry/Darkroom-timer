@@ -1,8 +1,11 @@
-name: Build Darkroom Timer APK
+name: Build Diario Percorsi APK
 
 on:
   push:
-    branches: [ main ]
+    branches: [ diario-percorsi ]
+    paths:
+      - 'diario-percorsi/**'
+      - '.github/workflows/main.yml'
   workflow_dispatch:
 
 permissions:
@@ -13,93 +16,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Scarica repository
+      - name: Checkout Diario Percorsi branch
         uses: actions/checkout@v4
 
-      - name: Prepara base consolidata e patch attive
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf work
-          mkdir -p work
-          test -d base/v0.6.0/project
-          test -f base/v0.6.0/build_darkroom.py
-          echo "Uso base consolidata v0.6.0"
-          cp -a base/v0.6.0/project work/project
-          cp base/v0.6.0/build_darkroom.py work/build_darkroom.py
-
-          if [ -d patches/active ]; then
-            while IFS= read -r patch_file; do
-              echo "Applico patch attiva $patch_file"
-              patch -d work -p1 < "$patch_file"
-            done < <(find patches/active -maxdepth 1 -type f -name '*.patch' | sort)
-          fi
-
-      - name: Leggi versione risultante
-        id: version
-        shell: bash
-        run: |
-          VERSION_NAME=$(python3 - <<'PY'
-          import re
-          from pathlib import Path
-          text = Path('work/project/app/src/main/AndroidManifest.xml').read_text(encoding='utf-8')
-          m = re.search(r'android:versionName="([^"]+)"', text)
-          if not m:
-              raise SystemExit('versionName non trovato')
-          print(m.group(1))
-          PY
-          )
-          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
-          echo "Versione da compilare: $VERSION_NAME"
-
-      - name: Configura Java 17
-        uses: actions/setup-java@v5
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Prepara Android SDK
-        shell: bash
-        run: |
-          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          if [ ! -x "$SDKMANAGER" ]; then
-            SDKMANAGER="$(command -v sdkmanager)"
-          fi
-          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+      - name: Setup Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
 
-      - name: Prepara firma stabile
-        shell: bash
+      - name: Create runtime config
+        working-directory: diario-percorsi
         env:
-          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          set -euo pipefail
-          test -n "$KEYSTORE_B64"
-          test -n "$KEYSTORE_PASSWORD"
-          test -n "$KEY_ALIAS"
-          test -n "$KEY_PASSWORD"
-          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+        run: python3 scripts/write_config.py
 
-      - name: Compila APK
-        shell: bash
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          VERSION_NAME: ${{ steps.version.outputs.name }}
-        run: |
-          python3 work/build_darkroom.py \
-            work/project \
-            --output "DarkroomTimer-DIY-v${VERSION_NAME}.apk" \
-            --keystore "$RUNNER_TEMP/darkroom-signing.p12" \
-            --alias "$KEY_ALIAS" \
-            --storepass "$KEYSTORE_PASSWORD" \
-            --keypass "$KEY_PASSWORD"
+      - name: Build Diario Percorsi debug APK
+        working-directory: diario-percorsi
+        run: gradle assembleDebug
 
-      - name: Salva APK
+      - name: Upload Diario Percorsi APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}
-          path: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}.apk
+          name: Diario-Percorsi-APK
+          path: diario-percorsi/app/build/outputs/apk/debug/app-debug.apk
