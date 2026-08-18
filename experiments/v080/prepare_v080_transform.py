@@ -19,7 +19,11 @@ replace_labeled_block(
 
 replace_labeled_block(
     'log editor sequence display', 'rep(main,',
-    """rep(main,\n'''                \"\\nData: \" + formatDate(entry.timestamp) +''',\n'''                \"\\nSequenza di stampa: \" + sequenceRecipe +\n                \"\\nData: \" + formatDate(entry.timestamp) +''', 'log editor sequence display')""")
+    r'''_s = rd(main)
+_old = r''' + "'''                \"\\nData: \" + formatDate(entry.timestamp) +'''" + r'''
+_new = r''' + "'''                \"\\nSequenza di stampa: \" + sequenceRecipe +\n                \"\\nData: \" + formatDate(entry.timestamp) +'''" + r'''
+if _old not in _s: raise SystemExit('v0.8.0 log editor sequence display: target non trovato')
+wr(main, _s.replace(_old, _new, 1)); print('v0.8.0 OK log editor sequence display', flush=True)''')
 
 p.write_text(s, encoding='utf-8')
 print('prepare v0.8.0 OK: matcher LogStore + ricetta LOG robusti', flush=True)
