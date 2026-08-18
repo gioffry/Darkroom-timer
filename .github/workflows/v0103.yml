@@ -103,6 +103,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 experiments/v0103/prepare_v0103_transform.py
           python3 -m py_compile experiments/v0103/apply_v0103_split_short_exposure.py
           python3 experiments/v0103/apply_v0103_split_short_exposure.py work
 
