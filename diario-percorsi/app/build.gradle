@@ -6,11 +6,30 @@ android {
     namespace 'app.diariopercorsigiallo'
     compileSdk 35
 
+    signingConfigs {
+        stable {
+            storeFile rootProject.file('signing/diario-percorsi.jks')
+            storePassword 'android'
+            keyAlias 'diario'
+            keyPassword 'android'
+        }
+    }
+
     defaultConfig {
         applicationId 'app.diariopercorsigiallo'
         minSdk 23
         targetSdk 35
-        versionCode 3
-        versionName '1.2.0'
+        versionCode 4
+        versionName '1.3.0'
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.stable
+        }
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.stable
+        }
     }
 }

@@ -22,7 +22,18 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                view.evaluateJavascript(
+                    "(function(){if(document.getElementById('diario-v13'))return;" +
+                    "var s=document.createElement('script');s.id='diario-v13';" +
+                    "s.src='file:///android_asset/ui-v13.js';document.body.appendChild(s);})();",
+                    null
+                );
+            }
+        });
         webView.loadUrl("file:///android_asset/index.html");
         setContentView(webView);
     }
