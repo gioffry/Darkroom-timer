@@ -19,6 +19,18 @@ jobs:
         with:
           ref: feature-v080-print-sequence
 
+      - name: Record run id
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/v080
+          printf 'run_id=%s\ncommit=%s\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" > experiments/v080/latest_run.txt
+          git config user.name "Darkroom Timer Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add experiments/v080/latest_run.txt
+          git commit -m "Record v0.8.0 build run [skip ci]"
+          git push origin HEAD:feature-v080-print-sequence
+
       - name: Prepare clean v0.7.7 base
         shell: bash
         run: |
@@ -33,8 +45,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m py_compile experiments/v080/apply_v080_print_sequence.py
+          python3 -m py_compile experiments/v080/apply_v080_print_sequence.py experiments/v080/apply_v080_fixups.py
           python3 experiments/v080/apply_v080_print_sequence.py work
+          python3 experiments/v080/apply_v080_fixups.py work
 
       - name: Read version
         id: version
@@ -90,28 +103,10 @@ jobs:
           "$ANDROID_HOME/build-tools/34.0.0/zipalign" -c -v 4 "DarkroomTimer-DIY-v${VERSION_NAME}.apk"
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "DarkroomTimer-DIY-v${VERSION_NAME}.apk"
           "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging "DarkroomTimer-DIY-v${VERSION_NAME}.apk" | head -20
-          sha256sum "DarkroomTimer-DIY-v${VERSION_NAME}.apk" | tee /tmp/apk.sha256
+          sha256sum "DarkroomTimer-DIY-v${VERSION_NAME}.apk"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}
           path: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}.apk
-
-      - name: Record successful run
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p experiments/v080
-          {
-            echo "run_id=${GITHUB_RUN_ID}"
-            echo "job=build-apk"
-            echo "version=${{ steps.version.outputs.name }}"
-            echo "commit=${GITHUB_SHA}"
-            cat /tmp/apk.sha256
-          } > experiments/v080/latest_run.txt
-          git config user.name "Darkroom Timer Builder"
-          git config user.email "actions@users.noreply.github.com"
-          git add experiments/v080/latest_run.txt
-          git commit -m "Record successful v0.8.0 build [skip ci]"
-          git push origin HEAD:feature-v080-print-sequence
