@@ -1,0 +1,150 @@
+name: Materialize Darkroom Timer v0.7.7 base
+
+on:
+  push:
+    branches: [ feature-v080-print-sequence ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reconstruct base and active patches
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf work && mkdir -p work
+          cp -a base/v0.6.0/project work/project
+          cp base/v0.6.0/build_darkroom.py work/build_darkroom.py
+          if [ -d patches/active ]; then
+            while IFS= read -r patch_file; do
+              patch -d work -p1 < "$patch_file"
+            done < <(find patches/active -maxdepth 1 -type f -name '*.patch' | sort)
+          fi
+
+      - name: Apply v0.7.1 F-STOP
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('experiments/v071/apply_v071_fstop.py')
+          s=p.read_text(encoding='utf-8')
+          old="new, n = re.subn(pattern, replacement, text, count=1, flags=flags)"
+          new="new, n = re.subn(pattern, lambda _m: replacement, text, count=1, flags=flags)"
+          if old not in s: raise SystemExit('helper regex_replace non trovato')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+          python3 experiments/v071/apply_v071_fstop.py work
+
+      - name: Apply v0.7.2 polish
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('experiments/v072/apply_v072_polish.py')
+          s=p.read_text(encoding='utf-8')
+          start=s.index('# Stato SONOFF: PRONTO non è ammesso durante la riconnessione.')
+          end=s.index('# Badge F-STOP helper, red-only in camera oscura.')
+          s=s[:start]+"# Stato SONOFF: fix robusto nel workflow\nprint('OK stato SONOFF rinviato')\n\n"+s[end:]
+          start=s.index('# JPG: trasforma solo i valori che terminano esattamente in ,5/.5.')
+          end=s.index('# Icona: sostituisce il vecchio preparatore v0.6.4, ma usa byte-per-byte l\'immagine fornita.')
+          s=s[:start]+"# JPG: fix robusto nel workflow\nprint('OK JPG rinviato')\n\n"+s[end:]
+          start=s.index('# Verifiche finali.')
+          s=s[:start]+"# Verifiche finali eseguite dal workflow\nprint('v0.7.2: rifiniture principali applicate')\n"
+          p.write_text(s,encoding='utf-8')
+          PY
+          python3 experiments/v072/apply_v072_polish.py work
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          main=Path('work/project/app/src/main/java/it/darkroom/timer/MainActivity.java')
+          s=main.read_text(encoding='utf-8')
+          old_ready='''    private final Runnable readyResetRunnable = () -> {\n        if (!armed && mode != MODE_LOG && stateCard != null) {\n            setStatusPresentation("PRONTO", "Scegli il tempo e premi ARMA",\n                    device != null && device.isValid() ? GREEN : MUTED);\n        }\n    };'''
+          new_ready='''    private final Runnable readyResetRunnable = () -> {\n        if (!armed && mode != MODE_LOG && stateCard != null) {\n            if (device != null && device.isValid()) {\n                setStatusPresentation("PRONTO", "Scegli il tempo e premi ARMA", GREEN);\n            } else {\n                setStatusPresentation("ATTESA SONOFF",\n                        "RICONNESSIONE AUTOMATICA — attendo conferma dal SONOFF",\n                        darkroomMode ? RED : AMBER);\n            }\n        }\n    };'''
+          if old_ready not in s: raise SystemExit('readyResetRunnable non trovato')
+          s=s.replace(old_ready,new_ready,1)
+          old_normal='''            } else {\n                if (detail.isEmpty() && device != null && device.isValid()) detail = "Scegli il tempo e premi ARMA";\n                accent = device != null && device.isValid() ? GREEN : MUTED;\n            }'''
+          new_normal='''            } else {\n                if (device != null && device.isValid()) {\n                    title = "PRONTO";\n                    if (detail.isEmpty()) detail = "Scegli il tempo e premi ARMA";\n                    accent = GREEN;\n                } else {\n                    title = "ATTESA SONOFF";\n                    detail = "RICONNESSIONE AUTOMATICA — attendo conferma dal SONOFF";\n                    accent = darkroomMode ? RED : AMBER;\n                }\n            }'''
+          if old_normal not in s: raise SystemExit('ramo STATE_NORMAL non trovato')
+          main.write_text(s.replace(old_normal,new_normal,1),encoding='utf-8')
+          jpg=Path('work/project/app/src/main/java/it/darkroom/timer/JpegCardRenderer.java')
+          j=jpg.read_text(encoding='utf-8')
+          m=re.search(r'    private static String apertureLabel\(String [A-Za-z_][A-Za-z0-9_]*\) \{.*?\n    \}',j,re.S)
+          if not m: raise SystemExit('apertureLabel non trovato')
+          aperture='''    private static String apertureLabel(String value) {\n        String v = text(value, "—").trim();\n        if ("—".equals(v)) return v;\n        boolean hasPrefix = v.toLowerCase(Locale.ITALY).startsWith("f/");\n        String core = hasPrefix ? v.substring(2).trim() : v;\n        if (core.matches("^[0-9]+[,.]5$")) core = core.substring(0, core.length() - 2) + "½";\n        return "f/" + core;\n    }'''
+          j=j[:m.start()]+aperture+j[m.end():]
+          marker='        return b;\n    }'
+          if marker not in j: raise SystemExit('return b non trovato')
+          badge='''        if (TimingMath.isFStop(e.exposureMethod) || TimingMath.isFStop(e.testMethod)) {\n            Paint badgeFill = new Paint(Paint.ANTI_ALIAS_FLAG);\n            badgeFill.setColor(Color.rgb(80, 207, 70));\n            RectF badgeRect = new RectF(WIDTH - 350f, 48f, WIDTH - 64f, 112f);\n            c.drawRoundRect(badgeRect, 32f, 32f, badgeFill);\n            Paint badgeText = new Paint(Paint.ANTI_ALIAS_FLAG);\n            badgeText.setColor(Color.BLACK);\n            badgeText.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));\n            badgeText.setTextSize(27f);\n            badgeText.setTextAlign(Paint.Align.CENTER);\n            c.drawText("F-STOP  ·  ¼ stop", badgeRect.centerX(), badgeRect.centerY() + 10f, badgeText);\n        }\n\n'''+marker
+          jpg.write_text(j.replace(marker,badge,1),encoding='utf-8')
+          build=Path('work/build_darkroom.py').read_text(encoding='utf-8')
+          m=re.search(r'from v064_icon import ([A-Za-z_][A-Za-z0-9_]*)',build)
+          if not m: raise SystemExit('import v064_icon non trovato')
+          func=m.group(1)
+          Path('work/v064_icon.py').write_text('def '+func+'(project):\n    print("[Darkroom v0.7.2] launcher provvisorio", flush=True)\n',encoding='utf-8')
+          PY
+
+      - name: Apply v0.7.3-v0.7.7
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v073/apply_v073_badge_state.py work
+          python3 experiments/v074/apply_v074_badge_color.py work
+          cat experiments/v075/part00.pyfrag experiments/v075/part01.pyfrag experiments/v075/part02.pyfrag experiments/v075/part03.pyfrag > /tmp/apply_v075.py
+          python3 /tmp/apply_v075.py work
+          python3 experiments/v076/apply_v076_interlock.py work
+          python3 experiments/v077/apply_v077_preserve_safelight.py work
+
+      - name: Preserve v0.7.2 icon source and materialize launcher
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work/project/app/src/main/res/drawable-nodpi
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64
+          parts=sorted(Path('assets/v075').glob('icon_*.b64'))
+          raw=base64.b64decode(''.join(p.read_text() for p in parts))
+          Path('work/user_icon_v075.jpg').write_bytes(raw)
+          PY
+          mkdir -p "$RUNNER_TEMP/iconconvert"
+          cat > "$RUNNER_TEMP/iconconvert/IconConvert.java" <<'JAVA'
+          import java.io.File;
+          import java.awt.image.BufferedImage;
+          import javax.imageio.ImageIO;
+          public class IconConvert {
+            public static void main(String[] a) throws Exception {
+              BufferedImage im=ImageIO.read(new File(a[0]));
+              if(im==null) throw new Exception("Immagine icona non leggibile");
+              if(!ImageIO.write(im,"png",new File(a[1]))) throw new Exception("PNG non scritto");
+            }
+          }
+          JAVA
+          javac "$RUNNER_TEMP/iconconvert/IconConvert.java"
+          java -cp "$RUNNER_TEMP/iconconvert" IconConvert work/user_icon_v075.jpg work/project/app/src/main/res/drawable-nodpi/ic_launcher.png
+
+      - name: Package clean v0.7.7 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf materialized-v077
+          mkdir -p materialized-v077
+          cp -a work/project materialized-v077/project
+          cp work/build_darkroom.py materialized-v077/build_darkroom.py
+          if [ -f work/v064_icon.py ]; then cp work/v064_icon.py materialized-v077/v064_icon.py; fi
+          printf 'Materialized from v0.7.7 patch chain for consolidation into v0.8.0\n' > materialized-v077/README.txt
+          tar -czf DarkroomTimer-v0.7.7-materialized.tar.gz materialized-v077
+
+      - name: Upload materialized source
+        uses: actions/upload-artifact@v4
+        with:
+          name: DarkroomTimer-v0.7.7-materialized
+          path: DarkroomTimer-v0.7.7-materialized.tar.gz
