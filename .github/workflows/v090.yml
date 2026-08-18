@@ -63,8 +63,9 @@ jobs:
         run: |
           set -euo pipefail
           python3 experiments/v090/prepare_v090_transform.py
-          python3 -m py_compile experiments/v090/apply_v090_split_grade.py
+          python3 -m py_compile experiments/v090/apply_v090_split_grade.py experiments/v090/apply_v090_fixups.py
           python3 experiments/v090/apply_v090_split_grade.py work
+          python3 experiments/v090/apply_v090_fixups.py work
 
       - name: Read version
         id: version
