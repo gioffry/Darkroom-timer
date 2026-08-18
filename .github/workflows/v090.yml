@@ -62,6 +62,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 experiments/v090/prepare_v090_transform.py
           python3 -m py_compile experiments/v090/apply_v090_split_grade.py
           python3 experiments/v090/apply_v090_split_grade.py work
 
