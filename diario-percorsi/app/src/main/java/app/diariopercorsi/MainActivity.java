@@ -31,7 +31,12 @@ public class MainActivity extends Activity {
                     "if(document.getElementById('diario-v13'))return;" +
                     "var s=document.createElement('script');s.id='diario-v13';" +
                     "s.src='file:///android_asset/ui-v13.js';" +
-                    "s.onload=function(){if(document.getElementById('diario-v14'))return;var n=document.createElement('script');n.id='diario-v14';n.src='file:///android_asset/ui-v14.js';document.body.appendChild(n);};" +
+                    "s.onload=function(){" +
+                    "  if(document.getElementById('diario-v14'))return;" +
+                    "  var n=document.createElement('script');n.id='diario-v14';n.src='file:///android_asset/ui-v14.js';" +
+                    "  var loadV15=function(){if(document.getElementById('diario-v15'))return;var p=document.createElement('script');p.id='diario-v15';p.src='file:///android_asset/ui-v15.js';document.body.appendChild(p);};" +
+                    "  n.onload=loadV15;n.onerror=loadV15;document.body.appendChild(n);" +
+                    "};" +
                     "document.body.appendChild(s);" +
                     "})();",
                     null
