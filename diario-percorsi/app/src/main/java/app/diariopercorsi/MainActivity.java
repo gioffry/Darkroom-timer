@@ -29,13 +29,15 @@ public class MainActivity extends Activity {
                 view.evaluateJavascript(
                     "(function(){" +
                     "if(document.getElementById('diario-v13'))return;" +
-                    "var s=document.createElement('script');s.id='diario-v13';" +
-                    "s.src='file:///android_asset/ui-v13.js';" +
+                    "var s=document.createElement('script');s.id='diario-v13';s.src='file:///android_asset/ui-v13.js';" +
                     "s.onload=function(){" +
-                    "  if(document.getElementById('diario-v14'))return;" +
-                    "  var n=document.createElement('script');n.id='diario-v14';n.src='file:///android_asset/ui-v14.js';" +
-                    "  var loadV15=function(){if(document.getElementById('diario-v15'))return;var p=document.createElement('script');p.id='diario-v15';p.src='file:///android_asset/ui-v15.js';document.body.appendChild(p);};" +
-                    "  n.onload=loadV15;n.onerror=loadV15;document.body.appendChild(n);" +
+                    " var n=document.createElement('script');n.id='diario-v14';n.src='file:///android_asset/ui-v14.js';" +
+                    " n.onload=function(){" +
+                    "  var p=document.createElement('script');p.id='diario-v15';p.src='file:///android_asset/ui-v15.js';" +
+                    "  p.onload=function(){if(document.getElementById('diario-v16'))return;var q=document.createElement('script');q.id='diario-v16';q.src='file:///android_asset/ui-v16.js';document.body.appendChild(q);};" +
+                    "  document.body.appendChild(p);" +
+                    " };" +
+                    " document.body.appendChild(n);" +
                     "};" +
                     "document.body.appendChild(s);" +
                     "})();",
