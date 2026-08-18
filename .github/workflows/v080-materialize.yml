@@ -3,10 +3,11 @@ name: Materialize Darkroom Timer v0.7.7 base
 on:
   push:
     branches: [ feature-v080-print-sequence ]
+    paths: [ '.github/workflows/v080-materialize.yml' ]
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   materialize:
@@ -14,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: feature-v080-print-sequence
 
       - name: Reconstruct base and active patches
         shell: bash
@@ -103,7 +106,7 @@ jobs:
           python3 experiments/v076/apply_v076_interlock.py work
           python3 experiments/v077/apply_v077_preserve_safelight.py work
 
-      - name: Preserve v0.7.2 icon source and materialize launcher
+      - name: Materialize launcher icon
         shell: bash
         run: |
           set -euo pipefail
@@ -131,20 +134,18 @@ jobs:
           javac "$RUNNER_TEMP/iconconvert/IconConvert.java"
           java -cp "$RUNNER_TEMP/iconconvert" IconConvert work/user_icon_v075.jpg work/project/app/src/main/res/drawable-nodpi/ic_launcher.png
 
-      - name: Package clean v0.7.7 source
+      - name: Commit clean v0.7.7 base
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf materialized-v077
-          mkdir -p materialized-v077
-          cp -a work/project materialized-v077/project
-          cp work/build_darkroom.py materialized-v077/build_darkroom.py
-          if [ -f work/v064_icon.py ]; then cp work/v064_icon.py materialized-v077/v064_icon.py; fi
-          printf 'Materialized from v0.7.7 patch chain for consolidation into v0.8.0\n' > materialized-v077/README.txt
-          tar -czf DarkroomTimer-v0.7.7-materialized.tar.gz materialized-v077
-
-      - name: Upload materialized source
-        uses: actions/upload-artifact@v4
-        with:
-          name: DarkroomTimer-v0.7.7-materialized
-          path: DarkroomTimer-v0.7.7-materialized.tar.gz
+          rm -rf base/v0.7.7
+          mkdir -p base/v0.7.7
+          cp -a work/project base/v0.7.7/project
+          cp work/build_darkroom.py base/v0.7.7/build_darkroom.py
+          if [ -f work/v064_icon.py ]; then cp work/v064_icon.py base/v0.7.7/v064_icon.py; fi
+          printf 'Clean materialized base from v0.7.7. Future v0.8.x work starts here.\n' > base/v0.7.7/README.md
+          git config user.name "Darkroom Timer Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add base/v0.7.7
+          git commit -m "Consolidate clean v0.7.7 base for v0.8.0"
+          git push origin HEAD:feature-v080-print-sequence
