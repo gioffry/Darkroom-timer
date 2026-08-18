@@ -1,0 +1,53 @@
+name: Materialize Darkroom Timer v0.9.1 base
+
+on:
+  push:
+    branches: [ feature-v0100-pro-recipe ]
+    paths:
+      - '.github/workflows/materialize_v091.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feature-v0100-pro-recipe
+
+      - name: Reconstruct v0.9.1
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf work && mkdir -p work
+          cp -a base/v0.7.7/project work/project
+          cp base/v0.7.7/build_darkroom.py work/build_darkroom.py
+          cp base/v0.7.7/v064_icon.py work/v064_icon.py
+          python3 experiments/v080/prepare_v080_transform.py
+          python3 experiments/v080/apply_v080_print_sequence.py work
+          python3 experiments/v080/apply_v080_fixups.py work
+          python3 experiments/v081/prepare_v081_transform.py
+          python3 experiments/v081/apply_v081_print_plan_polish.py work
+          python3 experiments/v090/prepare_v090_transform.py
+          python3 experiments/v090/apply_v090_split_grade.py work
+          python3 experiments/v090/apply_v090_fixups.py work
+          python3 experiments/v091/apply_v091_timing_voice_polish.py work
+
+      - name: Commit consolidated v0.9.1 base
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf base/v0.9.1
+          mkdir -p base/v0.9.1
+          cp -a work/project base/v0.9.1/project
+          cp work/build_darkroom.py base/v0.9.1/build_darkroom.py
+          cp work/v064_icon.py base/v0.9.1/v064_icon.py
+          printf 'Consolidated Darkroom Timer v0.9.1 base.\n' > base/v0.9.1/README.txt
+          git config user.name "Darkroom Timer Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add base/v0.9.1
+          git commit -m "Consolidate Darkroom Timer v0.9.1 base"
+          git push origin HEAD:feature-v0100-pro-recipe
