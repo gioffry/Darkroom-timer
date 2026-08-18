@@ -45,6 +45,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 experiments/v080/prepare_v080_transform.py
           python3 -m py_compile experiments/v080/apply_v080_print_sequence.py experiments/v080/apply_v080_fixups.py
           python3 experiments/v080/apply_v080_print_sequence.py work
           python3 experiments/v080/apply_v080_fixups.py work
