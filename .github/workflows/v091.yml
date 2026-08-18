@@ -71,6 +71,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 experiments/v091/prepare_v091_transform.py
           python3 -m py_compile experiments/v091/apply_v091_timing_voice_polish.py
           python3 experiments/v091/apply_v091_timing_voice_polish.py work
 
