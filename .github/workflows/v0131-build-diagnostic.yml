@@ -1,0 +1,130 @@
+name: Build Diagnostic Darkroom Timer v0.13.1
+
+on:
+  push:
+    branches: [ feature-v0131-fstop-subtractive-teststrip ]
+    paths-ignore:
+      - 'experiments/v0131/build_diagnostic.txt'
+      - 'experiments/v0131/diagnostic.txt'
+      - 'experiments/v0131/latest_run.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: darkroom-v0131-builddiag-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature-v0131-fstop-subtractive-teststrip
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Reconstruct and apply exact repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf work && mkdir -p work
+          cp -a base/v0.12.0-materialized/project work/project
+          cp base/v0.12.0-materialized/build_darkroom.py work/build_darkroom.py
+          cp base/v0.12.0-materialized/v064_icon.py work/v064_icon.py
+          python3 experiments/v0121/apply_v0121_assistant_ux_smart_catalog.py work
+          python3 experiments/v0122/apply_v0122_real_device_repair.py work
+          python3 experiments/v0123/apply_v0123_live_web_repair.py work
+          python3 experiments/v0123/apply_v0123_no_manual_cleanup.py work
+          python3 experiments/v0130/apply_v0130_timer_only_reset.py work
+          python3 experiments/v0131/apply_v0131_fstop_subtractive_teststrip.py work
+          ROOT=work/project/app/src/main/java/it/darkroom/timer
+          rm -rf /tmp/timingtest && mkdir -p /tmp/timingtest
+          javac -encoding UTF-8 -d /tmp/timingtest "$ROOT/TimingMath.java" experiments/v0131/TimingMathRegressionTest.java
+          java -cp /tmp/timingtest it.darkroom.timer.TimingMathRegressionTest | tee timing-regression.txt
+      - name: Prepare Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+      - name: Prepare signing
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
+          echo "::add-mask::$KEYSTORE_PASSWORD"
+          echo "::add-mask::$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
+      - name: Build and verify signed APK
+        shell: bash
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          APK=DarkroomTimer-DIY-v0.13.1.apk
+          echo "::add-mask::$KEYSTORE_PASSWORD"
+          echo "::add-mask::$KEY_PASSWORD"
+          python3 work/build_darkroom.py work/project --output "$APK" --keystore "$RUNNER_TEMP/darkroom-signing.p12" --alias "$KEY_ALIAS" --storepass "$KEYSTORE_PASSWORD" --keypass "$KEY_PASSWORD"
+          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -c -v 4 "$APK" > zipalign.txt
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" > certificate.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging "$APK" > apk-badging.txt
+          grep -q "package: name='it.darkroom.timer' versionCode='62' versionName='0.13.1'" apk-badging.txt
+          CERT_FP=$(grep -m1 'certificate SHA-256 digest:' certificate.txt | sed 's/.*: *//')
+          test "$CERT_FP" = "fbead305657584b50a9d8892aa19bd9844b412d77db316e7daa5593c94e2a02f"
+          sha256sum "$APK" > apk.sha256
+          echo "APK_SHA=$(cut -d' ' -f1 apk.sha256)" >> "$GITHUB_ENV"
+          echo "CERT_FP=$CERT_FP" >> "$GITHUB_ENV"
+      - name: Upload APK
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: DarkroomTimer-DIY-v0.13.1-builddiag
+          path: |
+            DarkroomTimer-DIY-v0.13.1.apk
+            apk.sha256
+            certificate.txt
+            apk-badging.txt
+            timing-regression.txt
+      - name: Record successful diagnostic build
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/v0131
+          cat > experiments/v0131/build_diagnostic.txt <<EOF
+          run_id=$GITHUB_RUN_ID
+          commit=$GITHUB_SHA
+          status=PASS
+          versionName=0.13.1
+          versionCode=62
+          timing_regression=PASS
+          seconds_method=UNCHANGED
+          fstop_targets=4.0,5.0,5.5,6.5,8.0,9.5
+          fstop_pulses=1.5,1.5,1.0,0.5,1.0,4.0
+          final_bands=9.5,8.0,6.5,5.5,5.0,4.0
+          build=SUCCESS
+          signature=SUCCESS
+          certificate_SHA256=$CERT_FP
+          artifact=DarkroomTimer-DIY-v0.13.1-builddiag
+          artifact_id=$ARTIFACT_ID
+          apk_SHA256=$APK_SHA
+          EOF
+          git config user.name "Darkroom Timer Build Diagnostic"
+          git config user.email "actions@users.noreply.github.com"
+          git add experiments/v0131/build_diagnostic.txt
+          git commit -m "Record v0.13.1 build diagnostic $GITHUB_RUN_ID [skip ci]" || true
+          git push origin HEAD:feature-v0131-fstop-subtractive-teststrip || true
