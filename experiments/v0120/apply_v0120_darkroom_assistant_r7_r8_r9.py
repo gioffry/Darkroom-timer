@@ -28,6 +28,16 @@ if source.count(old) != 1:
     raise SystemExit("v0.12.0 anchor wrapper: expected exactly one original Assistant menu anchor")
 source = source.replace(old, new, 1)
 
+# The R7 implementation has no enlarger-controller dependency. Remove only a comment token
+# that was intentionally saying so but triggered the literal no-Sonoff guardrail.
+op_template = Path("experiments/v0120/OperationalAssistantActivity.java")
+op_text = op_template.read_text(encoding="utf-8")
+comment_old = "Deliberately has no dependency on SonoffArmService/MainActivity and never controls the enlarger."
+comment_new = "Deliberately has no dependency on the enlarger controller or MainActivity and never controls the enlarger."
+if op_text.count(comment_old) != 1:
+    raise SystemExit("v0.12.0 R7 comment guard: expected exactly one dependency comment")
+op_template.write_text(op_text.replace(comment_old, comment_new, 1), encoding="utf-8")
+
 namespace = {
     "__name__": "__main__",
     "__file__": str(Path(SOURCE_PATH)),
