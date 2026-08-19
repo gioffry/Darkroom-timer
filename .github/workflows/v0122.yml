@@ -1,0 +1,237 @@
+name: Build Darkroom Timer v0.12.2
+
+on:
+  push:
+    branches: [ feature-v0122-assistant-real-device-repair ]
+    paths-ignore:
+      - 'experiments/v0122/latest_run.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: darkroom-v0122-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact v0.12.2 repair branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature-v0122-assistant-real-device-repair
+          fetch-depth: 0
+
+      - name: Prove direct genealogy from exact v0.12.1 HEAD
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_BASE=2f68fb5b79ae11f56286146605d63a10f69a0107
+          git fetch origin feature-v0121-assistant-ux-smart-catalog
+          BASE_HEAD=$(git rev-parse origin/feature-v0121-assistant-ux-smart-catalog)
+          test "$BASE_HEAD" = "$EXPECTED_BASE"
+          git merge-base --is-ancestor "$BASE_HEAD" HEAD
+          MERGE_BASE=$(git merge-base "$BASE_HEAD" HEAD)
+          test "$MERGE_BASE" = "$BASE_HEAD"
+          FIRST_NEW=$(git rev-list --reverse "$BASE_HEAD"..HEAD | sed -n '1p')
+          test -n "$FIRST_NEW"
+          test "$(git rev-parse "$FIRST_NEW^")" = "$BASE_HEAD"
+          {
+            echo "base_branch=feature-v0121-assistant-ux-smart-catalog"
+            echo "base_head=$BASE_HEAD"
+            echo "merge_base=$MERGE_BASE"
+            echo "first_v0122_commit=$FIRST_NEW"
+            echo "functional_commit=$GITHUB_SHA"
+          } | tee genealogy.txt
+          echo "BASE_HEAD=$BASE_HEAD" >> "$GITHUB_ENV"
+          echo "MERGE_BASE=$MERGE_BASE" >> "$GITHUB_ENV"
+
+      - name: Reconstruct exact protected v0.12.1 functional image
+        shell: bash
+        run: |
+          set -euo pipefail
+          SNAP=base/v0.12.0-materialized
+          test -d "$SNAP/project"
+          grep -q '^versionName=0.12.0$' "$SNAP/BASE_PROVENANCE.txt"
+          grep -q '^versionCode=57$' "$SNAP/BASE_PROVENANCE.txt"
+          rm -rf work && mkdir -p work
+          cp -a "$SNAP/project" work/project
+          cp "$SNAP/build_darkroom.py" work/build_darkroom.py
+          cp "$SNAP/v064_icon.py" work/v064_icon.py
+          python3 -m py_compile experiments/v0121/apply_v0121_assistant_ux_smart_catalog.py
+          python3 experiments/v0121/apply_v0121_assistant_ux_smart_catalog.py work
+          grep -q 'android:versionName="0.12.1"' work/project/app/src/main/AndroidManifest.xml
+          grep -q 'android:versionCode="58"' work/project/app/src/main/AndroidManifest.xml
+          grep -q 'SmartSearchEngine.Item' work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchBinder.java
+          echo "Exact v0.12.1 functional image reconstructed" | tee v0121-base-check.txt
+
+      - name: Apply v0.12.2 real-device repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            experiments/v0122/apply_v0122_real_device_repair.py \
+            experiments/v0122/verify_v0122_release.py
+          python3 experiments/v0122/apply_v0122_real_device_repair.py work
+
+      - name: Configure Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepare Android SDK on GitHub runner only
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Run screenshot-regression behavior tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v0122/verify_v0122_release.py work | tee v0122-real-device-tests.txt
+          python3 experiments/v0120/test_backup_restore.py | tee backup-restore.txt
+
+      - name: Read and verify final version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION_NAME=$(python3 - <<'PY'
+          import re
+          from pathlib import Path
+          t=Path('work/project/app/src/main/AndroidManifest.xml').read_text()
+          print(re.search(r'android:versionName="([^"]+)"',t).group(1))
+          PY
+          )
+          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          test "$VERSION_NAME" = "0.12.2"
+          grep -q 'android:versionCode="59"' work/project/app/src/main/AndroidManifest.xml
+          grep -q 'package="it.darkroom.timer"' work/project/app/src/main/AndroidManifest.xml
+          grep -q 'public static final int VERSION = 3;' work/project/app/src/main/java/it/darkroom/timer/assistant/data/AssistantDataSchema.java
+          cat > validation-report.txt <<'EOF'
+          Assistant=9/9
+          repair_release=PASS
+          SmartSearch_real_device_text=PASS
+          AutoComplete_result_conversion=PASS
+          FOMA_Universal_alias=PASS
+          multifunction_category_label=PASS
+          Paper_stock_calculation=PASS
+          Paper_saved_session_rehydrate=PASS
+          Paper_manual_fallback=PASS
+          PrepareChemistry_9_of_9=PASS
+          databaseSchema=3
+          Timer_regression=PASS
+          STAMPA_TO_PROVINO_REMOVAL=PASS
+          Backup_restore=PASS
+          package=it.darkroom.timer
+          versionName=0.12.2
+          versionCode=59
+          EOF
+
+      - name: Prepare same stable signing configuration
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
+
+      - name: Build sign zipalign verify package version certificate and SHA-256
+        shell: bash
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+        run: |
+          set -euo pipefail
+          APK="DarkroomTimer-DIY-v${VERSION_NAME}.apk"
+          python3 work/build_darkroom.py work/project --output "$APK" --keystore "$RUNNER_TEMP/darkroom-signing.p12" --alias "$KEY_ALIAS" --storepass "$KEYSTORE_PASSWORD" --keypass "$KEY_PASSWORD"
+          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -c -v 4 "$APK" | tee zipalign.txt
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" | tee certificate.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging "$APK" | tee apk-badging.txt
+          grep -q "package: name='it.darkroom.timer' versionCode='59' versionName='0.12.2'" apk-badging.txt
+          sha256sum "$APK" | tee apk.sha256
+          APK_SHA=$(cut -d' ' -f1 apk.sha256)
+          CERT_FP=$(grep -m1 'certificate SHA-256 digest:' certificate.txt | sed 's/.*: *//')
+          test "$CERT_FP" = "fbead305657584b50a9d8892aa19bd9844b412d77db316e7daa5593c94e2a02f"
+          echo "APK_SHA=$APK_SHA" >> "$GITHUB_ENV"
+          echo "CERT_FP=$CERT_FP" >> "$GITHUB_ENV"
+          {
+            echo "Build=SUCCESS"
+            echo "zipalign=SUCCESS"
+            echo "signature=SUCCESS"
+            echo "certificate_continuity_v0121=PASS"
+            echo "certificate_SHA256=$CERT_FP"
+            echo "apk_SHA256=$APK_SHA"
+            echo "artifact=DarkroomTimer-DIY-v0.12.2"
+          } >> validation-report.txt
+
+      - name: Upload final APK and verification report
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: DarkroomTimer-DIY-v0.12.2
+          path: |
+            DarkroomTimer-DIY-v0.12.2.apk
+            apk.sha256
+            certificate.txt
+            zipalign.txt
+            apk-badging.txt
+            genealogy.txt
+            v0121-base-check.txt
+            v0122-real-device-tests.txt
+            backup-restore.txt
+            validation-report.txt
+
+      - name: Record successful run metadata
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/v0122
+          cat > experiments/v0122/latest_run.txt <<EOF
+          run_id=$GITHUB_RUN_ID
+          base_branch=feature-v0121-assistant-ux-smart-catalog
+          base_head=$BASE_HEAD
+          new_branch=feature-v0122-assistant-real-device-repair
+          merge_base=$MERGE_BASE
+          functional_commit=$GITHUB_SHA
+          versionName=0.12.2
+          versionCode=59
+          databaseSchema=3
+          smartsearch_real_device_text=PASS
+          autocomplete_result_conversion=PASS
+          foma_universal_alias=PASS
+          multifunction_category_label=PASS
+          paper_stock_calculation=PASS
+          paper_saved_session_rehydrate=PASS
+          paper_manual_fallback=PASS
+          prepare_chemistry_9_9=PASS
+          backup_restore=PASS
+          timer_regression=PASS
+          build=SUCCESS
+          zipalign=SUCCESS
+          signature=SUCCESS
+          certificate_continuity=PASS
+          certificate_SHA256=$CERT_FP
+          artifact=DarkroomTimer-DIY-v0.12.2
+          artifact_id=$ARTIFACT_ID
+          apk_SHA256=$APK_SHA
+          EOF
+          git config user.name "Darkroom Timer Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add experiments/v0122/latest_run.txt
+          git commit -m "Record v0.12.2 successful build $GITHUB_RUN_ID [skip ci]"
+          git push origin HEAD:feature-v0122-assistant-real-device-repair
