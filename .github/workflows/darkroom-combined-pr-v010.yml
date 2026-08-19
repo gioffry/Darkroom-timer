@@ -55,6 +55,32 @@ jobs:
         run: |
           set -euo pipefail
           sed -i 's/adst_assistant_java/dst_assistant_java/g' combined/prepare_combined.py
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('combined/prepare_combined.py')
+          s=p.read_text(encoding='utf-8')
+          start=s.index('# onCreate: apre direttamente la sezione richiesta dalla Home unica.')
+          end=s.index('# Back = Home unica.', start)
+          block=r'''# onCreate: conserva tutte le inizializzazioni della v0.3.8 e sostituisce
+          # soltanto la showHome finale con il routing dalla Home combinata.
+          on_start = s.index('    @Override\n    protected void onCreate(Bundle savedInstanceState) {')
+          on_end = s.index('\n    @Override', on_start + 20)
+          on_seg = s[on_start:on_end]
+          old_home = '        showHome();'
+          if old_home not in on_seg:
+              raise SystemExit('Assistant onCreate showHome marker missing')
+          route = ''' + "'''" + '''        String target = getIntent().getStringExtra("darkroom_target");
+                  if ("products".equals(target)) showProducts();
+                  else if ("film".equals(target)) showFilm();
+                  else if ("paper".equals(target)) showPaper();
+                  else finish();''' + "'''" + r'''
+          on_seg = on_seg.replace(old_home, route, 1)
+          s = s[:on_start] + on_seg + s[on_end:]
+
+          '''
+          s=s[:start]+block+s[end:]
+          p.write_text(s,encoding='utf-8')
+          PY
           bash combined/ci_build.sh
 
       - name: Upload APK
