@@ -1,0 +1,1027 @@
+{
+  "catalogVersion": 2,
+  "schemaVersion": 2,
+  "payload": {
+    "note": "Catalogo tecnico integrato v2: Smart Search offline-first, dati tecnici solo con provenienza esplicita.",
+    "aliasesVersion": 1,
+    "sources": [
+      {
+        "id": "foma-handbook",
+        "author": "FOMA BOHEMIA",
+        "title": "B&W Photo Materials and Developing Information",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.foma.cz/en/catalogue_bw_photo_materials_and_developing_information",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "2020",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "foma-universal",
+        "author": "FOMA BOHEMIA",
+        "title": "FOMA Universal",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.foma.cz/en/catalogue-foma-universal-detail-1109",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "foma-fotonal",
+        "author": "FOMA BOHEMIA",
+        "title": "FOTONAL",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.foma.cz/en/catalogue-fotonal-detail-293",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "foma-fomatol-lqn",
+        "author": "FOMA BOHEMIA",
+        "title": "FOMATOL LQN",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.foma.cz/en/catalogue-fomatol-lqn-detail-286",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "foma-fomafix",
+        "author": "FOMA BOHEMIA",
+        "title": "FOMAFIX",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.foma.cz/en/catalogue-fomafix-detail-821",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "ilford-hp5",
+        "author": "HARMAN technology / ILFORD",
+        "title": "HP5 PLUS Technical Information",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.ilfordphoto.com/amfile/file/download/file/1903/product/693/",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "Nov 2018",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "kodak-bw-processing",
+        "author": "Kodak Alaris",
+        "title": "Processing KODAK PROFESSIONAL Black-and-White Films",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.kodakprofessional.com/sites/default/files/wysiwyg/pro/resources/edbwf_0.pdf",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "Mar 2023",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "kodak-trix",
+        "author": "Kodak Alaris",
+        "title": "KODAK PROFESSIONAL TRI-X 320 and 400 Films",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://kodakprofessional.com/sites/default/files/wysiwyg/film/f4017_trix_320400.pdf",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "Oct 2021",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "adox-adostop",
+        "author": "ADOX Fotowerke GmbH",
+        "title": "ADOSTOP ECO",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.adox.de/adostop-eco-2/",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "jobo-1510",
+        "author": "JOBO International GmbH",
+        "title": "#1510 JOBO 35mm Tank",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.jobo.com/en/analogue/1510-jobo-35mm-tank-",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "jobo-1520",
+        "author": "JOBO International GmbH",
+        "title": "#1520 JOBO Uni Tank + LAB Kit M",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.jobo.com/en/analogue/1500m-lab-kit-m",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "jobo-1540",
+        "author": "JOBO International GmbH",
+        "title": "#1540 JOBO Multi Tank + LAB Kit L",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.jobo.com/en/analogue/1500l-lab-kit-l",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "jobo-2502",
+        "author": "JOBO International GmbH",
+        "title": "#2502 JOBO Duo Set Reel",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.jobo.com/en/analogue/2502-jobo-duo-set-reel",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "jobo-2520",
+        "author": "JOBO International GmbH",
+        "title": "#2520 JOBO Multitank 2",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.jobo.com/en/analogue/2520-jobo-multi-tank-2-",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "jobo-2540",
+        "author": "JOBO International GmbH",
+        "title": "#2540 JOBO Multitank 1",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.jobo.com/en/analogue/2540-jobo-multi-tank-1",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "jobo-2550",
+        "author": "JOBO International GmbH",
+        "title": "#2550 JOBO Multitank 5",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.jobo.com/en/analogue/2550-jobo-multi-tank-5",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "jobo-processors",
+        "author": "JOBO International GmbH",
+        "title": "JOBO analogue processors",
+        "reference": "Documentazione ufficiale produttore",
+        "url": "https://www.jobo.com/en/analogue/",
+        "sourceType": "FONTE UFFICIALE",
+        "documentVersion": "",
+        "verificationStatus": "VERIFICATO"
+      }
+    ],
+    "records": [
+      {
+        "id": "film-fomapan-100",
+        "name": "Fomapan 100 Classic",
+        "manufacturer": "FOMA",
+        "categories": [
+          "FILM"
+        ],
+        "aliases": [
+          "foma 100",
+          "fomapan100",
+          "foma classic 100"
+        ],
+        "subtitle": "Pellicola B/N · ISO 100",
+        "sourceId": "foma-handbook",
+        "technical": {
+          "nominalIso": 100,
+          "formats": [
+            "35 mm",
+            "120"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "film-fomapan-200",
+        "name": "Fomapan 200 Creative",
+        "manufacturer": "FOMA",
+        "categories": [
+          "FILM"
+        ],
+        "aliases": [
+          "foma 200",
+          "foma 2",
+          "fomapan200"
+        ],
+        "subtitle": "Pellicola B/N · ISO 200",
+        "sourceId": "foma-handbook",
+        "technical": {
+          "nominalIso": 200,
+          "formats": [
+            "35 mm",
+            "120"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "film-fomapan-400",
+        "name": "Fomapan 400 Action",
+        "manufacturer": "FOMA",
+        "categories": [
+          "FILM"
+        ],
+        "aliases": [
+          "foma 400",
+          "fomapan400",
+          "foma action"
+        ],
+        "subtitle": "Pellicola B/N · ISO 400",
+        "sourceId": "foma-handbook",
+        "technical": {
+          "nominalIso": 400,
+          "formats": [
+            "35 mm",
+            "120"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "film-hp5",
+        "name": "ILFORD HP5 PLUS",
+        "manufacturer": "ILFORD",
+        "categories": [
+          "FILM"
+        ],
+        "aliases": [
+          "hp5",
+          "hp5+",
+          "hp 5",
+          "ilford hp5",
+          "hp5 plus"
+        ],
+        "subtitle": "Pellicola B/N · ISO 400",
+        "sourceId": "ilford-hp5",
+        "technical": {
+          "nominalIso": 400,
+          "formats": [
+            "35 mm",
+            "120"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "film-trix400",
+        "name": "KODAK TRI-X 400",
+        "manufacturer": "KODAK",
+        "categories": [
+          "FILM"
+        ],
+        "aliases": [
+          "tri x",
+          "trix",
+          "tri-x",
+          "400tx",
+          "kodak trix"
+        ],
+        "subtitle": "Pellicola B/N · ISO 400",
+        "sourceId": "kodak-trix",
+        "technical": {
+          "nominalIso": 400,
+          "formats": [
+            "35 mm",
+            "120"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "film-tmax100",
+        "name": "KODAK T-MAX 100",
+        "manufacturer": "KODAK",
+        "categories": [
+          "FILM"
+        ],
+        "aliases": [
+          "tmax 100",
+          "t max 100",
+          "100tmx"
+        ],
+        "subtitle": "Pellicola B/N · ISO 100",
+        "sourceId": "kodak-bw-processing",
+        "technical": {
+          "nominalIso": 100,
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "film-tmax400",
+        "name": "KODAK T-MAX 400",
+        "manufacturer": "KODAK",
+        "categories": [
+          "FILM"
+        ],
+        "aliases": [
+          "tmax 400",
+          "t max 400",
+          "400tmy"
+        ],
+        "subtitle": "Pellicola B/N · ISO 400",
+        "sourceId": "kodak-bw-processing",
+        "technical": {
+          "nominalIso": 400,
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "dev-foma-universal",
+        "name": "FOMA Universal",
+        "manufacturer": "FOMA",
+        "categories": [
+          "FILM_DEVELOPER",
+          "PAPER_DEVELOPER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "foma universal developer",
+          "foma un",
+          "universal developer foma"
+        ],
+        "subtitle": "Rivelatore film e carta",
+        "sourceId": "foma-universal",
+        "technical": {
+          "filmDilutions": [
+            "1+3"
+          ],
+          "paperDilutions": [
+            "stock"
+          ],
+          "physicalState": "polvere",
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "dev-fomadon-r09",
+        "name": "FOMADON R09",
+        "manufacturer": "FOMA",
+        "categories": [
+          "FILM_DEVELOPER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "r09",
+          "r 09",
+          "foma r09",
+          "fomadon r 09"
+        ],
+        "subtitle": "Rivelatore pellicola",
+        "sourceId": "foma-handbook",
+        "technical": {
+          "dilutions": [
+            "1+25",
+            "1+50",
+            "1+100"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "dev-fomadon-lqn",
+        "name": "FOMADON LQN",
+        "manufacturer": "FOMA",
+        "categories": [
+          "FILM_DEVELOPER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "lqn",
+          "foma lqn"
+        ],
+        "subtitle": "Rivelatore pellicola",
+        "sourceId": "foma-handbook",
+        "technical": {
+          "dilutions": [
+            "1+10",
+            "1+14"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "dev-fomadon-lqr",
+        "name": "FOMADON LQR",
+        "manufacturer": "FOMA",
+        "categories": [
+          "FILM_DEVELOPER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "lqr",
+          "foma lqr"
+        ],
+        "subtitle": "Rivelatore pellicola",
+        "sourceId": "foma-handbook",
+        "technical": {
+          "dilutions": [
+            "1+10",
+            "1+14"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "dev-fomadon-excel",
+        "name": "FOMADON Excel",
+        "manufacturer": "FOMA",
+        "categories": [
+          "FILM_DEVELOPER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "foma excel",
+          "fomadon excel developer"
+        ],
+        "subtitle": "Rivelatore pellicola",
+        "sourceId": "foma-handbook",
+        "technical": {
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "dev-kodak-d76",
+        "name": "KODAK D-76",
+        "manufacturer": "KODAK",
+        "categories": [
+          "FILM_DEVELOPER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "d76",
+          "d-76",
+          "d 76",
+          "kodak d76"
+        ],
+        "subtitle": "Rivelatore pellicola",
+        "sourceId": "kodak-bw-processing",
+        "technical": {
+          "dilutions": [
+            "stock",
+            "1+1"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "dev-kodak-xtol",
+        "name": "KODAK XTOL",
+        "manufacturer": "KODAK",
+        "categories": [
+          "FILM_DEVELOPER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "xtol",
+          "x tol",
+          "kodak x-tol"
+        ],
+        "subtitle": "Rivelatore pellicola",
+        "sourceId": "kodak-bw-processing",
+        "technical": {
+          "dilutions": [
+            "stock",
+            "1+1"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "dev-kodak-hc110",
+        "name": "KODAK HC-110",
+        "manufacturer": "KODAK",
+        "categories": [
+          "FILM_DEVELOPER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "hc110",
+          "hc 110",
+          "hc-110"
+        ],
+        "subtitle": "Rivelatore pellicola",
+        "sourceId": "kodak-bw-processing",
+        "technical": {
+          "dilutions": [
+            "B"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "dev-kodak-tmax",
+        "name": "KODAK T-MAX",
+        "manufacturer": "KODAK",
+        "categories": [
+          "FILM_DEVELOPER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "tmax developer",
+          "t max developer",
+          "kodak tmax developer"
+        ],
+        "subtitle": "Rivelatore pellicola",
+        "sourceId": "kodak-bw-processing",
+        "technical": {
+          "dilutions": [
+            "1+4"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "dev-ilford-id11",
+        "name": "ILFORD ID-11",
+        "manufacturer": "ILFORD",
+        "categories": [
+          "FILM_DEVELOPER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "id11",
+          "id-11",
+          "id 11",
+          "ilford id11"
+        ],
+        "subtitle": "Rivelatore pellicola",
+        "sourceId": "foma-handbook",
+        "technical": {
+          "dilutions": [
+            "stock",
+            "1+1",
+            "1+3"
+          ],
+          "dataType": "DATO DIRETTO",
+          "note": "Diluizioni già presenti nel catalogo tecnico v0.12.0"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "dev-ilford-microphen",
+        "name": "ILFORD MICROPHEN",
+        "manufacturer": "ILFORD",
+        "categories": [
+          "FILM_DEVELOPER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "microphen",
+          "ilford microphen developer"
+        ],
+        "subtitle": "Rivelatore pellicola",
+        "sourceId": "foma-handbook",
+        "technical": {
+          "dilutions": [
+            "stock",
+            "1+1",
+            "1+3"
+          ],
+          "dataType": "DATO DIRETTO",
+          "note": "Diluizioni già presenti nel catalogo tecnico v0.12.0"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "dev-ilford-ddx",
+        "name": "ILFORD ILFOTEC DD-X",
+        "manufacturer": "ILFORD",
+        "categories": [
+          "FILM_DEVELOPER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "ddx",
+          "dd-x",
+          "dd x",
+          "ilfotec ddx"
+        ],
+        "subtitle": "Rivelatore pellicola",
+        "sourceId": "ilford-hp5",
+        "technical": {
+          "dilutions": [
+            "1+4"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "paper-fomaspeed-311",
+        "name": "Fomaspeed Variant 311",
+        "manufacturer": "FOMA",
+        "categories": [
+          "PAPER"
+        ],
+        "aliases": [
+          "foma 311",
+          "fomaspeed 311",
+          "variant 311",
+          "foma variant 311"
+        ],
+        "subtitle": "Carta RC multigrade · glossy",
+        "sourceId": "foma-handbook",
+        "technical": {
+          "family": "Fomaspeed Variant",
+          "surfaceCode": "311",
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "paperdev-fomatol-lqn",
+        "name": "FOMATOL LQN",
+        "manufacturer": "FOMA",
+        "categories": [
+          "PAPER_DEVELOPER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "fomatol",
+          "foma paper developer",
+          "foma lqn paper"
+        ],
+        "subtitle": "Rivelatore carta",
+        "sourceId": "foma-fomatol-lqn",
+        "technical": {
+          "dilutions": [
+            "1+7"
+          ],
+          "use": "manuale",
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "stop-adox-adostop",
+        "name": "ADOX Adostop ECO",
+        "manufacturer": "ADOX",
+        "categories": [
+          "STOP_BATH",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "ado stop",
+          "adostop",
+          "adox stop",
+          "adostop eco"
+        ],
+        "subtitle": "Bagno d'arresto",
+        "sourceId": "adox-adostop",
+        "technical": {
+          "dilutions": [
+            "1+19"
+          ],
+          "capacity": "> 3 m²/L soluzione di lavoro",
+          "workingSolutionLife": "1–2 settimane raccomandate",
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "fix-fomafix",
+        "name": "FOMAFIX",
+        "manufacturer": "FOMA",
+        "categories": [
+          "FIXER",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "foma fix",
+          "fomafix rapid fixer"
+        ],
+        "subtitle": "Fissaggio rapido film/carta",
+        "sourceId": "foma-fomafix",
+        "technical": {
+          "dilutions": [],
+          "dataType": "DATO DIRETTO",
+          "note": "La pagina prodotto conferma uso film/carta; la diluizione non è valorizzata se non verificata per il contesto fotografico."
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "wet-fotonal",
+        "name": "FOTONAL",
+        "manufacturer": "FOMA",
+        "categories": [
+          "WETTING_AGENT",
+          "CHEMISTRY"
+        ],
+        "aliases": [
+          "foma fotonal",
+          "wetting agent fotonal"
+        ],
+        "subtitle": "Imbibente / agente bagnante",
+        "sourceId": "foma-fotonal",
+        "technical": {
+          "dilutions": [
+            "5 ml / 1 L acqua"
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "tank-jobo-1510",
+        "name": "JOBO 1510",
+        "manufacturer": "JOBO",
+        "categories": [
+          "TANK",
+          "EQUIPMENT"
+        ],
+        "aliases": [
+          "1510",
+          "jobo1510",
+          "jobo 15"
+        ],
+        "subtitle": "System 1500 · 35 mm Tank",
+        "sourceId": "jobo-1510",
+        "technical": {
+          "system": "System 1500",
+          "tankType": "35mm Tank",
+          "capacity35": 1,
+          "capacity120": 0,
+          "capacityDataType": "DATO DIRETTO",
+          "minInversionMl": 250,
+          "minRotationMl": 140,
+          "cogCompatible": true,
+          "liftCompatible": true,
+          "processorCompatibility": "JOBO processors dopo retrofit magnete/cog",
+          "processorCompatibilityDataType": "DATO DIRETTO",
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "tank-jobo-1520",
+        "name": "JOBO 1520",
+        "manufacturer": "JOBO",
+        "categories": [
+          "TANK",
+          "EQUIPMENT"
+        ],
+        "aliases": [
+          "1520",
+          "jobo1520",
+          "jobo 15",
+          "jobo uni tank"
+        ],
+        "subtitle": "System 1500 · Uni Tank",
+        "sourceId": "jobo-1520",
+        "technical": {
+          "system": "System 1500",
+          "tankType": "Uni Tank",
+          "capacity35": 2,
+          "capacity120": 2,
+          "capacityDataType": "DATO DIRETTO",
+          "minInversionMl": 485,
+          "minRotationMl": 240,
+          "cogCompatible": true,
+          "liftCompatible": true,
+          "processorCompatibility": "JOBO processors dopo retrofit magnete/cog",
+          "processorCompatibilityDataType": "DATO DIRETTO",
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "tank-jobo-1540",
+        "name": "JOBO 1540",
+        "manufacturer": "JOBO",
+        "categories": [
+          "TANK",
+          "EQUIPMENT"
+        ],
+        "aliases": [
+          "1540",
+          "jobo1540",
+          "jobo 15",
+          "jobo multi tank"
+        ],
+        "subtitle": "System 1500 · Multi Tank",
+        "sourceId": "jobo-1540",
+        "technical": {
+          "system": "System 1500",
+          "tankType": "Multi Tank",
+          "capacity35": 4,
+          "capacity120": 4,
+          "capacityDataType": "DATO DIRETTO",
+          "minInversionMl": 975,
+          "minRotationMl": 470,
+          "cogCompatible": true,
+          "liftCompatible": true,
+          "processorCompatibility": "JOBO processors dopo retrofit magnete/cog",
+          "processorCompatibilityDataType": "DATO DIRETTO",
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "tank-jobo-2520",
+        "name": "JOBO 2520",
+        "manufacturer": "JOBO",
+        "categories": [
+          "TANK",
+          "EQUIPMENT"
+        ],
+        "aliases": [
+          "2520",
+          "jobo2520",
+          "jobo 25",
+          "multitank 2",
+          "multi tank 2"
+        ],
+        "subtitle": "System 2500 · Multitank 2",
+        "sourceId": "jobo-2520",
+        "technical": {
+          "system": "System 2500",
+          "tankType": "Multitank 2",
+          "reels2502": 2,
+          "capacity35": 2,
+          "capacity120": 2,
+          "capacityDataType": "DATO INTERNO VERIFICATO",
+          "minInversionMl": 775,
+          "minInversionDataType": "DATO INTERNO VERIFICATO",
+          "minRotationMl": 270,
+          "cogCompatible": true,
+          "liftCompatible": true,
+          "cpe2Compatible": true,
+          "cpe2CompatibilityDataType": "DATO INTERNO VERIFICATO",
+          "dataType": "DATO DIRETTO + DATO INTERNO VERIFICATO",
+          "note": "I valori 35/120, inversione e compatibilità CPE2 preservano il record verificato v0.12.0; JOBO corrente conferma 2 spirali 2502 e 270 ml."
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "tank-jobo-2540",
+        "name": "JOBO 2540",
+        "manufacturer": "JOBO",
+        "categories": [
+          "TANK",
+          "EQUIPMENT"
+        ],
+        "aliases": [
+          "2540",
+          "jobo2540",
+          "jobo 25",
+          "multitank 1",
+          "multi tank 1"
+        ],
+        "subtitle": "System 2500 · Multitank 1",
+        "sourceId": "jobo-2540",
+        "technical": {
+          "system": "System 2500",
+          "tankType": "Multitank 1",
+          "reels2502": 1,
+          "minRotationMl": 140,
+          "cogCompatible": true,
+          "liftCompatible": true,
+          "processorCompatibility": "JOBO processors",
+          "processorCompatibilityDataType": "DATO DIRETTO",
+          "capacity35": 1,
+          "capacity120": 2,
+          "capacityDataType": "CALCOLO",
+          "capacityCalculation": "1 spirale 2502; la 2502 può accogliere 2 rollfilm 120 con clip",
+          "dataType": "DATO DIRETTO + CALCOLO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "tank-jobo-2550",
+        "name": "JOBO 2550",
+        "manufacturer": "JOBO",
+        "categories": [
+          "TANK",
+          "EQUIPMENT"
+        ],
+        "aliases": [
+          "2550",
+          "jobo2550",
+          "jobo 25",
+          "multitank 5",
+          "multi tank 5"
+        ],
+        "subtitle": "System 2500 · Multitank 5",
+        "sourceId": "jobo-2550",
+        "technical": {
+          "system": "System 2500",
+          "tankType": "Multitank 5",
+          "reels2502": 5,
+          "minRotationMl": 640,
+          "cogCompatible": true,
+          "liftCompatible": true,
+          "processorCompatibility": "JOBO processors; pagina corrente: CPE-3 e CPP-3",
+          "processorCompatibilityDataType": "DATO DIRETTO",
+          "capacity35": 5,
+          "capacity120": 10,
+          "capacityDataType": "CALCOLO",
+          "capacityCalculation": "5 spirali 2502; ogni 2502 può accogliere 2 rollfilm 120 con clip",
+          "dataType": "DATO DIRETTO + CALCOLO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "processor-jobo-cpe3",
+        "name": "JOBO CPE-3",
+        "manufacturer": "JOBO",
+        "categories": [
+          "PROCESSOR",
+          "EQUIPMENT"
+        ],
+        "aliases": [
+          "cpe3",
+          "cpe 3",
+          "jobo cpe"
+        ],
+        "subtitle": "Processore a rotazione",
+        "sourceId": "jobo-processors",
+        "technical": {
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      },
+      {
+        "id": "processor-jobo-cpp3",
+        "name": "JOBO CPP-3",
+        "manufacturer": "JOBO",
+        "categories": [
+          "PROCESSOR",
+          "EQUIPMENT"
+        ],
+        "aliases": [
+          "cpp3",
+          "cpp 3",
+          "jobo cpp"
+        ],
+        "subtitle": "Processore a rotazione",
+        "sourceId": "jobo-processors",
+        "technical": {
+          "temperatureRangeC": [
+            20,
+            40
+          ],
+          "dataType": "DATO DIRETTO"
+        },
+        "dataDate": "2026-08-19",
+        "verificationStatus": "VERIFICATO"
+      }
+    ]
+  },
+  "payloadSha256": "c21f040493fad506431290fd873d79c32df09845c0fc9f5886514061648ca0d4"
+}
