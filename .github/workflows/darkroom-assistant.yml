@@ -3,7 +3,7 @@ name: Build Darkroom Assistant APK
 on:
   push:
     branches:
-      - feature-darkroom-assistant-v030-offline-mdc
+      - feature-darkroom-assistant-v035-format-stop-fix
   pull_request:
     branches:
       - main
@@ -64,7 +64,7 @@ jobs:
           unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
           echo "$RUNNER_TEMP/gradle-8.13/bin" >> "$GITHUB_PATH"
 
-      - name: Applica base UI e sorgenti precedenti
+      - name: Applica base offline v0.3.4
         shell: bash
         run: |
           set -euo pipefail
@@ -79,17 +79,39 @@ jobs:
           python3 assistant/patch_v033_startup_safe.py
           python3 assistant/patch_v034_db_schema_match.py
 
-      - name: Verifica contratto offline v0.3.4
+      - name: Applica formato e database stop fix v0.3.5
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 assistant/patch_v035_format_stop_fix.py
+
+      - name: Verifica contratto offline v0.3.5
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'mdc_offline_v034.sqlite' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
           grep -q 'private static final int DB_VERSION = 2;' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
+          grep -q 'static String\[\] formatsForFilm' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
+          grep -q 'curatedAuxChemistry' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+          grep -q 'Adox Adostop ECO' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+          grep -q 'Bellini FX100' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+          grep -q 'formatSpinner' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+          grep -q 'localProductMatchesForRole' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+          grep -q "versionName '0.3.5'" assistant/build.gradle
+          grep -q 'versionCode 19' assistant/build.gradle
           grep -q 'return MdcOfflineStore.searchDevelopers(query, 80)' assistant/src/main/java/it/darkroom/assistant/OnlineCatalogSearch.java
           grep -q 'Nessuna combinazione esatta nel database offline Digitaltruth' assistant/src/main/java/it/darkroom/assistant/DevTimeEngine.java
           ! grep -q 'uses-permission android:name="android.permission.INTERNET"' assistant/src/main/AndroidManifest.xml
           test -f assistant/src/main/assets/mdc_full.sqlite
-          echo 'SQLite asset user_version=2 e helper DB_VERSION=2'
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java').read_text()
+          stops=['Adox Adostop ECO','Adox Adostop ECO P','Ilford Ilfostop','Rollei RCS Citro Stop','MACO Eco Citrostop','Compard Stop Bath 60%','Fomacitro','Bellini ECOSTOP','Bellini INDEXSTOP','Bellini STOP (Acetic Acid)']
+          fixes=['Compard Fix Ag Plus','Ilford Rapid Fixer','Ilford Hypam','Fomafix','Adox Adofix Plus','Rollei RXA Fix Acid','Rollei RXN Fix Neutral','Bellini FX100','MACO Ecofix','Bellini FX5 Fixer & Hardener']
+          for x in stops+fixes: assert x in s, x
+          assert len(stops)==10 and len(fixes)==10
+          print('Curated chemistry verified: 10 stop + 10 fixer')
+          PY
 
       - name: Prepara firma stabile
         shell: bash
@@ -110,7 +132,7 @@ jobs:
         run: |
           set -euo pipefail
           gradle :assistant:assembleRelease --stacktrace
-          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.3.4.apk
+          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.3.5.apk
 
       - name: Verifica APK
         shell: bash
@@ -118,17 +140,17 @@ jobs:
           set -euo pipefail
           APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
           AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.3.4.apk
-          "$AAPT" dump badging DarkroomAssistant-v0.3.4.apk | head -20
-          unzip -l DarkroomAssistant-v0.3.4.apk | grep -q 'assets/mdc_full.sqlite'
-          if "$AAPT" dump permissions DarkroomAssistant-v0.3.4.apk | grep -q 'android.permission.INTERNET'; then
+          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.3.5.apk
+          "$AAPT" dump badging DarkroomAssistant-v0.3.5.apk | head -20
+          unzip -l DarkroomAssistant-v0.3.5.apk | grep -q 'assets/mdc_full.sqlite'
+          if "$AAPT" dump permissions DarkroomAssistant-v0.3.5.apk | grep -q 'android.permission.INTERNET'; then
             echo 'ERRORE: APK chiede ancora INTERNET' >&2
             exit 1
           fi
-          echo 'APK v0.3.4 verificato: DB incluso, schema version allineato, nessun Internet'
+          echo 'APK v0.3.5 verificato: DB Digitaltruth incluso, formati DB, catalogo stop/fix, nessun Internet'
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.3.4
-          path: DarkroomAssistant-v0.3.4.apk
+          name: DarkroomAssistant-v0.3.5
+          path: DarkroomAssistant-v0.3.5.apk
