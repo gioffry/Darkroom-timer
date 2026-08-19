@@ -3,7 +3,7 @@ name: Build Darkroom Assistant APK
 on:
   push:
     branches:
-      - feature-darkroom-assistant-v020-source-brain
+      - feature-darkroom-assistant-v021-live-index
   pull_request:
     branches:
       - main
@@ -39,6 +39,27 @@ jobs:
           unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
           echo "$RUNNER_TEMP/gradle-8.13/bin" >> "$GITHUB_PATH"
 
+      - name: Verifica indice live Massive Dev Chart
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 -A 'Mozilla/5.0 DarkroomAssistant/0.2.1' \
+            'https://www.digitaltruth.com/chart/print.php' -o "$RUNNER_TEMP/mdc-index.html"
+          python3 - "$RUNNER_TEMP/mdc-index.html" <<'PY'
+          import re, sys
+          p=sys.argv[1]
+          html=open(p,encoding='utf-8',errors='ignore').read()
+          text=re.sub(r'<[^>]+>',' ',html)
+          text=' '.join(text.split()).lower()
+          required=['rodinal','rollei supergrain','bellini hydrofen','foma universal','fuji neopan 100 acros ii','agfaphoto apx 100','ilford hp5+','kodak tri-x 400']
+          missing=[x for x in required if x not in text]
+          if missing:
+              raise SystemExit('Indice MDC incompleto/non leggibile: '+', '.join(missing))
+          if 'developer=' not in html.lower() or 'film=' not in html.lower():
+              raise SystemExit('Indice MDC senza link Film/Developer interrogabili')
+          print('MDC live index OK:', ', '.join(required))
+          PY
+
       - name: Applica fix risultati ricerca visibili
         shell: bash
         run: |
@@ -51,7 +72,7 @@ jobs:
           set -euo pipefail
           python3 assistant/patch_v019_search_enrichment.py
 
-      - name: Applica cervello fonti v0.2.0
+      - name: Applica integrazione fonti v0.2.0
         shell: bash
         run: |
           set -euo pipefail
@@ -76,7 +97,7 @@ jobs:
         run: |
           set -euo pipefail
           gradle :assistant:assembleRelease --stacktrace
-          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.2.0.apk
+          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.2.1.apk
 
       - name: Verifica APK prima dell'upload
         shell: bash
@@ -84,11 +105,11 @@ jobs:
           set -euo pipefail
           APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
           AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.2.0.apk
-          "$AAPT" dump badging DarkroomAssistant-v0.2.0.apk | head -20
+          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.2.1.apk
+          "$AAPT" dump badging DarkroomAssistant-v0.2.1.apk | head -20
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.2.0
-          path: DarkroomAssistant-v0.2.0.apk
+          name: DarkroomAssistant-v0.2.1
+          path: DarkroomAssistant-v0.2.1.apk
