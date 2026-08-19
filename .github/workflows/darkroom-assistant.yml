@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feature-darkroom-assistant-v012-signed
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
