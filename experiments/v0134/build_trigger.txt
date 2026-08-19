@@ -1,0 +1,1 @@
+Trigger authorized v0.13.4 APK build after workflow installation.
