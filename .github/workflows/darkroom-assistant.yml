@@ -3,7 +3,7 @@ name: Build Darkroom Assistant APK
 on:
   push:
     branches:
-      - feature-darkroom-assistant-v019-search-enrichment
+      - feature-darkroom-assistant-v020-source-brain
   pull_request:
     branches:
       - main
@@ -45,11 +45,17 @@ jobs:
           set -euo pipefail
           python3 assistant/patch_v018_visible_results.py
 
-      - name: Applica fix ricerca e dati prodotto
+      - name: Applica fix ricerca v0.1.9
         shell: bash
         run: |
           set -euo pipefail
           python3 assistant/patch_v019_search_enrichment.py
+
+      - name: Applica cervello fonti v0.2.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 assistant/patch_v020_source_brain.py
 
       - name: Prepara firma stabile
         shell: bash
@@ -70,7 +76,7 @@ jobs:
         run: |
           set -euo pipefail
           gradle :assistant:assembleRelease --stacktrace
-          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.1.9.apk
+          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.2.0.apk
 
       - name: Verifica APK prima dell'upload
         shell: bash
@@ -78,11 +84,11 @@ jobs:
           set -euo pipefail
           APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
           AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.1.9.apk
-          "$AAPT" dump badging DarkroomAssistant-v0.1.9.apk | head -20
+          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.2.0.apk
+          "$AAPT" dump badging DarkroomAssistant-v0.2.0.apk | head -20
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.1.9
-          path: DarkroomAssistant-v0.1.9.apk
+          name: DarkroomAssistant-v0.2.0
+          path: DarkroomAssistant-v0.2.0.apk
