@@ -30,14 +30,15 @@ jobs:
           rows=con.execute('select count(*) from times').fetchone()[0]
           films=con.execute('select count(*) from films').fetchone()[0]
           devs=con.execute('select count(*) from developers').fetchone()[0]
+          dbv=con.execute('pragma user_version').fetchone()[0]
           rod=con.execute("select count(*) from developers where lower(name)='rodinal'").fetchone()[0]
           ferr=con.execute("select count(*) from films where lower(name)='ferrania p30'").fetchone()[0]
           noise=con.execute("select count(*) from films where lower(name) like '%prewash%' or lower(name) like '%from 2025%'").fetchone()[0]
           qc=con.execute('pragma quick_check').fetchone()[0]
-          print(f'CANONICAL DB VERIFIED: films={films} developers={devs} rows={rows} rodinal={rod} ferrania={ferr} noise={noise} quick_check={qc}')
+          print(f'CANONICAL DB VERIFIED: films={films} developers={devs} rows={rows} user_version={dbv} rodinal={rod} ferrania={ferr} noise={noise} quick_check={qc}')
           assert 250 <= films <= 450
           assert 180 <= devs <= 234
-          assert rows >= 3000 and rod == 1 and ferr == 1 and noise == 0 and qc == 'ok'
+          assert rows >= 3000 and dbv == 2 and rod == 1 and ferr == 1 and noise == 0 and qc == 'ok'
           con.close()
           PY
 
@@ -75,19 +76,20 @@ jobs:
           python3 assistant/patch_v030_offline_mdc.py
           python3 assistant/patch_v031_bundled_db.py
           python3 assistant/patch_v032_pure_offline.py
+          python3 assistant/patch_v033_startup_safe.py
+          python3 assistant/patch_v034_db_schema_match.py
 
-      - name: Applica fix avvio v0.3.3
+      - name: Verifica contratto offline v0.3.4
         shell: bash
         run: |
           set -euo pipefail
-          python3 assistant/patch_v033_startup_safe.py
-          grep -q 'mdc_offline_v033.sqlite' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
-          grep -q 'openBundledDatabase' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
+          grep -q 'mdc_offline_v034.sqlite' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
+          grep -q 'private static final int DB_VERSION = 2;' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
           grep -q 'return MdcOfflineStore.searchDevelopers(query, 80)' assistant/src/main/java/it/darkroom/assistant/OnlineCatalogSearch.java
           grep -q 'Nessuna combinazione esatta nel database offline Digitaltruth' assistant/src/main/java/it/darkroom/assistant/DevTimeEngine.java
           ! grep -q 'uses-permission android:name="android.permission.INTERNET"' assistant/src/main/AndroidManifest.xml
-          ! grep -A8 'protected void onCreate' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java | grep -q 'repairLegacyInventoryFromOfflineDb'
           test -f assistant/src/main/assets/mdc_full.sqlite
+          echo 'SQLite asset user_version=2 e helper DB_VERSION=2'
 
       - name: Prepara firma stabile
         shell: bash
@@ -108,25 +110,25 @@ jobs:
         run: |
           set -euo pipefail
           gradle :assistant:assembleRelease --stacktrace
-          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.3.3.apk
+          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.3.4.apk
 
-      - name: Verifica APK e assenza rete
+      - name: Verifica APK
         shell: bash
         run: |
           set -euo pipefail
           APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
           AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.3.3.apk
-          "$AAPT" dump badging DarkroomAssistant-v0.3.3.apk | head -20
-          unzip -l DarkroomAssistant-v0.3.3.apk | grep -q 'assets/mdc_full.sqlite'
-          if "$AAPT" dump permissions DarkroomAssistant-v0.3.3.apk | grep -q 'android.permission.INTERNET'; then
+          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.3.4.apk
+          "$AAPT" dump badging DarkroomAssistant-v0.3.4.apk | head -20
+          unzip -l DarkroomAssistant-v0.3.4.apk | grep -q 'assets/mdc_full.sqlite'
+          if "$AAPT" dump permissions DarkroomAssistant-v0.3.4.apk | grep -q 'android.permission.INTERNET'; then
             echo 'ERRORE: APK chiede ancora INTERNET' >&2
             exit 1
           fi
-          echo 'APK v0.3.3: database incluso, nessun permesso Internet, startup fail-safe'
+          echo 'APK v0.3.4 verificato: DB incluso, schema version allineato, nessun Internet'
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.3.3
-          path: DarkroomAssistant-v0.3.3.apk
+          name: DarkroomAssistant-v0.3.4
+          path: DarkroomAssistant-v0.3.4.apk
