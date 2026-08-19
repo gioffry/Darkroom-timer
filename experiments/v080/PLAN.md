@@ -1,0 +1,1 @@
+Consolidate v0.7.7 into a clean source base, then implement optional print sequences inside STAMPA: base exposure, timed DODGE cues during base exposure, manual-confirmed BURN steps after base, f-stop burn calculations, full LOG/JPG persistence, and USA PER STAMPA restore.

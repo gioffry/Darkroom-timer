@@ -1,0 +1,64 @@
+            try {
+                if (on) SonoffHttp.switchOn(safelight); else SonoffHttp.switchOff(safelight);
+                TechnicalLog.add(this, techSessionId, "SAFELIGHT comando " + wanted.toUpperCase(Locale.ITALY) + " • tentativo " + attempt + "/4");
+                for (int check = 0; check < 3; check++) {
+                    String observed = SonoffHttp.infoQuick(safelight, 1800);
+                    if (wanted.equals(observed)) {
+                        TechnicalLog.add(this, techSessionId, "SAFELIGHT osservata " + wanted.toUpperCase(Locale.ITALY));
+                        return;
+                    }
+                    try { Thread.sleep(120L); } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw ie;
+                    }
+                }
+                last = new Exception("stato " + wanted + " non confermato");
+            } catch (Exception e) {
+                last = e;
+            }
+        }
+        throw new Exception("safelight " + wanted.toUpperCase(Locale.ITALY) + " non confermata: " + readable(last));
+    }
+
+    private void restoreSafelightBestEffort() {
+        if (!safelightAuto) return;
+        try {
+            setSafelightConfirmed(true);
+            TechnicalLog.add(this, techSessionId, "SAFELIGHT ON ripristinata in sicurezza");
+        } catch (Exception e) {
+            TechnicalLog.add(this, techSessionId, "ATTENZIONE SAFELIGHT: ripristino ON fallito — " + readable(e));
+        }
+    }
+
+'''+anchor_service
+rep(service, anchor_service, service_helpers, 'service safelight helpers')
+
+# fail-safe: su qualsiasi errore spegne il primario/disarma e prova a riaccendere il rosso.
+rrep(service,
+      r'''    private void fail\(String message\) \{.*?\n    \}\n\n    private void stopCleanly''',
+      '''    private void fail(String message) {\n        TechnicalLog.add(this, techSessionId, "ERRORE — " + message);\n        cancelTimers();\n        completing.set(true);\n        try {\n            if (device != null && device.isValid()) {\n                try { SonoffHttp.switchOff(device); } catch (Exception ignored) {}\n                try { SonoffHttp.pulseOff(device); } catch (Exception ignored) {}\n            }\n        } finally {\n            restoreSafelightBestEffort();\n        }\n        broadcast(STATE_ERROR, message);\n        updateNotification("ATTENZIONE — " + message);\n        releaseWakeLock();\n    }\n\n    private void stopCleanly''', 'service fail-safe')
+
+# Icona v0.7.2: stessa immagine, ricodificata solo per conservarla nel repo; conversione PNG PRIMA della firma.
+asset_dir = Path.cwd()/'assets'/'v075'
+parts = sorted(asset_dir.glob('icon_*.b64'))
+if not parts: raise SystemExit('v0.7.5 asset icona mancante')
+encoded=''.join(p.read_text(encoding='ascii').strip() for p in parts)
+raw=base64.b64decode(encoded, validate=True)
+if not raw.startswith(b'\xff\xd8'): raise SystemExit('v0.7.5 asset icona JPEG non valido')
+icon_source=work/'user_icon_v075.jpg'
+icon_source.write_bytes(raw)
+wr(work/'v064_icon.py', '''def materialize_icon(project):\n    print("[Darkroom v0.7.5] Icona v0.7.2 preparata dal workflow prima della firma", flush=True)\n''')
+print('v0.7.5 icon source', len(raw), hashlib.sha256(raw).hexdigest(), flush=True)
+
+# Verifiche statiche.
+checks={
+ main:['LUCE ROSSA AUTOMATICA:', 'showSafelightPicker()', 'ensureSafelightIdleOn()', 'SafelightConfig.load(this)', 'selectedSafelightDeviceId'],
+ service:['setSafelightConfirmed(false)', 'setSafelightConfirmed(true)', 'restoreSafelightBestEffort()', 'SAFELIGHT OFF confermata'],
+ build:['VERSION_NAME = "0.7.5"','VERSION_CODE = "38"'],
+ java/'SafelightConfig.java':['safelight_diy','public static void save'],
+}
+for p,needles in checks.items():
+    t=rd(p)
+    for n in needles:
+        if n not in t: raise SystemExit(f'v0.7.5 verifica fallita: {n} in {p}')
+print('v0.7.5 TUTTE LE VERIFICHE SORGENTE OK', flush=True)

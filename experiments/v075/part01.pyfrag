@@ -1,0 +1,74 @@
+insert='''        Button safelightToggle = compactButton("LUCE ROSSA AUTOMATICA: " + (safelightAuto ? "ON" : "OFF"));\n        safelightToggle.setOnClickListener(v -> {\n            if (!safelightAuto) {\n                DeviceConfig safe = SafelightConfig.load(this);\n                if (!safe.isValid()) {\n                    Toast.makeText(this, "Prima seleziona il SONOFF della luce rossa", Toast.LENGTH_LONG).show();\n                    return;\n                }\n                if (safe.deviceId.equals(selectedDeviceId)) {\n                    Toast.makeText(this, "Ingranditore e luce rossa devono usare due SONOFF diversi", Toast.LENGTH_LONG).show();\n                    return;\n                }\n                safelightAuto = true;\n            } else {\n                safelightAuto = false;\n            }\n            getSharedPreferences("ui", MODE_PRIVATE).edit().putBoolean("safelightAuto", safelightAuto).apply();\n            safelightToggle.setText("LUCE ROSSA AUTOMATICA: " + (safelightAuto ? "ON" : "OFF"));\n            updateSafelightStatus();\n            if (safelightAuto) ensureSafelightIdleOn();\n        });\n        panel.addView(safelightToggle, margin(lp(-1, dp(50)), 0, 0, 0, 8));\n\n        DeviceConfig safeCfg = SafelightConfig.load(this);\n        String safeInfo = safeCfg.isValid()\n                ? "SONOFF SAFELIGHT  •  ID " + safeCfg.deviceId + "\\nNormalmente ON • OFF durante l’esposizione"\n                : "SONOFF SAFELIGHT  •  non configurato";\n        TextView safeDetails = text(safeInfo, 12, MUTED, false);\n        safeDetails.setPadding(dp(4), dp(2), dp(4), dp(6));\n        panel.addView(safeDetails);\n        Button safePick = compactButton(safeCfg.isValid() ? "CAMBIA SONOFF SAFELIGHT" : "SCEGLI SONOFF SAFELIGHT");\n        safePick.setOnClickListener(v -> { dialog.dismiss(); showSafelightPicker(); });\n        panel.addView(safePick, margin(lp(-1, dp(50)), 0, 0, 0, 12));\n\n''' + marker
+rep(main, marker, insert, 'settings safelight')
+
+# Blocca ARM se automazione attiva ma secondo SONOFF non valido.
+rep(main,
+'''        if (device == null || !device.isValid()) {\n            stateText.setText("Il SONOFF dell’ingranditore non è ancora verificato in DIY");\n            return;\n        }''',
+'''        if (device == null || !device.isValid()) {\n            stateText.setText("Il SONOFF dell’ingranditore non è ancora verificato in DIY");\n            return;\n        }\n        if (safelightAuto) {\n            DeviceConfig safe = SafelightConfig.load(this);\n            if (!safe.isValid() || safe.deviceId.equals(device.deviceId)) {\n                setStatusPresentation("ATTENZIONE", "Configura un secondo SONOFF DIY dedicato alla luce rossa", RED);\n                return;\n            }\n        }''', 'arm guard safelight')
+
+# Il discovery aggiorna anche l'IP del secondo SONOFF.
+rep(main,
+'''        FoundDevice f = new FoundDevice(found, true, type, apiVersion);\n        foundDevices.put(found.deviceId, f);\n        if (found.deviceId.equals(selectedDeviceId)) {''',
+'''        FoundDevice f = new FoundDevice(found, true, type, apiVersion);\n        foundDevices.put(found.deviceId, f);\n        if (found.deviceId.equals(selectedSafelightDeviceId)) {\n            SafelightConfig.save(this, found);\n            safelightDevice = found;\n            updateSafelightStatus();\n            if (safelightAuto && !armed) ensureSafelightIdleOn();\n        }\n        if (found.deviceId.equals(selectedDeviceId)) {''', 'discovery safelight')
+
+# Metodi picker/idle inseriti prima del picker ingranditore esistente.
+anchor='''    private void showDevicePicker() {'''
+helpers=r'''    private void updateSafelightStatus() {
+        if (safelightStatus == null) return;
+        DeviceConfig safe = SafelightConfig.load(this);
+        if (!safelightAuto) {
+            safelightStatus.setText("LUCE ROSSA AUTOMATICA — OFF");
+            safelightStatus.setTextColor(MUTED);
+        } else if (!safe.isValid()) {
+            safelightStatus.setText("LUCE ROSSA AUTOMATICA — DA CONFIGURARE");
+            safelightStatus.setTextColor(RED);
+        } else {
+            safelightStatus.setText("LUCE ROSSA AUTOMATICA — ON");
+            safelightStatus.setTextColor(darkroomMode ? RED : Color.rgb(201, 157, 70));
+        }
+    }
+
+    private void showSafelightPicker() {
+        ArrayList<FoundDevice> list = new ArrayList<>();
+        for (FoundDevice f : foundDevices.values()) {
+            if (!f.diyCandidate) continue;
+            if (f.config.deviceId.equals(selectedDeviceId)) continue;
+            list.add(f);
+        }
+        Collections.sort(list, Comparator.comparing(a -> a.config.deviceId));
+        if (list.isEmpty()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Nessun secondo SONOFF DIY trovato")
+                    .setMessage("La luce rossa richiede un secondo SONOFF in modalità DIY, diverso da quello dell’ingranditore. Attendi la ricerca di rete e riprova.")
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+        String[] labels = new String[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            FoundDevice f = list.get(i);
+            String selected = f.config.deviceId.equals(selectedSafelightDeviceId) ? "  ✓" : "";
+            labels[i] = "ID " + f.config.deviceId + selected + "\n" + f.config.host + ":" + f.config.port + " • DIY";
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("Scegli il SONOFF della luce rossa")
+                .setItems(labels, (d, which) -> selectSafelight(list.get(which)))
+                .setNegativeButton("ANNULLA", null)
+                .show();
+    }
+
+    private void selectSafelight(FoundDevice found) {
+        if (found == null || !found.diyCandidate || !found.config.isValid()) return;
+        if (found.config.deviceId.equals(selectedDeviceId)) {
+            Toast.makeText(this, "Scegli un SONOFF diverso da quello dell’ingranditore", Toast.LENGTH_LONG).show();
+            return;
+        }
+        selectedSafelightDeviceId = found.config.deviceId;
+        safelightDevice = found.config;
+        SafelightConfig.save(this, found.config);
+        updateSafelightStatus();
+        if (safelightAuto) ensureSafelightIdleOn();
+        Toast.makeText(this, "SONOFF luce rossa selezionato", Toast.LENGTH_SHORT).show();
+    }
+
+    private void ensureSafelightIdleOn() {

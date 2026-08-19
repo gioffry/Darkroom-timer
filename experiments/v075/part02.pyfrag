@@ -1,0 +1,78 @@
+        if (!safelightAuto || armed) return;
+        DeviceConfig safe = SafelightConfig.load(this);
+        if (!safe.isValid() || safe.deviceId.equals(selectedDeviceId)) return;
+        io.execute(() -> {
+            try {
+                SonoffHttp.pulseOff(safe);
+                SonoffHttp.switchOn(safe);
+                String state = SonoffHttp.infoQuick(safe, 1800);
+                if (!"on".equals(state)) throw new Exception("accensione non confermata");
+                safelightDevice = safe;
+                runOnUiThread(this::updateSafelightStatus);
+            } catch (Exception ignored) {
+                runOnUiThread(() -> {
+                    if (safelightStatus != null && safelightAuto) {
+                        safelightStatus.setText("LUCE ROSSA AUTOMATICA — SONOFF NON RAGGIUNGIBILE");
+                        safelightStatus.setTextColor(RED);
+                    }
+                });
+            }
+        });
+    }
+
+'''+anchor
+rep(main, anchor, helpers, 'picker e idle safelight')
+
+# Service: carica secondo SONOFF e sequenzia luce rossa/ingranditore.
+rep(service,
+'''    private volatile DeviceConfig device;\n    private volatile int mode = MODE_PRINT;''',
+'''    private volatile DeviceConfig device;\n    private volatile DeviceConfig safelight;\n    private volatile boolean safelightAuto = false;\n    private volatile int mode = MODE_PRINT;''', 'service fields')
+# Tutte le azioni che caricano il device principale caricano anche la configurazione safelight.
+s=rd(service)
+needle='            device = DeviceConfig.load(this);'
+if s.count(needle) < 3: raise SystemExit('v0.7.5 service load device: meno di 3 occorrenze')
+s=s.replace(needle, needle+'\n            loadSafelightConfig();')
+wr(service,s); print('v0.7.5 OK service load safelight', flush=True)
+
+# Prima di dichiarare ARMATO, spegne e CONFERMA la luce rossa.
+rep(service,
+'''            SonoffHttp.pulseOn(device, currentPulseWidthMs);\n            TechnicalLog.add(this, techSessionId, "COMANDO pulse=on accettato • " + seconds(currentPulseWidthMs));''',
+'''            SonoffHttp.pulseOn(device, currentPulseWidthMs);\n            TechnicalLog.add(this, techSessionId, "COMANDO pulse=on accettato • " + seconds(currentPulseWidthMs));\n            if (safelightAuto) {\n                setSafelightConfirmed(false);\n                TechnicalLog.add(this, techSessionId, "SAFELIGHT OFF confermata • pronto all’esposizione");\n            }''', 'safelight off prima armato')
+# Messaggio armato esplicito.
+rep(service,
+'''            String msg = mode == MODE_PRINT\n                    ? "ARMATO — premi il pulsante fisico"\n                    : "PROVINO ARMATO — premi il pulsante fisico una volta";''',
+'''            String msg = mode == MODE_PRINT\n                    ? (safelightAuto ? "ARMATO — luce rossa OFF • premi il pulsante fisico" : "ARMATO — premi il pulsante fisico")\n                    : (safelightAuto ? "PROVINO ARMATO — luce rossa OFF • premi il pulsante fisico una volta" : "PROVINO ARMATO — premi il pulsante fisico una volta");''', 'messaggio armato safelight')
+# Appena l'ingranditore torna OFF, la safelight torna ON: anche durante le pause del provino.
+rep(service,
+'''        seenOn.set(false);\n        completed++;''',
+'''        seenOn.set(false);\n        completed++;\n        if (safelightAuto) {\n            try {\n                setSafelightConfirmed(true);\n                TechnicalLog.add(this, techSessionId, "SAFELIGHT ON confermata dopo esposizione " + completed);\n            } catch (Exception e) {\n                fail("Ingranditore OFF, ma luce rossa non riaccesa: " + readable(e));\n                return;\n            }\n        }''', 'safelight on dopo esposizione')
+# Prima delle esposizioni automatiche successive: rosso OFF confermato, poi ingranditore ON.
+rep(service,
+'''                SonoffHttp.switchOn(device);\n                TechnicalLog.add(this, techSessionId, "COMANDO switch=on accettato per esposizione " + (completed + 1) + "/" + count);''',
+'''                if (safelightAuto) {\n                    setSafelightConfirmed(false);\n                    TechnicalLog.add(this, techSessionId, "SAFELIGHT OFF confermata prima della esposizione " + (completed + 1));\n                }\n                SonoffHttp.switchOn(device);\n                TechnicalLog.add(this, techSessionId, "COMANDO switch=on accettato per esposizione " + (completed + 1) + "/" + count);''', 'safelight off provino automatico')
+# Annullamento/ripristino: prima spegne l'ingranditore, poi riaccende il rosso, poi disarma Inching.
+rep(service,
+'''            if (forceLampOff) {\n                SonoffHttp.switchOff(device);\n                TechnicalLog.add(this, techSessionId, "COMANDO switch=off accettato (annullamento/ripristino)");\n            }\n            pulseOffWithWatchdog();''',
+'''            if (forceLampOff) {\n                SonoffHttp.switchOff(device);\n                TechnicalLog.add(this, techSessionId, "COMANDO switch=off accettato (annullamento/ripristino)");\n            }\n            if (safelightAuto) {\n                setSafelightConfirmed(true);\n                TechnicalLog.add(this, techSessionId, "SAFELIGHT ON confermata durante ripristino");\n            }\n            pulseOffWithWatchdog();''', 'restore safelight disarm')
+
+# Helper di conferma, inseriti prima del watchdog pulseOff.
+anchor_service='''    private void pulseOffWithWatchdog() throws Exception {'''
+service_helpers=r'''    private void loadSafelightConfig() {
+        safelightAuto = getSharedPreferences("ui", MODE_PRIVATE).getBoolean("safelightAuto", false);
+        safelight = SafelightConfig.load(this);
+        if (safelightAuto && (safelight == null || !safelight.isValid())) {
+            safelight = null;
+        }
+    }
+
+    private void setSafelightConfirmed(boolean on) throws Exception {
+        if (!safelightAuto) return;
+        if (safelight == null || !safelight.isValid()) throw new Exception("SONOFF safelight non configurato");
+        if (device != null && device.isValid() && safelight.deviceId.equals(device.deviceId)) {
+            throw new Exception("il SONOFF safelight coincide con l’ingranditore");
+        }
+        String wanted = on ? "on" : "off";
+        Exception last = null;
+        // La safelight deve essere in normale ON/OFF, mai in Inching.
+        try { SonoffHttp.pulseOff(safelight); } catch (Exception e) { last = e; }
+        for (int attempt = 1; attempt <= 4; attempt++) {

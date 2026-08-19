@@ -1,0 +1,2 @@
+Build Darkroom Timer v0.10.5
+Premature OFF fail-safe: two consecutive premature OFF observations abort the cycle.
