@@ -35,7 +35,7 @@ jobs:
           git merge-base --is-ancestor "$BASE_HEAD" HEAD
           MERGE_BASE=$(git merge-base "$BASE_HEAD" HEAD)
           test "$MERGE_BASE" = "$BASE_HEAD"
-          FIRST_NEW=$(git rev-list --reverse "$BASE_HEAD"..HEAD | head -1)
+          FIRST_NEW=$(git rev-list --reverse "$BASE_HEAD"..HEAD | sed -n '1p')
           test -n "$FIRST_NEW"
           test "$(git rev-parse "$FIRST_NEW^")" = "$BASE_HEAD"
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
@@ -248,7 +248,6 @@ jobs:
           assert 'ANDROID_KEYSTORE' not in backup and 'KEY_PASSWORD' not in backup and 'GITHUB' not in backup
           assert 'public static final int VERSION = 3;' in schema and 'if(oldVersion<3)' in db
           assert 'DROP TABLE' not in schema and 'DROP TABLE' not in db
-          # Internet is optional and isolated to the explicit catalog updater inside Assistant.
           for p in root.rglob('*.java'):
               if p.name=='CatalogManager.java': continue
               assert 'java.net.HttpURLConnection' not in p.read_text(),str(p)
@@ -270,11 +269,11 @@ jobs:
           print(re.search(r'android:versionName="([^"]+)"',t).group(1))
           PY
           )
+          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
           test "$VERSION_NAME" = "0.12.0"
           grep -q 'android:versionCode="57"' work/project/app/src/main/AndroidManifest.xml
           grep -q 'package="it.darkroom.timer"' work/project/app/src/main/AndroidManifest.xml
           grep -q 'public static final int VERSION = 3;' work/project/app/src/main/java/it/darkroom/timer/assistant/data/AssistantDataSchema.java
-          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
           cat > validation-report.txt <<'EOF'
           Timer regression=PASS
           STAMPA_TO_PROVINO_REMOVAL=PASS
