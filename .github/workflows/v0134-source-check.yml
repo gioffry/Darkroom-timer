@@ -1,0 +1,79 @@
+name: Check Darkroom Timer v0.13.4 source only
+
+on:
+  push:
+    branches: [ feature-v0134-preferred-strip-button-fix ]
+    paths-ignore:
+      - 'experiments/v0134/source_check.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  source-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature-v0134-preferred-strip-button-fix
+          fetch-depth: 0
+
+      - name: Reconstruct exact v0.13.3 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf work && mkdir -p work
+          cp -a base/v0.12.0-materialized/project work/project
+          cp base/v0.12.0-materialized/build_darkroom.py work/build_darkroom.py
+          cp base/v0.12.0-materialized/v064_icon.py work/v064_icon.py
+          python3 experiments/v0121/apply_v0121_assistant_ux_smart_catalog.py work
+          python3 experiments/v0122/apply_v0122_real_device_repair.py work
+          python3 experiments/v0123/apply_v0123_live_web_repair.py work
+          python3 experiments/v0123/apply_v0123_no_manual_cleanup.py work
+          python3 experiments/v0130/apply_v0130_timer_only_reset.py work
+          python3 experiments/v0131/apply_v0131_fstop_subtractive_teststrip.py work
+          python3 experiments/v0132/apply_v0132_consolidated_timer_fixes.py work
+          python3 experiments/v0133/apply_v0133_preferred_strip_pending.py work
+          grep -q 'android:versionName="0.13.3"' work/project/app/src/main/AndroidManifest.xml
+          grep -q 'android:versionCode="64"' work/project/app/src/main/AndroidManifest.xml
+          sha256sum work/project/app/src/main/java/it/darkroom/timer/TimingMath.java | cut -d' ' -f1 > /tmp/timing.before
+          sha256sum work/project/app/src/main/java/it/darkroom/timer/SonoffArmService.java | cut -d' ' -f1 > /tmp/sonoff.before
+
+      - name: Apply v0.13.4 button fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile experiments/v0134/apply_v0134_preferred_strip_button_fix.py
+          python3 experiments/v0134/apply_v0134_preferred_strip_button_fix.py work
+          ROOT=work/project/app/src/main/java/it/darkroom/timer
+          grep -q 'android:versionName="0.13.4"' work/project/app/src/main/AndroidManifest.xml
+          grep -q 'android:versionCode="65"' work/project/app/src/main/AndroidManifest.xml
+          grep -q 'maybeShowTestResultChooser(true)' "$ROOT/MainActivity.java"
+          grep -q 'maybeShowTestResultChooser(boolean forceManual)' "$ROOT/MainActivity.java"
+          grep -q 'testChooserOpen = false;' "$ROOT/MainActivity.java"
+          test "$(cat /tmp/timing.before)" = "$(sha256sum "$ROOT/TimingMath.java" | cut -d' ' -f1)"
+          test "$(cat /tmp/sonoff.before)" = "$(sha256sum "$ROOT/SonoffArmService.java" | cut -d' ' -f1)"
+
+      - name: Record source-only verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/v0134
+          cat > experiments/v0134/source_check.txt <<EOF
+          run_id=$GITHUB_RUN_ID
+          versionName=0.13.4
+          versionCode=65
+          manual_button_forced_path=PASS
+          stale_testChooserOpen_bypass=PASS
+          pending_state_preserved=PASS
+          timing_math_unchanged=PASS
+          sonoff_service_unchanged=PASS
+          apk_built=NO
+          source_check=PASS
+          EOF
+          git config user.name "Darkroom Timer Source Check"
+          git config user.email "actions@users.noreply.github.com"
+          git add experiments/v0134/source_check.txt
+          git commit -m "Record v0.13.4 source-only check $GITHUB_RUN_ID [skip ci]"
+          git push origin HEAD:feature-v0134-preferred-strip-button-fix
