@@ -1,0 +1,14 @@
+run_id=32268111381
+versionName=0.13.7
+versionCode=68
+flat_bottom_nav=PASS
+card_backgrounds_removed=PASS
+active_top_indicator=PASS
+nav_order=PROVINO,STAMPA,LOG
+default_provino=PASS
+contrast_note=PRESERVED
+preferred_strip_manual_fix=PRESERVED
+timing_math_unchanged=PASS
+sonoff_service_unchanged=PASS
+apk_built=NO
+source_check=PASS
