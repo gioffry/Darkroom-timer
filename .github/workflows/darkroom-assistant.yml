@@ -3,10 +3,7 @@ name: Build Darkroom Assistant APK
 on:
   push:
     branches:
-      - feature-darkroom-assistant-v011-functional
-  pull_request:
-    branches:
-      - main
+      - feature-darkroom-assistant-v012-signed
   workflow_dispatch:
 
 jobs:
@@ -39,15 +36,29 @@ jobs:
           unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
           echo "$RUNNER_TEMP/gradle-8.13/bin" >> "$GITHUB_PATH"
 
-      - name: Build Assistant
+      - name: Prepara firma stabile
         shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
           set -euo pipefail
-          gradle :assistant:assembleDebug --stacktrace
-          cp assistant/build/outputs/apk/debug/assistant-debug.apk DarkroomAssistant-v0.1.1.apk
+          test -n "$KEYSTORE_B64"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
+
+      - name: Build Assistant firmato
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/darkroom-signing.p12
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          gradle :assistant:assembleRelease --stacktrace
+          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.1.2.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.1.1
-          path: DarkroomAssistant-v0.1.1.apk
+          name: DarkroomAssistant-v0.1.2
+          path: DarkroomAssistant-v0.1.2.apk
