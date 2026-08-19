@@ -22,3 +22,5 @@ Nessun'altra funzione va aggiunta senza decisione esplicita.
 
 ## v0.1.0
 Shell grafica dark ad alta fedeltà con navigazione tra le tre sezioni. Nessun motore dati online attivo in questa prima base.
+
+Build trigger verificato sul branch dedicato.
