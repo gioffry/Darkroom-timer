@@ -1,5 +1,5 @@
-run_id=32220414951
-commit=ab864a30e59b28034a385d3544918b994981a029
+run_id=32220473639
+commit=3870707c4f5ec12c247bde261abc3d32c8017b73
 status=FAIL
 failed_stage=build
 --- builddiag-transform.txt ---
@@ -80,11 +80,11 @@ Loading package information...                                                  
 [Darkroom v0.12.3] Preflight v0.12.3 OK: manifest/versione/requisiti SONOFF invarianti verificati
 [Darkroom v0.7.5] Icona v0.7.2 preparata dal workflow prima della firma
 [Darkroom v0.12.3] 1/7 Compilo risorse con aapt2
-[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/aapt2 compile --dir /home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/res -o /tmp/darkroom-v058-25k1hxv_/build/compiled.zip
+[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/aapt2 compile --dir /home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/res -o /tmp/darkroom-v058-7cqxowq5/build/compiled.zip
 [Darkroom v0.12.3] 2/7 Link risorse + genero R.java
-[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/aapt2 link -I /usr/local/lib/android/sdk/platforms/android-34/android.jar --manifest /home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/AndroidManifest.xml -o /tmp/darkroom-v058-25k1hxv_/build/base.apk /tmp/darkroom-v058-25k1hxv_/build/compiled.zip --java /tmp/darkroom-v058-25k1hxv_/build/gen --auto-add-overlay --min-sdk-version 26 --target-sdk-version 34 --version-code 60 --version-name 0.12.3
+[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/aapt2 link -I /usr/local/lib/android/sdk/platforms/android-34/android.jar --manifest /home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/AndroidManifest.xml -o /tmp/darkroom-v058-7cqxowq5/build/base.apk /tmp/darkroom-v058-7cqxowq5/build/compiled.zip --java /tmp/darkroom-v058-7cqxowq5/build/gen --auto-add-overlay --min-sdk-version 26 --target-sdk-version 34 --version-code 60 --version-name 0.12.3
 [Darkroom v0.12.3] 3/7 Compilo Java
-[Darkroom v0.12.3] > /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64/bin/javac -encoding UTF-8 -source 8 -target 8 -cp /usr/local/lib/android/sdk/platforms/android-34/android.jar -d /tmp/darkroom-v058-25k1hxv_/build/classes @/tmp/darkroom-v058-25k1hxv_/build/sources.txt
+[Darkroom v0.12.3] > /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64/bin/javac -encoding UTF-8 -source 8 -target 8 -cp /usr/local/lib/android/sdk/platforms/android-34/android.jar -d /tmp/darkroom-v058-7cqxowq5/build/classes @/tmp/darkroom-v058-7cqxowq5/build/sources.txt
 warning: [options] bootstrap class path not set in conjunction with -source 8
 /home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:107: error: unclosed string literal
     private void confirmWebItem(SmartSearchEngine.Item item){String d=WebProductResolver.dilutionCsv(item),url=WebProductResolver.sourceUrl(item);StringBuilder msg=new StringBuilder();msg.append(item.name);if(!item.manufacturer.isEmpty())msg.append("
@@ -170,4 +170,4 @@ Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno co
 27 errors
 1 warning
 
-ERRORE: Comando fallito (1): /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64/bin/javac -encoding UTF-8 -source 8 -target 8 -cp /usr/local/lib/android/sdk/platforms/android-34/android.jar -d /tmp/darkroom-v058-25k1hxv_/build/classes @/tmp/darkroom-v058-25k1hxv_/build/sources.txt
+ERRORE: Comando fallito (1): /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64/bin/javac -encoding UTF-8 -source 8 -target 8 -cp /usr/local/lib/android/sdk/platforms/android-34/android.jar -d /tmp/darkroom-v058-7cqxowq5/build/classes @/tmp/darkroom-v058-7cqxowq5/build/sources.txt
