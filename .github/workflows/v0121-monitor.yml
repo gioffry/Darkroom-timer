@@ -1,0 +1,58 @@
+name: Monitor final v0.12.1 run
+
+on:
+  push:
+    branches: [ feature-v0121-assistant-ux-smart-catalog ]
+    paths:
+      - '.github/workflows/v0121-monitor.yml'
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature-v0121-assistant-ux-smart-catalog
+          fetch-depth: 0
+      - name: Record exact v0121 conclusion
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          API="https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/v0121.yml/runs?branch=feature-v0121-assistant-ux-smart-catalog&event=push&per_page=20"
+          RUN_ID=""; STATUS=""; CONCLUSION=""; URL=""
+          for i in $(seq 1 60); do
+            JSON=$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "$API")
+            RUN_ID=$(printf '%s' "$JSON" | jq -r --arg sha "$HEAD_SHA" '.workflow_runs[] | select(.head_sha==$sha) | .id' | sed -n '1p')
+            if [ -n "$RUN_ID" ] && [ "$RUN_ID" != "null" ]; then
+              STATUS=$(printf '%s' "$JSON" | jq -r --argjson id "$RUN_ID" '.workflow_runs[] | select(.id==$id) | .status')
+              CONCLUSION=$(printf '%s' "$JSON" | jq -r --argjson id "$RUN_ID" '.workflow_runs[] | select(.id==$id) | .conclusion')
+              URL=$(printf '%s' "$JSON" | jq -r --argjson id "$RUN_ID" '.workflow_runs[] | select(.id==$id) | .html_url')
+              echo "v0121 run $RUN_ID status=$STATUS conclusion=$CONCLUSION"
+              [ "$STATUS" = "completed" ] && break
+            fi
+            sleep 10
+          done
+          test "$STATUS" = "completed"
+          if [ "$CONCLUSION" != "success" ]; then
+            git pull --ff-only origin feature-v0121-assistant-ux-smart-catalog
+            mkdir -p experiments/v0121
+            cat > experiments/v0121/latest_run.txt <<EOF
+          run_id=$RUN_ID
+          functional_commit=$HEAD_SHA
+          build=FAILURE
+          conclusion=$CONCLUSION
+          html_url=$URL
+          EOF
+            git config user.name "Darkroom Timer Builder"
+            git config user.email "actions@users.noreply.github.com"
+            git add experiments/v0121/latest_run.txt
+            git commit -m "Record v0.12.1 failed run $RUN_ID [skip ci]"
+            git push origin HEAD:feature-v0121-assistant-ux-smart-catalog
+          fi
