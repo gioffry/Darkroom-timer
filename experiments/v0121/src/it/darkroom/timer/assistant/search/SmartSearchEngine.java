@@ -87,6 +87,7 @@ public final class SmartSearchEngine {
 
     private static final class Match { int score;String reason; Match(int s,String r){score=s;reason=r;} }
     private static Match match(Item item,String q,String qc){
+        // Ranking contract tested independently: exact name > exact alias > startsWith prefix > allWords > partial; local before remote.
         if(q.isEmpty())return new Match(80,"catalogo");
         String name=normalize(item.name), nameCompact=compact(item.name);
         if(q.equals(name)||(!qc.isEmpty()&&qc.equals(nameCompact)))return new Match(600,"nome esatto");
