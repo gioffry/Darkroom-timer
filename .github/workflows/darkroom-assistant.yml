@@ -3,7 +3,7 @@ name: Build Darkroom Assistant APK
 on:
   push:
     branches:
-      - feature-darkroom-assistant-v030-offline-mdc
+      - feature-darkroom-assistant-v031-bundled-mdc
   pull_request:
     branches:
       - main
@@ -17,11 +17,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Scarico completo Digitaltruth di verifica
+      - name: Genera database Digitaltruth completo
         shell: bash
         run: |
           set -euo pipefail
-          python3 assistant/validate_mdc_full_download.py
+          python3 assistant/build_mdc_sqlite_asset.py
+          python3 - <<'PY'
+          import sqlite3, pathlib
+          p=pathlib.Path('assistant/src/main/assets/mdc_full.sqlite')
+          assert p.exists() and p.stat().st_size > 250000
+          con=sqlite3.connect(p)
+          rows=con.execute('select count(*) from times').fetchone()[0]
+          films=con.execute('select count(*) from films').fetchone()[0]
+          devs=con.execute('select count(*) from developers').fetchone()[0]
+          qc=con.execute('pragma quick_check').fetchone()[0]
+          con.close()
+          print(f'ASSET DB VERIFIED: films={films} developers={devs} rows={rows} quick_check={qc}')
+          assert rows >= 3000 and films >= 250 and devs >= 180 and qc == 'ok'
+          PY
 
       - name: Java 17
         uses: actions/setup-java@v5
@@ -80,11 +93,17 @@ jobs:
         run: |
           set -euo pipefail
           python3 assistant/patch_v030_offline_mdc.py
+
+      - name: Applica database incluso v0.3.1
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 assistant/patch_v031_bundled_db.py
+          grep -q 'mdc_offline_v031.sqlite' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
+          grep -q 'app.getAssets().open("mdc_full.sqlite")' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
           grep -q 'MdcOfflineStore.searchDevelopers' assistant/src/main/java/it/darkroom/assistant/OnlineCatalogSearch.java
           grep -q 'MdcOfflineStore.lookup' assistant/src/main/java/it/darkroom/assistant/DevTimeEngine.java
-          grep -q 'ensureOfflineDatabase' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
-          test -f assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
-          test -f assistant/src/main/assets/mdc_developers_seed.txt
+          test -f assistant/src/main/assets/mdc_full.sqlite
 
       - name: Prepara firma stabile
         shell: bash
@@ -105,19 +124,21 @@ jobs:
         run: |
           set -euo pipefail
           gradle :assistant:assembleRelease --stacktrace
-          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.3.0.apk
+          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.3.1.apk
 
-      - name: Verifica APK prima dell'upload
+      - name: Verifica APK e database incluso
         shell: bash
         run: |
           set -euo pipefail
           APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
           AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.3.0.apk
-          "$AAPT" dump badging DarkroomAssistant-v0.3.0.apk | head -20
+          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.3.1.apk
+          "$AAPT" dump badging DarkroomAssistant-v0.3.1.apk | head -20
+          unzip -l DarkroomAssistant-v0.3.1.apk | grep -q 'assets/mdc_full.sqlite'
+          echo 'Bundled Digitaltruth SQLite found inside APK'
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.3.0
-          path: DarkroomAssistant-v0.3.0.apk
+          name: DarkroomAssistant-v0.3.1
+          path: DarkroomAssistant-v0.3.1.apk
