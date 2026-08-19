@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="it.darkroom.timer"
+    android:versionCode="56"
+    android:versionName="0.11.0">
+
+    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
+    <application
+        android:allowBackup="false"
+        android:label="Darkroom Timer"
+        android:icon="@drawable/ic_launcher"
+        android:usesCleartextTraffic="true"
+        android:theme="@android:style/Theme.Holo.NoActionBar">
+
+        <activity
+            android:name=".home.HomeActivity"
+            android:screenOrientation="portrait"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity
+            android:name=".assistant.AssistantActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity
+            android:name=".assistant.chemistry.PrepareChemistryActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity
+            android:name=".assistant.development.NewDevelopmentActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity
+            android:name=".assistant.development.DevelopmentResultActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity
+            android:name=".assistant.recipes.MyRecipesActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity
+            android:name=".assistant.log.DevelopmentLogActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity
+            android:name=".assistant.chemistry.inventory.MyChemistryActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity
+            android:name=".assistant.equipment.MyEquipmentActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <service
+            android:name=".SonoffArmService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+    </application>
+</manifest>
