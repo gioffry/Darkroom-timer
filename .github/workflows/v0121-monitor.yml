@@ -1,5 +1,5 @@
 name: Monitor v0.12.1 final workflow
-# retry after Smart Search guard/capture fixes
+# retry after builder preflight version-regex fix
 
 on:
   push:
