@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feature-darkroom-combined-v010
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -191,7 +194,7 @@ jobs:
           echo "$BADGING" | head -30
           echo "$BADGING" | grep -q "package: name='it.darkroom.darkroom' versionCode='1' versionName='0.1.0'"
           unzip -l Darkroom-v0.1.0.apk | grep -q 'assets/mdc_full.sqlite'
-          echo "$BADGING" | grep -q 'launchable-activity: name=.it.darkroom.timer.home.HomeActivity.'
+          echo "$BADGING" | grep -q "launchable-activity: name='it.darkroom.timer.home.HomeActivity'"
           sha256sum Darkroom-v0.1.0.apk | tee Darkroom-v0.1.0.sha256
 
       - name: Upload APK
