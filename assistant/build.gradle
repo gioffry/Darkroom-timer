@@ -7,11 +7,11 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId 'it.darkroom.assistant'
+        applicationId 'it.darkroom.assistant.app'
         minSdk 26
         targetSdk 34
-        versionCode 3
-        versionName '0.1.2'
+        versionCode 4
+        versionName '0.1.3'
     }
 
     signingConfigs {
@@ -20,6 +20,8 @@ android {
             storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
             keyAlias System.getenv('ANDROID_KEY_ALIAS')
             keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+            enableV1Signing true
+            enableV2Signing true
         }
     }
 
