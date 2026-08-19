@@ -68,6 +68,12 @@ jobs:
           set -euo pipefail
           python3 assistant/patch_v020_source_brain.py
 
+      - name: Applica fallback indice live v0.2.1
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 assistant/patch_v021_index_fallback.py
+
       - name: Prepara firma stabile
         shell: bash
         env:
