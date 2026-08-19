@@ -1,0 +1,210 @@
+name: Build Darkroom Timer v0.13.6
+
+on:
+  push:
+    branches: [ feature-v0136-bottom-nav-provino-first ]
+    paths-ignore:
+      - 'experiments/v0136/latest_run.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: darkroom-v0136-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact v0.13.6 branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature-v0136-bottom-nav-provino-first
+          fetch-depth: 0
+
+      - name: Prove genealogy from v0.13.5
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_BASE=52552ec2b477c6473ba74a6ebf68f7235fc60f7c
+          git fetch origin feature-v0135-provino-contrast-note
+          BASE_HEAD=$(git rev-parse origin/feature-v0135-provino-contrast-note)
+          test "$BASE_HEAD" = "$EXPECTED_BASE"
+          git merge-base --is-ancestor "$BASE_HEAD" HEAD
+          MERGE_BASE=$(git merge-base "$BASE_HEAD" HEAD)
+          test "$MERGE_BASE" = "$BASE_HEAD"
+          echo "BASE_HEAD=$BASE_HEAD" >> "$GITHUB_ENV"
+          echo "MERGE_BASE=$MERGE_BASE" >> "$GITHUB_ENV"
+
+      - name: Reconstruct exact Timer source through v0.13.5
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf work && mkdir -p work
+          cp -a base/v0.12.0-materialized/project work/project
+          cp base/v0.12.0-materialized/build_darkroom.py work/build_darkroom.py
+          cp base/v0.12.0-materialized/v064_icon.py work/v064_icon.py
+          python3 experiments/v0121/apply_v0121_assistant_ux_smart_catalog.py work
+          python3 experiments/v0122/apply_v0122_real_device_repair.py work
+          python3 experiments/v0123/apply_v0123_live_web_repair.py work
+          python3 experiments/v0123/apply_v0123_no_manual_cleanup.py work
+          python3 experiments/v0130/apply_v0130_timer_only_reset.py work
+          python3 experiments/v0131/apply_v0131_fstop_subtractive_teststrip.py work
+          python3 experiments/v0132/apply_v0132_consolidated_timer_fixes.py work
+          python3 experiments/v0133/apply_v0133_preferred_strip_pending.py work
+          python3 experiments/v0134/apply_v0134_preferred_strip_button_fix.py work
+          python3 experiments/v0135/apply_v0135_provino_contrast_note.py work
+          grep -q 'android:versionName="0.13.5"' work/project/app/src/main/AndroidManifest.xml
+          grep -q 'android:versionCode="66"' work/project/app/src/main/AndroidManifest.xml
+          ROOT=work/project/app/src/main/java/it/darkroom/timer
+          sha256sum "$ROOT/TimingMath.java" | cut -d' ' -f1 > /tmp/timing.before
+          sha256sum "$ROOT/SonoffArmService.java" | cut -d' ' -f1 > /tmp/sonoff.before
+
+      - name: Apply v0.13.6 navigation release
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile experiments/v0136/apply_v0136_bottom_nav_provino_first.py
+          python3 experiments/v0136/apply_v0136_bottom_nav_provino_first.py work | tee validation-report.txt
+          ROOT=work/project/app/src/main/java/it/darkroom/timer
+          grep -q 'android:versionName="0.13.6"' work/project/app/src/main/AndroidManifest.xml
+          grep -q 'android:versionCode="67"' work/project/app/src/main/AndroidManifest.xml
+          grep -q 'mode = MODE_TEST;' "$ROOT/MainActivity.java"
+          grep -q 'page.addView(modeRow, lp(-1, dp(88)))' "$ROOT/MainActivity.java"
+          grep -q 'Leggi il provino dal CHIARO allo SCURO:' "$ROOT/MainActivity.java"
+          test "$(cat /tmp/timing.before)" = "$(sha256sum "$ROOT/TimingMath.java" | cut -d' ' -f1)"
+          test "$(cat /tmp/sonoff.before)" = "$(sha256sum "$ROOT/SonoffArmService.java" | cut -d' ' -f1)"
+          {
+            echo 'default_provino=PASS'
+            echo 'bottom_nav=PASS'
+            echo 'nav_order=PROVINO,STAMPA,LOG'
+            echo 'contrast_note=PASS'
+            echo 'timing_math_unchanged=PASS'
+            echo 'sonoff_service_unchanged=PASS'
+          } >> validation-report.txt
+
+      - name: Run timing regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT=work/project/app/src/main/java/it/darkroom/timer
+          rm -rf /tmp/timingtest && mkdir -p /tmp/timingtest
+          javac -encoding UTF-8 -d /tmp/timingtest "$ROOT/TimingMath.java" experiments/v0132/TimingMathRegressionTest.java
+          java -cp /tmp/timingtest it.darkroom.timer.TimingMathRegressionTest | tee timing-regression.txt
+
+      - name: Configure Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepare Android SDK on GitHub runner only
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Prepare stable signing configuration
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
+          echo "::add-mask::$KEYSTORE_PASSWORD"
+          echo "::add-mask::$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
+
+      - name: Build sign zipalign and verify APK
+        shell: bash
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          APK="DarkroomTimer-DIY-v0.13.6.apk"
+          echo "::add-mask::$KEYSTORE_PASSWORD"
+          echo "::add-mask::$KEY_PASSWORD"
+          python3 work/build_darkroom.py work/project --output "$APK" --keystore "$RUNNER_TEMP/darkroom-signing.p12" --alias "$KEY_ALIAS" --storepass "$KEYSTORE_PASSWORD" --keypass "$KEY_PASSWORD" >/tmp/darkroom-build.log 2>&1
+          cat /tmp/darkroom-build.log
+          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -c -v 4 "$APK" > zipalign.txt
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" > certificate.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging "$APK" > apk-badging.txt
+          grep -q "package: name='it.darkroom.timer' versionCode='67' versionName='0.13.6'" apk-badging.txt
+          CERT_FP=$(grep -m1 'certificate SHA-256 digest:' certificate.txt | sed 's/.*: *//')
+          test "$CERT_FP" = "fbead305657584b50a9d8892aa19bd9844b412d77db316e7daa5593c94e2a02f"
+          sha256sum "$APK" > apk.sha256
+          APK_SHA=$(cut -d' ' -f1 apk.sha256)
+          echo "APK_SHA=$APK_SHA" >> "$GITHUB_ENV"
+          echo "CERT_FP=$CERT_FP" >> "$GITHUB_ENV"
+          {
+            echo 'build=SUCCESS'
+            echo 'zipalign=SUCCESS'
+            echo 'signature=SUCCESS'
+            echo 'certificate_continuity=PASS'
+            echo "certificate_SHA256=$CERT_FP"
+            echo "apk_SHA256=$APK_SHA"
+          } >> validation-report.txt
+
+      - name: Upload v0.13.6 APK
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: DarkroomTimer-DIY-v0.13.6
+          path: |
+            DarkroomTimer-DIY-v0.13.6.apk
+            apk.sha256
+            certificate.txt
+            zipalign.txt
+            apk-badging.txt
+            timing-regression.txt
+            validation-report.txt
+
+      - name: Record successful build metadata
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/v0136
+          cat > experiments/v0136/latest_run.txt <<EOF
+          run_id=$GITHUB_RUN_ID
+          base_branch=feature-v0135-provino-contrast-note
+          base_head=$BASE_HEAD
+          new_branch=feature-v0136-bottom-nav-provino-first
+          merge_base=$MERGE_BASE
+          functional_commit=$GITHUB_SHA
+          versionName=0.13.6
+          versionCode=67
+          default_provino=PASS
+          bottom_nav=PASS
+          nav_order=PROVINO,STAMPA,LOG
+          contrast_note=PASS
+          preferred_strip_manual_fix=PRESERVED
+          timing_math_unchanged=PASS
+          sonoff_service_unchanged=PASS
+          seconds_regression=PASS
+          fstop_regression=PASS
+          assistant_module=REMOVED
+          build=SUCCESS
+          zipalign=SUCCESS
+          signature=SUCCESS
+          certificate_continuity=PASS
+          certificate_SHA256=$CERT_FP
+          artifact=DarkroomTimer-DIY-v0.13.6
+          artifact_id=$ARTIFACT_ID
+          apk_SHA256=$APK_SHA
+          EOF
+          git config user.name "Darkroom Timer Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add experiments/v0136/latest_run.txt
+          git commit -m "Record v0.13.6 successful build $GITHUB_RUN_ID [skip ci]"
+          git push origin HEAD:feature-v0136-bottom-nav-provino-first
