@@ -1,6 +1,9 @@
 name: Build Darkroom Assistant APK
 
 on:
+  push:
+    branches:
+      - feature-darkroom-assistant-v001-dark-mockup
   workflow_dispatch:
 
 jobs:
