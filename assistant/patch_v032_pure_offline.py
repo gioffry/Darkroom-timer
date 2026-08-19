@@ -32,12 +32,6 @@ helpers = r'''    static boolean isKnownDeveloper(String name) {
         }
     }
 
-    /**
-     * Migrazione dei risultati spazzatura delle vecchie versioni.
-     * Esempio: "Kodak Professional DEKTOL Paper Developer (To Make 1 gal)"
-     * viene ricondotto a "Dektol" se il nome canonico del MDC compare come
-     * sequenza di token completa. Sceglie sempre il match canonico piu' lungo.
-     */
     static String canonicalDeveloperForLooseName(String legacyName) {
         if (!isReady() || legacyName == null) return null;
         String input = " " + norm(legacyName) + " ";
@@ -71,7 +65,6 @@ p.write_text(s, encoding='utf-8')
 p = Path('assistant/src/main/java/it/darkroom/assistant/OnlineCatalogSearch.java')
 s = p.read_text(encoding='utf-8')
 
-# search methods were already replaced in v0.3.0; enforce them again.
 s, n = re.subn(
     r'    static List<SearchResult> searchChemicals\(String query\) \{.*?\n    \}\n\n    static List<SearchResult> searchFilms',
     '''    static List<SearchResult> searchChemicals(String query) {\n        return MdcOfflineStore.searchDevelopers(query, 80);\n    }\n\n    static List<SearchResult> searchFilms''',
@@ -84,12 +77,15 @@ s, n = re.subn(
     s, count=1, flags=re.S)
 if n != 1: raise SystemExit('pure-offline searchFilms replacement failed')
 
-# Enrichment is also offline-only. Any non-MDC result is rejected rather than parsed from web.
 start = s.find('    static ChemicalData enrichChemical(SearchResult r) {')
 end = s.find('    static FilmData enrichFilm(SearchResult r) {', start)
 if start < 0 or end < 0: raise SystemExit('enrichChemical boundaries missing')
 chem = r'''    static ChemicalData enrichChemical(SearchResult r) {
-        if (r == null || !MdcOfflineStore.isOfflineDeveloperResult(r)) return emptyChemical(r);
+        if (r == null || !MdcOfflineStore.isOfflineDeveloperResult(r)) {
+            String name = r == null ? "" : r.title;
+            return new ChemicalData(name, 0, false, new String[0], new String[0],
+                    null, null, -1, "");
+        }
         String canonical = MdcOfflineStore.canonicalDeveloperName(r.title);
         if (canonical == null) canonical = r.title;
         String[] d = MdcOfflineStore.dilutionsForDeveloper(canonical);
@@ -101,7 +97,6 @@ chem = r'''    static ChemicalData enrichChemical(SearchResult r) {
 s = s[:start] + chem + s[end:]
 
 start = s.find('    static FilmData enrichFilm(SearchResult r) {')
-# next helper after enrichFilm in current source
 end_candidates = [s.find('\n    private static ', start+10), s.find('\n    static ', start+10)]
 end_candidates = [x for x in end_candidates if x > start]
 if not end_candidates: raise SystemExit('enrichFilm end boundary missing')
@@ -155,7 +150,6 @@ p.write_text(s, encoding='utf-8')
 p = Path('assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java')
 s = p.read_text(encoding='utf-8')
 
-# After DB init, repair legacy product metadata once.
 old = '''        MdcOfflineStore.init(getApplicationContext());
         showHome();
         ensureOfflineDatabase();'''
@@ -166,12 +160,10 @@ new = '''        MdcOfflineStore.init(getApplicationContext());
 if old not in s: raise SystemExit('Activity v031 onCreate marker missing')
 s = s.replace(old, new, 1)
 
-# Search lists must contain ONLY SQLite results; localProductMatches/localFilmMatches are now empty.
 s, n = re.subn(r'''    private List<String> localProductMatches\(String q\) \{.*?\n    \}\n\n    private List<String> localFilmMatches\(String q\) \{.*?\n    \}''',
 '''    private List<String> localProductMatches(String q) {\n        return new ArrayList<>();\n    }\n\n    private List<String> localFilmMatches(String q) {\n        return new ArrayList<>();\n    }''', s, count=1, flags=re.S)
 if n != 1: raise SystemExit('local fallback removal failed')
 
-# Known MDC developer always overrides stale saved metadata (Rodinal can never remain a fixer).
 old = '''    private Product findProduct(String name) {
         if (name == null) return null;
         Product saved = loadSavedProduct(name.trim());'''
@@ -183,12 +175,10 @@ new = '''    private Product findProduct(String name) {
 if old not in s: raise SystemExit('findProduct repair marker missing')
 s = s.replace(old, new, 1)
 
-# No fallback films in search/calculation.
 s, n = re.subn(r'''    private FilmStock findFilm\(String name\) \{.*?\n    \}''',
 '''    private FilmStock findFilm(String name) {\n        return null;\n    }''', s, count=1, flags=re.S)
 if n != 1: raise SystemExit('findFilm fallback removal failed')
 
-# Insert migration + offline Product helper before persistence section.
 marker = '''    // ---------------------------------------------------------------------
     // PERSISTENZA MAGAZZINO
     // ---------------------------------------------------------------------'''
@@ -228,13 +218,11 @@ methods = r'''    private Product offlineDeveloperProduct(String canonicalName) 
 if marker not in s: raise SystemExit('persistence insertion marker missing')
 s = s.replace(marker, methods + marker, 1)
 
-# User-facing wording: no mention of online/source lookup.
 repls = {
     'Ricerca online dopo 3 lettere.':'Cerca nel database dopo 3 lettere.',
     'Cerco online…':'Cerco nel database…',
     'Online: nessun risultato. Mostro i dati locali disponibili.':'Nessun rivelatore trovato nel database.',
     'Online: ':'',
-    ' risultati trovati.':' risultati trovati.',
     'Recupero dati, preparazione e capacità online…':'Recupero dati dal database…',
     'Recupero ISO e formato…':'Recupero dati pellicola…',
     'La fonte non indica il formato in modo univoco.':'Scegli il formato della pellicola.',
