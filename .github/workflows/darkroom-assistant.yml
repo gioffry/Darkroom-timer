@@ -74,18 +74,19 @@ jobs:
           python3 assistant/patch_v022_strict_entities.py
           python3 assistant/patch_v030_offline_mdc.py
           python3 assistant/patch_v031_bundled_db.py
+          python3 assistant/patch_v032_pure_offline.py
 
-      - name: Applica modalità pura offline v0.3.2
+      - name: Applica fix avvio v0.3.3
         shell: bash
         run: |
           set -euo pipefail
-          python3 assistant/patch_v032_pure_offline.py
-          grep -q 'mdc_offline_v032.sqlite' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
-          grep -q 'canonicalDeveloperForLooseName' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
+          python3 assistant/patch_v033_startup_safe.py
+          grep -q 'mdc_offline_v033.sqlite' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
+          grep -q 'openBundledDatabase' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
           grep -q 'return MdcOfflineStore.searchDevelopers(query, 80)' assistant/src/main/java/it/darkroom/assistant/OnlineCatalogSearch.java
-          grep -q 'repairLegacyInventoryFromOfflineDb' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
           grep -q 'Nessuna combinazione esatta nel database offline Digitaltruth' assistant/src/main/java/it/darkroom/assistant/DevTimeEngine.java
           ! grep -q 'uses-permission android:name="android.permission.INTERNET"' assistant/src/main/AndroidManifest.xml
+          ! grep -A8 'protected void onCreate' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java | grep -q 'repairLegacyInventoryFromOfflineDb'
           test -f assistant/src/main/assets/mdc_full.sqlite
 
       - name: Prepara firma stabile
@@ -107,7 +108,7 @@ jobs:
         run: |
           set -euo pipefail
           gradle :assistant:assembleRelease --stacktrace
-          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.3.2.apk
+          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.3.3.apk
 
       - name: Verifica APK e assenza rete
         shell: bash
@@ -115,17 +116,17 @@ jobs:
           set -euo pipefail
           APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
           AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.3.2.apk
-          "$AAPT" dump badging DarkroomAssistant-v0.3.2.apk | head -20
-          unzip -l DarkroomAssistant-v0.3.2.apk | grep -q 'assets/mdc_full.sqlite'
-          if "$AAPT" dump permissions DarkroomAssistant-v0.3.2.apk | grep -q 'android.permission.INTERNET'; then
+          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.3.3.apk
+          "$AAPT" dump badging DarkroomAssistant-v0.3.3.apk | head -20
+          unzip -l DarkroomAssistant-v0.3.3.apk | grep -q 'assets/mdc_full.sqlite'
+          if "$AAPT" dump permissions DarkroomAssistant-v0.3.3.apk | grep -q 'android.permission.INTERNET'; then
             echo 'ERRORE: APK chiede ancora INTERNET' >&2
             exit 1
           fi
-          echo 'APK v0.3.2: database incluso, nessun permesso Internet'
+          echo 'APK v0.3.3: database incluso, nessun permesso Internet, startup fail-safe'
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.3.2
-          path: DarkroomAssistant-v0.3.2.apk
+          name: DarkroomAssistant-v0.3.3
+          path: DarkroomAssistant-v0.3.3.apk
