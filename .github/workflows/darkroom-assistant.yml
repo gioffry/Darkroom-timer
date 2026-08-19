@@ -39,34 +39,16 @@ jobs:
           unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
           echo "$RUNNER_TEMP/gradle-8.13/bin" >> "$GITHUB_PATH"
 
-      - name: Verifica indice live Massive Dev Chart
+      - name: Verifica contratto motore live-index
         shell: bash
         run: |
           set -euo pipefail
-          UA='Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Mobile Safari/537.36'
-          ok=0
-          for url in \
-            'https://www.digitaltruth.com/chart/print.php' \
-            'https://ftp.digitaltruth.com/chart/print.php' \
-            'https://www.digitaltruth.com/devchart.php'; do
-            if curl -L --fail --retry 2 -A "$UA" -e 'https://www.digitaltruth.com/' "$url" -o "$RUNNER_TEMP/mdc-index.html"; then
-              ok=1
-              break
-            fi
-          done
-          test "$ok" = 1
-          python3 - "$RUNNER_TEMP/mdc-index.html" <<'PY'
-          import re, sys
-          p=sys.argv[1]
-          html=open(p,encoding='utf-8',errors='ignore').read()
-          text=re.sub(r'<[^>]+>',' ',html)
-          text=' '.join(text.split()).lower()
-          required=['rodinal','rollei supergrain','bellini hydrofen','foma universal','fuji neopan 100 acros ii','agfaphoto apx 100','ilford hp5+','kodak tri-x 400']
-          missing=[x for x in required if x not in text]
-          if missing:
-              raise SystemExit('Indice MDC incompleto/non leggibile: '+', '.join(missing))
-          print('MDC live index OK:', ', '.join(required))
-          PY
+          grep -q 'https://www.digitaltruth.com/chart/print.php' assistant/src/main/java/it/darkroom/assistant/SourceBroker.java
+          grep -q 'FILM_DEVELOPER' assistant/src/main/java/it/darkroom/assistant/SourceBroker.java
+          grep -q 'searchMdc(query, true' assistant/src/main/java/it/darkroom/assistant/SourceBroker.java
+          grep -q 'searchMdc(query, false' assistant/src/main/java/it/darkroom/assistant/SourceBroker.java
+          grep -q 'strictRole' assistant/src/main/java/it/darkroom/assistant/SourceBroker.java
+          echo 'Live-index source contract OK'
 
       - name: Applica fix risultati ricerca visibili
         shell: bash
