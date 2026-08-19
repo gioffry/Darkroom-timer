@@ -1,5 +1,5 @@
 name: Monitor v0.12.1 final workflow
-# retry after builder preflight version-regex fix
+# retry after exact inherited builder-regex correction
 
 on:
   push:
