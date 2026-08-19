@@ -1,0 +1,54 @@
+name: Diagnose Darkroom Timer v0.13.1
+
+on:
+  push:
+    branches: [ feature-v0131-fstop-subtractive-teststrip ]
+    paths-ignore:
+      - 'experiments/v0131/diagnostic.txt'
+      - 'experiments/v0131/latest_run.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature-v0131-fstop-subtractive-teststrip
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Run staged diagnostics and record exact failure
+        shell: bash
+        run: |
+          set +e
+          FAIL=""
+          rm -rf work && mkdir -p work
+          cp -a base/v0.12.0-materialized/project work/project || FAIL="copy_base"
+          cp base/v0.12.0-materialized/build_darkroom.py work/build_darkroom.py || FAIL="copy_builder"
+          cp base/v0.12.0-materialized/v064_icon.py work/v064_icon.py || FAIL="copy_icon"
+          if [ -z "$FAIL" ]; then python3 experiments/v0121/apply_v0121_assistant_ux_smart_catalog.py work > diag-transform.txt 2>&1 || FAIL="apply_v0121"; fi
+          if [ -z "$FAIL" ]; then python3 experiments/v0122/apply_v0122_real_device_repair.py work >> diag-transform.txt 2>&1 || FAIL="apply_v0122"; fi
+          if [ -z "$FAIL" ]; then python3 experiments/v0123/apply_v0123_live_web_repair.py work >> diag-transform.txt 2>&1 || FAIL="apply_v0123"; fi
+          if [ -z "$FAIL" ]; then python3 experiments/v0123/apply_v0123_no_manual_cleanup.py work >> diag-transform.txt 2>&1 || FAIL="cleanup_v0123"; fi
+          if [ -z "$FAIL" ]; then python3 experiments/v0130/apply_v0130_timer_only_reset.py work >> diag-transform.txt 2>&1 || FAIL="apply_v0130"; fi
+          if [ -z "$FAIL" ]; then python3 experiments/v0131/apply_v0131_fstop_subtractive_teststrip.py work >> diag-transform.txt 2>&1 || FAIL="apply_v0131"; fi
+          if [ -z "$FAIL" ]; then ROOT=work/project/app/src/main/java/it/darkroom/timer; rm -rf /tmp/timingtest && mkdir -p /tmp/timingtest; javac -encoding UTF-8 -d /tmp/timingtest "$ROOT/TimingMath.java" experiments/v0131/TimingMathRegressionTest.java > diag-test.txt 2>&1 && java -cp /tmp/timingtest it.darkroom.timer.TimingMathRegressionTest >> diag-test.txt 2>&1 || FAIL="timing_test"; fi
+          mkdir -p experiments/v0131
+          {
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "commit=$GITHUB_SHA"
+            if [ -z "$FAIL" ]; then echo "status=PASS"; else echo "status=FAIL"; echo "failed_stage=$FAIL"; fi
+            for f in diag-transform.txt diag-test.txt; do if [ -f "$f" ]; then echo "--- $f ---"; tail -160 "$f"; fi; done
+          } > experiments/v0131/diagnostic.txt
+          git config user.name "Darkroom Timer Diagnostic"
+          git config user.email "actions@users.noreply.github.com"
+          git add experiments/v0131/diagnostic.txt
+          git commit -m "Record v0.13.1 diagnostic $GITHUB_RUN_ID [skip ci]" || true
+          git push origin HEAD:feature-v0131-fstop-subtractive-teststrip || true
+          exit 0
