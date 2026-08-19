@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 rootProject.name = 'DarkroomTimerDIY'
 include ':app'
 include ':assistant'
+include ':combined'
