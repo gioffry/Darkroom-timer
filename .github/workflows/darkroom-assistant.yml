@@ -39,6 +39,12 @@ jobs:
           unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
           echo "$RUNNER_TEMP/gradle-8.13/bin" >> "$GITHUB_PATH"
 
+      - name: Applica fix risultati ricerca visibili
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 assistant/patch_v018_visible_results.py
+
       - name: Prepara firma stabile
         shell: bash
         env:
@@ -58,7 +64,7 @@ jobs:
         run: |
           set -euo pipefail
           gradle :assistant:assembleRelease --stacktrace
-          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.1.7.apk
+          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.1.8.apk
 
       - name: Verifica APK prima dell'upload
         shell: bash
@@ -66,11 +72,11 @@ jobs:
           set -euo pipefail
           APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
           AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.1.7.apk
-          "$AAPT" dump badging DarkroomAssistant-v0.1.7.apk | head -20
+          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.1.8.apk
+          "$AAPT" dump badging DarkroomAssistant-v0.1.8.apk | head -20
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.1.7
-          path: DarkroomAssistant-v0.1.7.apk
+          name: DarkroomAssistant-v0.1.8
+          path: DarkroomAssistant-v0.1.8.apk
