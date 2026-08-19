@@ -74,6 +74,15 @@ jobs:
           set -euo pipefail
           python3 assistant/patch_v021_index_fallback.py
 
+      - name: Applica filtro entita e scroll v0.2.2
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 assistant/patch_v022_strict_entities.py
+          grep -q 'strictChemicalEntity' assistant/src/main/java/it/darkroom/assistant/SourceBroker.java
+          grep -q 'strictChemicalWebResults' assistant/src/main/java/it/darkroom/assistant/OnlineCatalogSearch.java
+          grep -q 'addProductScroll' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+
       - name: Prepara firma stabile
         shell: bash
         env:
@@ -93,7 +102,7 @@ jobs:
         run: |
           set -euo pipefail
           gradle :assistant:assembleRelease --stacktrace
-          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.2.1.apk
+          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.2.2.apk
 
       - name: Verifica APK prima dell'upload
         shell: bash
@@ -101,11 +110,11 @@ jobs:
           set -euo pipefail
           APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
           AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.2.1.apk
-          "$AAPT" dump badging DarkroomAssistant-v0.2.1.apk | head -20
+          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.2.2.apk
+          "$AAPT" dump badging DarkroomAssistant-v0.2.2.apk | head -20
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.2.1
-          path: DarkroomAssistant-v0.2.1.apk
+          name: DarkroomAssistant-v0.2.2
+          path: DarkroomAssistant-v0.2.2.apk
