@@ -3,7 +3,7 @@ name: Build Darkroom Assistant APK
 on:
   push:
     branches:
-      - feature-darkroom-assistant-v013-install-fix
+      - feature-darkroom-assistant-v014-online-edit
   pull_request:
     branches:
       - main
@@ -58,7 +58,7 @@ jobs:
         run: |
           set -euo pipefail
           gradle :assistant:assembleRelease --stacktrace
-          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.1.3.apk
+          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.1.5.apk
 
       - name: Verifica APK prima dell'upload
         shell: bash
@@ -66,11 +66,11 @@ jobs:
           set -euo pipefail
           APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
           AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.1.3.apk
-          "$AAPT" dump badging DarkroomAssistant-v0.1.3.apk | head -20
+          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.1.5.apk
+          "$AAPT" dump badging DarkroomAssistant-v0.1.5.apk | head -20
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.1.3
-          path: DarkroomAssistant-v0.1.3.apk
+          name: DarkroomAssistant-v0.1.5
+          path: DarkroomAssistant-v0.1.5.apk
