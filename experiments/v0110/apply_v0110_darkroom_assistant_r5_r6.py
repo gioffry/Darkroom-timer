@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import hashlib, sys
+import hashlib, re, sys
 
 work=Path(sys.argv[1]); project=work/'project'; java=project/'app/src/main/java/it/darkroom/timer'
 main=java/'MainActivity.java'; build=work/'build_darkroom.py'; gradle=project/'app/build.gradle'; manifest=project/'app/src/main/AndroidManifest.xml'
@@ -13,84 +13,82 @@ def rep(p,o,n,label,c=1):
     s=rd(p); k=s.count(o)
     if k<c: raise SystemExit(f'v0.11.0 {label}: atteso >= {c}, trovato {k}')
     wr(p,s.replace(o,n,c)); print('v0.11.0 OK',label,flush=True)
+def replace_between(p,start,end,new,label):
+    s=rd(p); a=s.find(start)
+    if a<0: raise SystemExit(f'v0.11.0 {label}: start non trovato')
+    b=s.find(end,a)
+    if b<0: raise SystemExit(f'v0.11.0 {label}: end non trovato')
+    wr(p,s[:a]+new+s[b:]); print('v0.11.0 OK',label,flush=True)
+def regex_rep(p,pattern,replacement,label):
+    s=rd(p); n=re.subn(pattern,replacement,s,count=1,flags=re.S)
+    if n[1]!=1: raise SystemExit(f'v0.11.0 {label}: matcher trovato {n[1]} volte')
+    wr(p,n[0]); print('v0.11.0 OK',label,flush=True)
 
-# Baseline guard: this release is applied AFTER v0.10.10. Only MainActivity version metadata may change in Timer root.
-timer_before={p.name:sha(p) for p in java.glob('*.java') if p.name!='MainActivity.java'}
-main_before=rd(main)
-for needle in ['NUOVO PROVINO DA QUESTA STAMPA','ⓘ  COME FUNZIONA','Le due esposizioni NON sono indipendenti','testFromPrint']:
-    if needle not in main_before: raise SystemExit('v0.11.0 BASELINE v0.10.10 mancante: '+needle)
-split_before=rd(java/'SplitGradePlan.java')
-for needle in ['public int softYellow = 60;','public int hardMagenta = 180;','softYellow + "Y / 0M','0Y / " + hardMagenta + "M']:
-    if needle not in split_before: raise SystemExit('v0.11.0 BASELINE SplitGrade v0.10.10 mancante: '+needle)
+# Protect the exact v0.10.10 Timer baseline.
+timer_before={p.name:sha(p) for p in java.glob('*.java') if p.name!='MainActivity.java'}; main_before=rd(main)
+for n in ['NUOVO PROVINO DA QUESTA STAMPA','ⓘ  COME FUNZIONA','Le due esposizioni NON sono indipendenti','testFromPrint']:
+    if n not in main_before: raise SystemExit('v0.11.0 baseline Timer mancante: '+n)
+split=rd(java/'SplitGradePlan.java')
+for n in ['public int softYellow = 60;','public int hardMagenta = 180;','softYellow + "Y / 0M','0Y / " + hardMagenta + "M']:
+    if n not in split: raise SystemExit('v0.11.0 baseline Split Grade mancante: '+n)
 
 # Version 0.11.0 / 56.
-rep(build,'VERSION_NAME = "0.10.10"','VERSION_NAME = "0.11.0"','version name build')
-rep(build,'VERSION_CODE = "55"','VERSION_CODE = "56"','version code build')
-rep(build,'[Darkroom v0.10.10]','[Darkroom v0.11.0]','build log tag')
-rep(build,r'versionCode\s+55\b',r'versionCode\s+56\b','preflight code regex')
-rep(build,r'0\.10\.10',r'0\.11\.0','preflight name regex')
-rep(build,'versionCode 55 / versionName 0.10.10','versionCode 56 / versionName 0.11.0','preflight message')
-rep(build,'Preflight v0.10.10 OK','Preflight v0.11.0 OK','preflight log')
-rep(gradle,"versionCode 55\n        versionName '0.10.10'","versionCode 56\n        versionName '0.11.0'",'gradle version')
-rep(manifest,'android:versionCode="55"\n    android:versionName="0.10.10"','android:versionCode="56"\n    android:versionName="0.11.0"','manifest version')
-rep(main,'private static final String APP_VERSION = "0.10.10";','private static final String APP_VERSION = "0.11.0";','Timer UI version')
+for p,o,n,label in [
+ (build,'VERSION_NAME = "0.10.10"','VERSION_NAME = "0.11.0"','build name'),(build,'VERSION_CODE = "55"','VERSION_CODE = "56"','build code'),
+ (build,'[Darkroom v0.10.10]','[Darkroom v0.11.0]','build tag'),(build,r'versionCode\s+55\b',r'versionCode\s+56\b','preflight code'),
+ (build,r'0\.10\.10',r'0\.11\.0','preflight name'),(build,'versionCode 55 / versionName 0.10.10','versionCode 56 / versionName 0.11.0','preflight message'),
+ (build,'Preflight v0.10.10 OK','Preflight v0.11.0 OK','preflight log'),(gradle,"versionCode 55\n        versionName '0.10.10'","versionCode 56\n        versionName '0.11.0'",'gradle'),
+ (manifest,'android:versionCode="55"\n    android:versionName="0.10.10"','android:versionCode="56"\n    android:versionName="0.11.0"','manifest'),
+ (main,'private static final String APP_VERSION = "0.10.10";','private static final String APP_VERSION = "0.11.0";','Timer UI')]: rep(p,o,n,label)
 
-# R5/R6 data layer replaces R4 implementation without modifying source catalog.
-wr(java/'assistant/data/AssistantDataSchema.java',rd(here/'AssistantDataSchema.java'))
-wr(java/'assistant/data/AssistantDatabase.java',rd(here/'AssistantDatabase.java'))
-wr(java/'assistant/chemistry/inventory/MyChemistryActivity.java',rd(here/'MyChemistryActivity.java'))
-wr(java/'assistant/equipment/MyEquipmentActivity.java',rd(here/'MyEquipmentActivity.java'))
-wr(java/'assistant/equipment/TankPlanner.java',rd(here/'TankPlanner.java'))
+# New additive R5/R6 data and UI classes.
+for dst,src in [
+ (java/'assistant/data/AssistantDataSchema.java','AssistantDataSchema.java'),(java/'assistant/data/AssistantDatabase.java','AssistantDatabase.java'),
+ (java/'assistant/chemistry/inventory/MyChemistryActivity.java','MyChemistryActivity.java'),(java/'assistant/equipment/MyEquipmentActivity.java','MyEquipmentActivity.java'),
+ (java/'assistant/equipment/TankPlanner.java','TankPlanner.java')]: wr(dst,rd(here/src))
 
-# Register new screens.
-anchor='''        <activity\n            android:name=".assistant.log.DevelopmentLogActivity"\n            android:screenOrientation="portrait"\n            android:exported="false" />\n'''
-blocks=anchor+'''\n        <activity\n            android:name=".assistant.chemistry.inventory.MyChemistryActivity"\n            android:screenOrientation="portrait"\n            android:exported="false" />\n\n        <activity\n            android:name=".assistant.equipment.MyEquipmentActivity"\n            android:screenOrientation="portrait"\n            android:exported="false" />\n'''
-rep(manifest,anchor,blocks,'manifest R5/R6')
+# Manifest and Assistant menu.
+activity='''        <activity\n            android:name=".assistant.log.DevelopmentLogActivity"\n            android:screenOrientation="portrait"\n            android:exported="false" />\n'''
+rep(manifest,activity,activity+'''\n        <activity\n            android:name=".assistant.chemistry.inventory.MyChemistryActivity"\n            android:screenOrientation="portrait"\n            android:exported="false" />\n\n        <activity\n            android:name=".assistant.equipment.MyEquipmentActivity"\n            android:screenOrientation="portrait"\n            android:exported="false" />\n''','manifest R5/R6')
+rep(assistant,'import it.darkroom.timer.assistant.log.DevelopmentLogActivity;\n','import it.darkroom.timer.assistant.log.DevelopmentLogActivity;\nimport it.darkroom.timer.assistant.chemistry.inventory.MyChemistryActivity;\nimport it.darkroom.timer.assistant.equipment.MyEquipmentActivity;\n','Assistant imports')
+rep(assistant,'        addPlaceholder(root, "LA MIA CHIMICA");\n','''        Button myChemistry = entry("LA MIA CHIMICA", "Inventario, residui, capacità e utilizzi", true);\n        myChemistry.setOnClickListener(v -> startActivity(new Intent(this, MyChemistryActivity.class)));\n        root.addView(myChemistry, margin(lp(-1, dp(78)), 0, 0, 0, 9));\n''','menu chimica')
+rep(assistant,'        addPlaceholder(root, "LA MIA ATTREZZATURA");\n','''        Button myEquipment = entry("LA MIA ATTREZZATURA", "Tank personali e scelta intelligente", true);\n        myEquipment.setOnClickListener(v -> startActivity(new Intent(this, MyEquipmentActivity.class)));\n        root.addView(myEquipment, margin(lp(-1, dp(78)), 0, 0, 0, 9));\n''','menu attrezzatura')
 
-# Assistant menu R5/R6.
-rep(assistant,'import it.darkroom.timer.assistant.log.DevelopmentLogActivity;\n','import it.darkroom.timer.assistant.log.DevelopmentLogActivity;\nimport it.darkroom.timer.assistant.chemistry.inventory.MyChemistryActivity;\nimport it.darkroom.timer.assistant.equipment.MyEquipmentActivity;\n','imports R5/R6')
-rep(assistant,'        addPlaceholder(root, "LA MIA CHIMICA");\n','''        Button myChemistry = entry("LA MIA CHIMICA", "Inventario, residui, capacità e utilizzi", true);\n        myChemistry.setOnClickListener(v -> startActivity(new Intent(this, MyChemistryActivity.class)));\n        root.addView(myChemistry, margin(lp(-1, dp(78)), 0, 0, 0, 9));\n''','La mia chimica operativa')
-rep(assistant,'        addPlaceholder(root, "LA MIA ATTREZZATURA");\n','''        Button myEquipment = entry("LA MIA ATTREZZATURA", "Tank personali e scelta intelligente", true);\n        myEquipment.setOnClickListener(v -> startActivity(new Intent(this, MyEquipmentActivity.class)));\n        root.addView(myEquipment, margin(lp(-1, dp(78)), 0, 0, 0, 9));\n''','La mia attrezzatura operativa')
-
-# R6: integrate optional tank selection into NEW DEVELOPMENT without blocking legacy manual-volume flow.
-rep(newdev,'    private EditText exposedIsoField, temperatureField, volumeField, rollsField;\n','''    private EditText exposedIsoField, temperatureField, volumeField, rollsField;\n    private TextView tankChoice;\n    private long selectedTankId=0;\n    private String selectedTankPlan="";\n''','campi tank R6')
+# R6 tank choice in New Development; legacy manual volume remains available.
+rep(newdev,'    private EditText exposedIsoField, temperatureField, volumeField, rollsField;\n','''    private EditText exposedIsoField, temperatureField, volumeField, rollsField;\n    private TextView tankChoice;\n    private long selectedTankId=0;\n    private String selectedTankPlan="";\n''','tank fields')
 rep(newdev,'        TextView eyebrow=text("DARKROOM ASSISTANT · 3/9",12,accent,true);','        TextView eyebrow=text("DARKROOM ASSISTANT · 6/9",12,accent,true);','badge 6/9')
 old_note='''        TextView volumeNote=text("Inserimento manuale in Release 3 · la tank automatica arriverà in Release 6",11,muted,false);\n        volumeNote.setPadding(dp(4),dp(5),dp(4),dp(2)); root.addView(volumeNote);\n\n        label(root,"TEMPERATURA REALE");\n'''
-new_note='''        TextView volumeNote=text("Volume manuale disponibile anche senza attrezzatura configurata",11,muted,false);\n        volumeNote.setPadding(dp(4),dp(5),dp(4),dp(2)); root.addView(volumeNote);\n\n        label(root,"TANK");\n        tankChoice=text("Nessuna tank selezionata · volume manuale",12,muted,true);\n        tankChoice.setPadding(dp(4),dp(4),dp(4),dp(6)); root.addView(tankChoice);\n        LinearLayout tankActions=new LinearLayout(this); tankActions.setOrientation(LinearLayout.HORIZONTAL);\n        Button chooseTank=smallButton("SCEGLI TANK"); chooseTank.setOnClickListener(v->chooseTankManual());\n        Button bestTank=smallButton("TANK MIGLIORE"); bestTank.setOnClickListener(v->chooseTankBest());\n        tankActions.addView(chooseTank,lp(0,dp(52),1)); tankActions.addView(bestTank,lp(0,dp(52),1)); root.addView(tankActions);\n\n        label(root,"TEMPERATURA REALE");\n'''
-rep(newdev,old_note,new_note,'UI scelta tank')
+new_note='''        TextView volumeNote=text("Volume manuale disponibile anche senza attrezzatura configurata",11,muted,false);\n        volumeNote.setPadding(dp(4),dp(5),dp(4),dp(2)); root.addView(volumeNote);\n\n        label(root,"TANK");\n        tankChoice=text("Nessuna tank selezionata · volume manuale",12,muted,true);\n        tankChoice.setPadding(dp(4),dp(4),dp(4),dp(6)); root.addView(tankChoice);\n        LinearLayout tankActions=new LinearLayout(this); tankActions.setOrientation(LinearLayout.HORIZONTAL);\n        Button chooseTank=smallChoice("SCEGLI TANK"); chooseTank.setOnClickListener(v->chooseTankManual());\n        Button bestTank=smallChoice("TANK MIGLIORE"); bestTank.setOnClickListener(v->chooseTankBest());\n        tankActions.addView(chooseTank,lp(0,dp(52),1)); tankActions.addView(bestTank,lp(0,dp(52),1)); root.addView(tankActions);\n\n        label(root,"TEMPERATURA REALE");\n'''
+rep(newdev,old_note,new_note,'tank UI')
 helper='''    private void chooseTankManual() {\n        it.darkroom.timer.assistant.data.AssistantDatabase db=new it.darkroom.timer.assistant.data.AssistantDatabase(this);\n        java.util.List<it.darkroom.timer.assistant.data.AssistantDatabase.TankItem> tanks=db.listTanks(); db.close();\n        if(tanks.isEmpty()){ toast("Nessuna tank personale configurata. Puoi continuare con il volume manuale."); return; }\n        String[] labels=new String[tanks.size()]; for(int i=0;i<tanks.size();i++) labels[i]=tanks.get(i).displayName();\n        new android.app.AlertDialog.Builder(this).setTitle("SCEGLI TANK").setItems(labels,(d,which)->{\n            it.darkroom.timer.assistant.data.AssistantDatabase.TankItem t=tanks.get(which); selectedTankId=t.id; selectedTankPlan="Scelta manuale · "+t.displayName(); tankChoice.setText(selectedTankPlan);\n        }).show();\n    }\n\n    private void chooseTankBest() {\n        int rolls=parseInt(rollsField.getText().toString(),-1); double volume=parseDouble(volumeField.getText().toString());\n        if(rolls<=0||Double.isNaN(volume)||volume<=0){ toast("Inserisci prima numero rulli e volume."); return; }\n        it.darkroom.timer.assistant.data.AssistantDatabase db=new it.darkroom.timer.assistant.data.AssistantDatabase(this);\n        java.util.List<it.darkroom.timer.assistant.data.AssistantDatabase.TankItem> tanks=db.listTanks();\n        it.darkroom.timer.assistant.data.AssistantDatabase.ChemicalItem inv=db.findChemicalForDeveloper(developerField.getText().toString());\n        it.darkroom.timer.assistant.equipment.TankPlanner.Plan p=it.darkroom.timer.assistant.equipment.TankPlanner.chooseBest(tanks,selectedFormat,rolls,volume,developerField.getText().toString(),dilutionField.getText().toString(),inv); db.close();\n        if(!p.ok){ selectedTankId=0; selectedTankPlan=p.problem; tankChoice.setText(p.problem); new android.app.AlertDialog.Builder(this).setTitle("TANK MIGLIORE").setMessage(p.problem).setPositiveButton("OK",null).show(); return; }\n        selectedTankId=p.tank.id; selectedTankPlan=p.summary(); tankChoice.setText(p.tank.displayName()+" · "+p.cycles+(p.cycles==1?" ciclo":" cicli"));\n        new android.app.AlertDialog.Builder(this).setTitle("TANK MIGLIORE").setMessage(p.summary()).setPositiveButton("USA QUESTA",null).show();\n    }\n\n'''
-rep(newdev,'    private void calculate() {\n',helper+'    private void calculate() {\n','logica scelta tank')
-rep(newdev,'        i.putExtra("alternatives",r.alternatives); i.putExtra("rolls",rolls); i.putExtra("volumeMl",volume);\n','''        i.putExtra("alternatives",r.alternatives); i.putExtra("rolls",rolls); i.putExtra("volumeMl",volume);\n        i.putExtra("selectedTankId",selectedTankId); i.putExtra("tankPlanSummary",selectedTankPlan);\n''','propaga piano tank')
+rep(newdev,'    private void calculate() {\n',helper+'    private void calculate() {\n','tank logic')
+rep(newdev,'        i.putExtra("alternatives",r.alternatives); i.putExtra("rolls",rolls); i.putExtra("volumeMl",volume);\n','''        i.putExtra("alternatives",r.alternatives); i.putExtra("rolls",rolls); i.putExtra("volumeMl",volume);\n        i.putExtra("selectedTankId",selectedTankId); i.putExtra("tankPlanSummary",selectedTankPlan);\n''','tank extras')
 
-# R4 fix 2: immediately re-evaluate personal recipe and rebuild visible result.
-old_choose='''    private void chooseActiveTime(){AssistantDatabase.SourceSnapshot s=snapshot();preferred=db.findPreferred(s.comboKey());latestPersonal=db.findLatest(s.comboKey());int repeat=e.getInt("repeatTimeSeconds",0);if(repeat>0){activeSeconds=repeat;activeOrigin=e.getString("repeatOrigin","RICETTA DAL LOG");return;}if(preferred!=null&&AssistantDatabase.sameTemperature(preferred.personalTemp,s.originalTemp)){activeSeconds=preferred.personalSeconds;activeOrigin="RICETTA PREFERITA";}else{activeSeconds=s.originalSeconds;activeOrigin=s.dataType.contains("ADATTATO")?"ADATTATO / CALCOLATO":"FONTE";}}\n'''
-new_choose='''    private void chooseActiveTime(){AssistantDatabase.SourceSnapshot s=snapshot();preferred=db.findPreferred(s.comboKey());latestPersonal=db.findLatest(s.comboKey());int repeat=e.getInt("repeatTimeSeconds",0);if(repeat>0){activeSeconds=repeat;activeOrigin=e.getString("repeatOrigin","RICETTA DAL LOG");return;}if(preferred!=null&&AssistantDatabase.sameTemperature(preferred.personalTemp,s.originalTemp)){activeSeconds=preferred.personalSeconds;activeOrigin="RICETTA PREFERITA";}else if(latestPersonal!=null&&AssistantDatabase.sameTemperature(latestPersonal.personalTemp,s.originalTemp)){activeSeconds=latestPersonal.personalSeconds;activeOrigin="MIA RICETTA";}else{activeSeconds=s.originalSeconds;activeOrigin=s.dataType.contains("ADATTATO")?"ADATTATO / CALCOLATO":"FONTE";}}\n'''
-rep(result,old_choose,new_choose,'refresh origine ricetta personale')
-rep(result,'db.saveRecipe(snapshot(),sec,tc,note.getText().toString(),fav.isChecked());toast("Ricetta personale salvata");chooseActiveTime();','db.saveRecipe(snapshot(),sec,tc,note.getText().toString(),fav.isChecked());toast("Ricetta personale salvata");chooseActiveTime();buildUi();','refresh immediato schermata risultato')
+# R4 immediate recipe refresh. Latest personal recipe at the same temperature becomes the active time unless a preferred recipe exists.
+new_choose='''    private void chooseActiveTime(){AssistantDatabase.SourceSnapshot s=snapshot();preferred=db.findPreferred(s.comboKey());latestPersonal=db.findLatest(s.comboKey());int repeat=e.getInt("repeatTimeSeconds",0);if(repeat>0){activeSeconds=repeat;activeOrigin=e.getString("repeatOrigin","RICETTA DAL LOG");return;}if(preferred!=null&&AssistantDatabase.sameTemperature(preferred.personalTemp,s.originalTemp)){activeSeconds=preferred.personalSeconds;activeOrigin="RICETTA PREFERITA";}else if(latestPersonal!=null&&AssistantDatabase.sameTemperature(latestPersonal.personalTemp,s.originalTemp)){activeSeconds=latestPersonal.personalSeconds;activeOrigin="MIA RICETTA";}else{activeSeconds=s.originalSeconds;activeOrigin=s.dataType.contains("ADATTATO")?"ADATTATO / CALCOLATO":"FONTE";}}'''
+replace_between(result,'    private void chooseActiveTime(){','\n\n    private void buildUi()',new_choose,'chooseActiveTime R4 fix')
+rep(result,'db.saveRecipe(snapshot(),sec,tc,note.getText().toString(),fav.isChecked());toast("Ricetta personale salvata");chooseActiveTime();','db.saveRecipe(snapshot(),sec,tc,note.getText().toString(),fav.isChecked());toast("Ricetta personale salvata");e.putInt("repeatTimeSeconds",0);chooseActiveTime();buildUi();','immediate recipe refresh')
 
-# R4 fix 1 + R5 usage proposal: semantic known flags, never treat UNKNOWN as measured zero.
-old_save='''l.productMl=c.dilutionKnown?c.productMl:0;l.waterMl=c.dilutionKnown?c.waterMl:0;l.rolls=e.getInt("rolls",1);l.capacityState=c.capacityState;l.capacityMessage=c.capacityMessage;l.rating=rating.getSelectedItemPosition()+1;l.notes=notes.getText().toString();db.saveLog(l);toast("Sviluppo salvato nel Log");'''
-new_save='''l.productMl=c.dilutionKnown?c.productMl:0;l.waterMl=c.dilutionKnown?c.waterMl:0;l.productKnown=c.dilutionKnown;l.waterKnown=c.dilutionKnown;l.rolls=e.getInt("rolls",1);l.capacityState=c.capacityState;l.capacityMessage=c.capacityMessage;l.rating=rating.getSelectedItemPosition()+1;l.notes=notes.getText().toString();long logId=db.saveLog(l);toast("Sviluppo salvato nel Log");maybeRegisterChemicalUsage(logId,l,c);'''
-rep(result,old_save,new_save,'UNKNOWN != zero nel Log + proposta consumo')
-usage_helper='''    private void maybeRegisterChemicalUsage(long logId, AssistantDatabase.LogEntry l, ChemistryCalculator.Result c){\n        AssistantDatabase.ChemicalItem item=db.findChemicalForDeveloper(l.source.developer); if(item==null)return;\n        boolean ml="ml".equalsIgnoreCase(item.unit); boolean liters="litri".equalsIgnoreCase(item.unit)||"l".equalsIgnoreCase(item.unit);\n        if(c.dilutionKnown&&(ml||liters)){\n            final double used=liters?c.productMl/1000.0:c.productMl; final double after=Math.max(0,item.remainingAmount-used);\n            String msg="Prodotto: "+item.name+"\\nQuantità utilizzata: "+fmtAmount(used)+" "+item.unit+"\\nResidua prima: "+fmtAmount(item.remainingAmount)+" "+item.unit+"\\nResidua dopo: "+fmtAmount(after)+" "+item.unit+"\\n\\nLa sottrazione avverrà solo confermando.";\n            new AlertDialog.Builder(this).setTitle("REGISTRA UTILIZZO CHIMICA").setMessage(msg).setPositiveButton("CONFERMA",(d,w)->{db.registerChemicalUsage(item.id,logId,used,item.unit,l,"");toast("Utilizzo chimica registrato");}).setNegativeButton("NON REGISTRARE",null).show();\n        }else{\n            LinearLayout box=formBox(); EditText q=field("Quantità realmente utilizzata · "+item.unit);q.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);box.addView(q);\n            String reason=c.dilutionKnown?"L'unità dell'inventario non è convertibile automaticamente.":"Quantità prodotto non determinata: la diluizione non è documentata.";\n            new AlertDialog.Builder(this).setTitle("REGISTRA UTILIZZO CHIMICA").setMessage(reason+" Inserisci la quantità realmente usata oppure annulla: nulla verrà sottratto automaticamente.").setView(box).setPositiveButton("REGISTRA",(d,w)->{double used=parseDouble(q.getText().toString());if(Double.isNaN(used)||used<0){toast("Quantità non valida");return;}db.registerChemicalUsage(item.id,logId,used,item.unit,l,"Quantità inserita manualmente");toast("Utilizzo chimica registrato");}).setNegativeButton("NON REGISTRARE",null).show();\n        }\n    }\n    private static String fmtAmount(double v){return Math.abs(v-Math.rint(v))<0.05?String.format(Locale.ITALY,"%.0f",v):String.format(Locale.ITALY,"%.2f",v);}\n\n'''
-rep(result,'    private void renderPrepare(LinearLayout box,double volume){',usage_helper+'    private void renderPrepare(LinearLayout box,double volume){','dialog conferma utilizzo chimica')
-# Final result exposes optional tank plan; no tank remains valid legacy flow.
-rep(result,'        LinearLayout prepare=new LinearLayout(this);prepare.setOrientation(LinearLayout.VERTICAL);prepare.setPadding(dp(14),dp(12),dp(14),dp(12));prepare.setBackground(roundRect(card,10,1,accent));root.addView(prepare);renderPrepare(prepare,e.getDouble("volumeMl",0));\n','''        LinearLayout prepare=new LinearLayout(this);prepare.setOrientation(LinearLayout.VERTICAL);prepare.setPadding(dp(14),dp(12),dp(14),dp(12));prepare.setBackground(roundRect(card,10,1,accent));root.addView(prepare);renderPrepare(prepare,e.getDouble("volumeMl",0));\n        String tankPlan=e.getString("tankPlanSummary",""); if(tankPlan!=null&&!tankPlan.trim().isEmpty()){LinearLayout tankBox=new LinearLayout(this);tankBox.setOrientation(LinearLayout.VERTICAL);tankBox.setPadding(dp(14),dp(12),dp(14),dp(12));tankBox.setBackground(roundRect(card,10,1,border));tankBox.addView(text("TANK / PIANO CICLI",12,accent,true));tankBox.addView(text(tankPlan,12,primary,false));root.addView(tankBox,margin(-1,-2,0,8,0,0));}\n''','riepilogo tank risultato')
+# R4 UNKNOWN != zero; R5 proposes inventory usage only after the log is explicitly saved.
+old_save='l.productMl=c.dilutionKnown?c.productMl:0;l.waterMl=c.dilutionKnown?c.waterMl:0;l.rolls=e.getInt("rolls",1);l.capacityState=c.capacityState;l.capacityMessage=c.capacityMessage;l.rating=rating.getSelectedItemPosition()+1;l.notes=notes.getText().toString();db.saveLog(l);toast("Sviluppo salvato nel Log");'
+new_save='l.productMl=c.dilutionKnown?c.productMl:0;l.waterMl=c.dilutionKnown?c.waterMl:0;l.productKnown=c.dilutionKnown;l.waterKnown=c.dilutionKnown;l.rolls=e.getInt("rolls",1);l.capacityState=c.capacityState;l.capacityMessage=c.capacityMessage;l.rating=rating.getSelectedItemPosition()+1;l.notes=notes.getText().toString();long logId=db.saveLog(l);toast("Sviluppo salvato nel Log");maybeRegisterChemicalUsage(logId,l,c);'
+rep(result,old_save,new_save,'UNKNOWN flags + usage proposal')
+usage='''    private void maybeRegisterChemicalUsage(long logId, AssistantDatabase.LogEntry l, ChemistryCalculator.Result c){\n        AssistantDatabase.ChemicalItem item=db.findChemicalForDeveloper(l.source.developer); if(item==null)return;\n        boolean ml="ml".equalsIgnoreCase(item.unit); boolean liters="litri".equalsIgnoreCase(item.unit)||"l".equalsIgnoreCase(item.unit);\n        if(c.dilutionKnown&&(ml||liters)){\n            final double used=liters?c.productMl/1000.0:c.productMl; final double after=Math.max(0,item.remainingAmount-used);\n            String msg="Prodotto: "+item.name+"\\nQuantità utilizzata: "+fmtAmount(used)+" "+item.unit+"\\nResidua prima: "+fmtAmount(item.remainingAmount)+" "+item.unit+"\\nResidua dopo: "+fmtAmount(after)+" "+item.unit+"\\n\\nLa sottrazione avverrà solo confermando.";\n            new AlertDialog.Builder(this).setTitle("REGISTRA UTILIZZO CHIMICA").setMessage(msg).setPositiveButton("CONFERMA",(d,w)->{db.registerChemicalUsage(item.id,logId,used,item.unit,l,"");toast("Utilizzo chimica registrato");}).setNegativeButton("NON REGISTRARE",null).show();\n        }else{\n            LinearLayout box=formBox(); EditText q=field("Quantità realmente utilizzata · "+item.unit); q.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL); box.addView(q);\n            String reason=c.dilutionKnown?"L'unità dell'inventario non è convertibile automaticamente.":"Quantità prodotto non determinata: la diluizione non è documentata.";\n            new AlertDialog.Builder(this).setTitle("REGISTRA UTILIZZO CHIMICA").setMessage(reason+" Inserisci la quantità realmente usata oppure annulla: nulla verrà sottratto automaticamente.").setView(box).setPositiveButton("REGISTRA",(d,w)->{double used=parseDouble(q.getText().toString());if(Double.isNaN(used)||used<0){toast("Quantità non valida");return;}db.registerChemicalUsage(item.id,logId,used,item.unit,l,"Quantità inserita manualmente");toast("Utilizzo chimica registrato");}).setNegativeButton("NON REGISTRARE",null).show();\n        }\n    }\n    private static String fmtAmount(double v){return Math.abs(v-Math.rint(v))<0.05?String.format(Locale.ITALY,"%.0f",v):String.format(Locale.ITALY,"%.2f",v);}\n\n'''
+rep(result,'    private void renderPrepare(LinearLayout box,double volume){',usage+'    private void renderPrepare(LinearLayout box,double volume){','usage dialog')
+prepare_anchor='        LinearLayout prepare=new LinearLayout(this);prepare.setOrientation(LinearLayout.VERTICAL);prepare.setPadding(dp(14),dp(12),dp(14),dp(12));prepare.setBackground(roundRect(card,10,1,accent));root.addView(prepare);renderPrepare(prepare,e.getDouble("volumeMl",0));\n'
+rep(result,prepare_anchor,prepare_anchor+'''        String tankPlan=e.getString("tankPlanSummary",""); if(tankPlan!=null&&!tankPlan.trim().isEmpty()){LinearLayout tankBox=new LinearLayout(this);tankBox.setOrientation(LinearLayout.VERTICAL);tankBox.setPadding(dp(14),dp(12),dp(14),dp(12));tankBox.setBackground(roundRect(card,10,1,border));tankBox.addView(text("TANK / PIANO CICLI",12,accent,true));tankBox.addView(text(tankPlan,12,primary,false));root.addView(tankBox,margin(-1,-2,0,8,0,0));}\n''','tank result summary')
 
-# Development Log: show semantic UNKNOWN instead of misleading 0 ml.
-old_prepare='''"\\n\\nPREPARA\\n"+fmtMl(l.productMl)+" ml prodotto/stock\\n"+fmtMl(l.waterMl)+" ml acqua\\n"+fmtMl(l.volumeMl)+" ml totale · "+l.rolls+" rulli\\n"+l.capacityMessage'''
-new_prepare='''"\\n\\nPREPARA\\n"+(l.productKnown?(fmtMl(l.productMl)+" ml prodotto/stock"):"Quantità prodotto: non determinata")+"\\n"+(l.waterKnown?(fmtMl(l.waterMl)+" ml acqua"):"Quantità acqua: non determinata")+"\\n"+fmtMl(l.volumeMl)+" ml totale · "+l.rolls+" rulli\\n"+l.capacityMessage'''
-rep(log,old_prepare,new_prepare,'Log UNKNOWN esplicito')
+# R4 Log: replace only the two quantity expressions, independent of surrounding formatting.
+regex_rep(log,r'fmtMl\(l\.productMl\)\+" ml prodotto/stock\\n"\+fmtMl\(l\.waterMl\)\+" ml acqua"',r'(l.productKnown?(fmtMl(l.productMl)+" ml prodotto/stock"):"Quantità prodotto: non determinata")+"\\n"+(l.waterKnown?(fmtMl(l.waterMl)+" ml acqua"):"Quantità acqua: non determinata")','Log UNKNOWN display')
 
-# Absolute regression guard: Timer core unchanged except APP_VERSION.
+# Absolute Timer guard after all Assistant changes.
 timer_after={p.name:sha(p) for p in java.glob('*.java') if p.name!='MainActivity.java'}
 if timer_before!=timer_after:
     bad=[n for n in sorted(set(timer_before)|set(timer_after)) if timer_before.get(n)!=timer_after.get(n)]
     raise SystemExit('v0.11.0 GUARDRAIL TIMER: '+', '.join(bad))
-expected=main_before.replace('private static final String APP_VERSION = "0.10.10";','private static final String APP_VERSION = "0.11.0";',1)
-if rd(main)!=expected: raise SystemExit('v0.11.0 GUARDRAIL MainActivity: oltre al version bump è cambiato il Timer')
+if rd(main)!=main_before.replace('private static final String APP_VERSION = "0.10.10";','private static final String APP_VERSION = "0.11.0";',1): raise SystemExit('v0.11.0 MainActivity modificato oltre versione')
 
-# Acceptance checks for R2-R6 and v0.10.10 baseline.
+# Static acceptance R2-R6.
 checks={
  build:['VERSION_NAME = "0.11.0"','VERSION_CODE = "56"'],gradle:["versionCode 56","versionName '0.11.0'"],manifest:['android:versionCode="56"','android:versionName="0.11.0"','.assistant.chemistry.inventory.MyChemistryActivity','.assistant.equipment.MyEquipmentActivity'],
  main:['NUOVO PROVINO DA QUESTA STAMPA','ⓘ  COME FUNZIONA','testFromPrint'],java/'SplitGradePlan.java':['public int softYellow = 60;','public int hardMagenta = 180;'],
@@ -100,17 +98,16 @@ checks={
  java/'assistant/equipment/MyEquipmentActivity.java':['JOBO 2520','minRotationMl=270','capacity35=2','capacity120=2','DATI INSERITI DALL\'UTENTE'],
  java/'assistant/equipment/TankPlanner.java':['CPE2_MAX_ML','chooseBest','cycles','chimica insufficiente','minor volume valido'],
  newdev:['DARKROOM ASSISTANT · 6/9','SCEGLI TANK','TANK MIGLIORE','chooseTankBest','selectedTankId','tankPlanSummary'],
- result:['MIA RICETTA','buildUi();','productKnown=c.dilutionKnown','REGISTRA UTILIZZO CHIMICA','nulla verrà sottratto automaticamente','TANK / PIANO CICLI'],
+ result:['MIA RICETTA','e.putInt("repeatTimeSeconds",0);chooseActiveTime();buildUi();','productKnown=c.dilutionKnown','REGISTRA UTILIZZO CHIMICA','nulla verrà sottratto automaticamente','TANK / PIANO CICLI'],
  log:['Quantità prodotto: non determinata','Quantità acqua: non determinata']}
 for p,needles in checks.items():
     t=rd(p)
     for n in needles:
-        if n not in t: raise SystemExit(f'v0.11.0 verifica fallita {n} in {p}')
+        if n not in t: raise SystemExit(f'v0.11.0 check fallito {n} in {p}')
 for p in [java/'assistant/data/AssistantDataSchema.java',java/'assistant/data/AssistantDatabase.java']:
-    if 'DROP TABLE' in rd(p): raise SystemExit('v0.11.0 schema distruttivo vietato')
-# Explicit R2/R3 regression facts.
+    if 'DROP TABLE' in rd(p): raise SystemExit('v0.11.0 DROP TABLE vietato')
 cat=rd(java/'assistant/development/DevelopmentCatalog.java'); chem=rd(java/'assistant/chemistry/ChemistryCalculator.java')
-for n in ['JOBO CPE2','rotazione continua','DATO DIRETTO','DATO ADATTATO / CALCOLATO']:
+for n in ['JOBO CPE2','rotazione continua','DATO DIRETTO','DATO ADATTATO / CALCOLATO','tempAdjusted * 0.85']:
     if n not in cat: raise SystemExit('v0.11.0 regressione R2: '+n)
 for n in ['CPE2_MAX_ML = 600.0','4000 ml working solution → 12 perforated or roll films','CAPACITY_UNKNOWN','Rapporto di diluizione non ancora disponibile dalla fonte']:
     if n not in chem: raise SystemExit('v0.11.0 regressione R3: '+n)
