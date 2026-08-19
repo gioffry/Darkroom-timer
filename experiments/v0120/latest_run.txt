@@ -1,5 +1,5 @@
-run_id=32203358222
-functional_commit=b3eb7936f8865f826174d66396986673802d35b6
+run_id=32203438553
+functional_commit=fd5f0d02ce634a5c49f0acd981d1b43cf589f0ff
 build=FAILURE
 conclusion=failure
-html_url=https://github.com/gioffry/Darkroom-timer/actions/runs/32203358222
+html_url=https://github.com/gioffry/Darkroom-timer/actions/runs/32203438553
