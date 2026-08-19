@@ -77,143 +77,34 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m py_compile experiments/v0121/apply_v0121_assistant_ux_smart_catalog.py experiments/v0121/catalog_data.py experiments/v0121/test_upgrade_v0120_to_v0121.py
+          python3 -m py_compile \
+            experiments/v0121/apply_v0121_assistant_ux_smart_catalog.py \
+            experiments/v0121/catalog_data.py \
+            experiments/v0121/verify_v0121_release.py \
+            experiments/v0121/test_upgrade_v0120_to_v0121.py \
+            experiments/v0121/test_v0121_java_behavior.py \
+            experiments/v0120/test_backup_restore.py
           python3 experiments/v0121/apply_v0121_assistant_ux_smart_catalog.py work
 
-      - name: Test real Smart Search engine and ranking
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf /tmp/smartclasses /tmp/smartsrc && mkdir -p /tmp/smartclasses /tmp/smartsrc/it/darkroom/timer/assistant/search
-          cp work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchEngine.java /tmp/smartsrc/it/darkroom/timer/assistant/search/
-          cat >/tmp/smartsrc/TestSmart.java <<'JAVA'
-          import java.util.*;
-          import it.darkroom.timer.assistant.search.SmartSearchEngine;
-          public class TestSmart {
-            static SmartSearchEngine.Item x(String id,String name,String maker,String[] cats,String[] aliases,boolean remote){return new SmartSearchEngine.Item(id,name,maker,Arrays.asList(cats),Arrays.asList(aliases),"","",name,remote);}
-            static String first(List<SmartSearchEngine.Item> all,String q,String cat){List<SmartSearchEngine.Result> r=SmartSearchEngine.search(all,q,cat,8);if(r.isEmpty())throw new RuntimeException("no result "+q);return r.get(0).item.name;}
-            public static void main(String[] a){
-              List<SmartSearchEngine.Item> all=new ArrayList<>();
-              all.add(x("fu","FOMA Universal","FOMA",new String[]{"FILM_DEVELOPER"},new String[]{"foma universal developer","foma un"},false));
-              all.add(x("fur","FOMA Universal Extra","FOMA",new String[]{"FILM_DEVELOPER"},new String[]{"universal extra"},false));
-              all.add(x("d76","KODAK D-76","KODAK",new String[]{"FILM_DEVELOPER"},new String[]{"d76","d-76","d 76"},false));
-              all.add(x("hp5","ILFORD HP5 PLUS","ILFORD",new String[]{"FILM"},new String[]{"hp5","hp5+","hp 5"},false));
-              all.add(x("trix","KODAK TRI-X 400","KODAK",new String[]{"FILM"},new String[]{"tri x","trix","tri-x"},false));
-              for(String n:new String[]{"1510","1520","1540","2520","2540","2550"})all.add(x("j"+n,"JOBO "+n,"JOBO",new String[]{"TANK"},new String[]{n,"jobo "+n.substring(0,2)},false));
-              all.add(x("online","FOMA Universal Online Extra","FOMA",new String[]{"FILM_DEVELOPER"},new String[]{"foma un"},true));
-              if(!first(all,"foma un","FILM_DEVELOPER").equals("FOMA Universal"))throw new RuntimeException("foma un");
-              if(!first(all,"FOMA UNIVERSAL","FILM_DEVELOPER").equals("FOMA Universal"))throw new RuntimeException("exact");
-              for(String q:new String[]{"d76","d-76","d 76"})if(!first(all,q,"FILM_DEVELOPER").equals("KODAK D-76"))throw new RuntimeException(q);
-              if(!first(all,"hp5","FILM").equals("ILFORD HP5 PLUS"))throw new RuntimeException("hp5");
-              if(!first(all,"tri x","FILM").equals("KODAK TRI-X 400"))throw new RuntimeException("tri x");
-              if(!first(all,"2520","TANK").equals("JOBO 2520"))throw new RuntimeException("2520");
-              if(SmartSearchEngine.search(all,"jobo","TANK",8).size()<2)throw new RuntimeException("jobo must return multiple");
-              if(!first(all,"FOMA Universal","FILM_DEVELOPER").equals("FOMA Universal"))throw new RuntimeException("exact must beat partial");
-              System.out.println("foma un -> FOMA Universal");
-              System.out.println("d76/d-76/d 76 -> KODAK D-76");
-              System.out.println("hp5 -> ILFORD HP5 PLUS; tri x -> KODAK TRI-X 400; 2520 -> JOBO 2520; jobo -> multiple: PASS");
-            }
-          }
-          JAVA
-          javac -d /tmp/smartclasses /tmp/smartsrc/it/darkroom/timer/assistant/search/SmartSearchEngine.java /tmp/smartsrc/TestSmart.java
-          java -cp /tmp/smartclasses TestSmart | tee smart-search-tests.txt
+      - name: Configure Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
 
-      - name: Test real catalog schema data aliases checksums update rollback cache
+      - name: Verify Smart Search catalog UX R2-R9 and Timer guards
         shell: bash
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          import json,hashlib,tempfile,shutil
-          from pathlib import Path
-          def load(path):
-              r=json.loads(Path(path).read_text(encoding='utf-8'));p=r['payload'];compact=json.dumps(p,ensure_ascii=False,separators=(',',':'));assert hashlib.sha256(compact.encode()).hexdigest()==r['payloadSha256'];assert r['schemaVersion']==2;return r
-          local=load('experiments/v0121/catalog-v2.json');remote=load('catalog/catalog-v3.json')
-          L=local['payload']['records'];R=remote['payload']['records'];assert local['catalogVersion']==2 and remote['catalogVersion']==3;assert len(L)==32 and len(R)==37
-          films=[r for r in L if 'FILM' in r['categories']];devs=[r for r in L if 'FILM_DEVELOPER' in r['categories']];tanks=[r for r in L if 'TANK' in r['categories']]
-          assert len(films)==7 and len(devs)==12 and len(tanks)==6
-          assert [r['name'] for r in tanks]==['JOBO 1510','JOBO 1520','JOBO 1540','JOBO 2520','JOBO 2540','JOBO 2550']
-          by={r['id']:r for r in L};assert {'d76','d-76','d 76'}<=set(by['dev-kodak-d76']['aliases']);assert 'foma un' in by['dev-foma-universal']['aliases'];assert 'tri x' in by['film-trix400']['aliases'];assert len(local['payload']['sources'])>=15
-          assert 'cpe2Compatible' not in by['tank-jobo-1510']['technical']  # unknown omitted, not false
-          assert by['tank-jobo-2540']['technical']['capacityDataType']=='CALCOLO'
-          # Atomic update simulation: validate staged v3 before replacing v2; corrupt candidate cannot touch active.
-          with tempfile.TemporaryDirectory() as td:
-              td=Path(td);active=td/'catalog.active.json';prev=td/'catalog.previous.json';tmp=td/'catalog.tmp.json';active.write_text(json.dumps(local),encoding='utf-8');tmp.write_text(json.dumps(remote),encoding='utf-8');load(tmp);active.rename(prev);tmp.rename(active);assert json.loads(active.read_text())['catalogVersion']==3 and json.loads(prev.read_text())['catalogVersion']==2
-              corrupt=json.loads(active.read_text());corrupt['payload']['records'][0]['name']='CORRUPT';candidate=td/'corrupt.json';candidate.write_text(json.dumps(corrupt),encoding='utf-8')
-              try:load(candidate);raise AssertionError('corrupt checksum accepted')
-              except AssertionError:pass
-              assert json.loads(active.read_text())['catalogVersion']==3
-              # selected online technical record cache: technical only, no inventory fields.
-              extra=next(r for r in R if r['id']=='dev-fomadon-p');cache={'schemaVersion':1,'records':[extra]};assert 'remaining_amount' not in json.dumps(cache) and cache['records'][0]['name']=='FOMADON P'
-          print('Catalog v2 local:',len(L),'records · films',len(films),'developers',len(devs),'tanks',len(tanks))
-          print('Catalog v3 remote:',len(R),'records · checksum/update/rollback/cache: PASS')
-          PY
+          python3 experiments/v0121/verify_v0121_release.py work | tee release-guards.txt
+          python3 experiments/v0121/test_v0121_java_behavior.py work | tee smart-search-tests.txt
 
-      - name: Test modern UX search selection catalog merge offline fallback
+      - name: Test v0.12.0 to v0.12.1 SQLite persistence and backup restore
         shell: bash
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          root=Path('work/project/app/src/main/java/it/darkroom/timer/assistant')
-          search=(root/'search/SmartSearchActivity.java').read_text();engine=(root/'search/SmartSearchEngine.java').read_text();catalog=(root/'search/SmartCatalog.java').read_text();ui=(root/'ui/AssistantUi.java').read_text();chem=(root/'chemistry/inventory/MyChemistryActivity.java').read_text();equip=(root/'equipment/MyEquipmentActivity.java').read_text();newdev=(root/'development/NewDevelopmentActivity.java').read_text();paper=(root/'paper/PaperChemistryActivity.java').read_text();dm=(root/'system/DataManagementActivity.java').read_text();manager=(root/'system/CatalogManager.java').read_text()
-          assert 'DEBOUNCE_MS=350' in search and 'generation' in search and 'handler.removeCallbacks' in search and 'fetchRemoteForSearch' in search
-          assert 'localItems(this)' in search and 'RISULTATI ONLINE' in search and 'RISULTATI LOCALI' in search
-          for n in ['exact','alias','startsWith','allWords','remote']:
-              assert n in engine,n
-          assert 'readActiveCatalog' in catalog and 'cachedSelectedRecords' in catalog and 'onlineItems' not in manager
-          assert 'SEARCH_CACHE_MS=5*60*1000L' in manager and 'catalog.previous.json' in manager and 'cacheSelectedRecord' in manager
-          assert 'Nome rivelatore esatto dal catalogo' not in chem and 'SmartSearchActivity.class' in chem and chem.count('new AlertDialog.Builder')<=1
-          assert 'AGGIUNGI TANK DAL CATALOGO · JOBO 2520' not in equip and 'AGGIUNGI TANK' in equip and 'SmartSearchActivity.class' in equip and 'new AlertDialog.Builder' not in equip
-          assert 'SmartSearchBinder.attach' in newdev and 'PICK_FILM_CATALOG' in newdev and 'OwnedTankPickerActivity.class' in newdev and 'new android.app.AlertDialog.Builder' not in newdev
-          assert paper.count('SmartSearchActivity.class')>=1 and paper.count('new AlertDialog.Builder')<=1
-          assert 'PROVENIENZA DEI DATI' in dm and 'showSourcesInline' in dm
-          for n in ['card(','primaryButton(','searchField(','resultRow(','emptyState(']:assert n in ui,n
-          print('UX: search/ranking/selection/catalog merge/offline fallback/progressive disclosure guards: PASS')
-          PY
-
-      - name: Test v0.12.0 to v0.12.1 SQLite preservation and R2-R9 core regression
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 experiments/v0121/test_upgrade_v0120_to_v0121.py work
-          python3 - <<'PY'
-          from pathlib import Path
-          import hashlib
-          b=Path('base/v0.12.0-materialized/project/app/src/main/java/it/darkroom/timer/assistant');f=Path('work/project/app/src/main/java/it/darkroom/timer/assistant')
-          unchanged=['development/DevelopmentCatalog.java','chemistry/ChemistryCalculator.java','data/AssistantDatabase.java','data/AssistantDataSchema.java','recipes/MyRecipesActivity.java','log/DevelopmentLogActivity.java','operational/OperationalAssistantActivity.java','paper/PaperChemistryStore.java','paper/PaperProductData.java','system/DataProvenance.java']
-          for rel in unchanged:
-              assert hashlib.sha256((b/rel).read_bytes()).digest()==hashlib.sha256((f/rel).read_bytes()).digest(),rel
-          planner=(f/'equipment/TankPlanner.java').read_text();assert 'chimica insufficiente' in planner and 'CPE2_MAX_ML' in planner and 'compatibilità JOBO CPE2 non documentata / non confermata' in planner
-          backup=(f/'system/BackupEngine.java').read_text();assert 'APP_VERSION="0.12.1"' in backup and 'VERSION_CODE=58' in backup and 'CATALOG_VERSION=2' in backup and 'beginTransaction' in backup and 'CONFLICT_IGNORE' in backup
-          assert 'DROP TABLE' not in (f/'data/AssistantDataSchema.java').read_text() and 'DROP TABLE' not in (f/'data/AssistantDatabase.java').read_text()
-          print('R2-R9 technical engines/data separation/backup/operational assistant regression: PASS')
-          PY
-
-      - name: Test Timer Split Grade SONOFF f-stop and log absolute regression
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          import hashlib
-          b=Path('base/v0.12.0-materialized/project/app/src/main/java/it/darkroom/timer');f=Path('work/project/app/src/main/java/it/darkroom/timer')
-          for name in ['SonoffArmService.java','SplitGradePlan.java','TimingMath.java','LogEntry.java','LogStore.java','ExposureRecipe.java','PrintSequence.java']:
-              assert hashlib.sha256((b/name).read_bytes()).digest()==hashlib.sha256((f/name).read_bytes()).digest(),name
-          main=(f/'MainActivity.java').read_text();service=(f/'SonoffArmService.java').read_text();split=(f/'SplitGradePlan.java').read_text()
-          for n in ['testFromPrint','NUOVO PROVINO DA QUESTA STAMPA','returnPrintToTest','testMigrationSummary']:assert n not in main,n
-          for n in ['maybeShowTestResultChooser','setMode(MODE_PRINT);','showPrintCorrectionEditor','DODGE','BURN','TimingMath.cumulativeSeries(timingMethod, testWidthMs, testCount)']:assert n in main,n
-          for n in ['ACTION_ARM_PRINT','ACTION_ARM_TEST','EXTRA_TEST_TARGETS','ACTION_CANCEL']:assert n in service,n
-          assert 'public int softYellow = 60;' in split and 'public int hardMagenta = 180;' in split
-          assert '"Azzera il magenta e imposta giallo " + softYellow' in split and '"Azzera il giallo e imposta magenta " + hardMagenta' in split
-          print('Timer/STAMPA/PROVINO/Split Grade/sec-fstop/corrections/SONOFF/pulsante/log: PASS')
-          PY
-          rm -rf /tmp/splitclasses /tmp/splitsrc && mkdir -p /tmp/splitclasses /tmp/splitsrc/it/darkroom/timer
-          cp work/project/app/src/main/java/it/darkroom/timer/TimingMath.java work/project/app/src/main/java/it/darkroom/timer/SplitGradePlan.java /tmp/splitsrc/it/darkroom/timer/
-          cat >/tmp/splitsrc/TestSplit.java <<'JAVA'
-          import it.darkroom.timer.SplitGradePlan; public class TestSplit { public static void main(String[] a){SplitGradePlan p=new SplitGradePlan();if(p.softYellow!=60||p.hardMagenta!=180)throw new RuntimeException();if(!p.softPrompt().equals("Azzera il magenta e imposta giallo 60. Poi premi il pulsante."))throw new RuntimeException();if(!p.hardPrompt().equals("Azzera il giallo e imposta magenta 180. Poi premi il pulsante."))throw new RuntimeException();p.softYellow=50;p.hardMagenta=160;if(!p.softPrompt().contains("giallo 50.")||!p.hardPrompt().contains("magenta 160."))throw new RuntimeException();System.out.println("Split Grade defaults + dynamic TTS: PASS");}}
-          JAVA
-          javac -d /tmp/splitclasses /tmp/splitsrc/it/darkroom/timer/TimingMath.java /tmp/splitsrc/it/darkroom/timer/SplitGradePlan.java /tmp/splitsrc/TestSplit.java
-          java -cp /tmp/splitclasses TestSplit
+          python3 experiments/v0121/test_upgrade_v0120_to_v0121.py work | tee sqlite-upgrade.txt
+          python3 experiments/v0120/test_backup_restore.py | tee backup-restore.txt
 
       - name: Read and verify final version
         id: version
@@ -234,20 +125,25 @@ jobs:
           cat > validation-report.txt <<'EOF'
           Assistant=9/9
           UX_modernization=PASS
+          Recipes_inline_UX=PASS
+          Development_Log_inline_UX=PASS
           Smart_Search=PASS
           Smart_Search_aliases=PASS
           Smart_Search_ranking=PASS
+          Smart_Search_debounce_ms=350
           Local_Catalog=32_records
           Remote_Catalog=37_records
           Films=7
           Film_Developers=12
           JOBO_Tanks=6
+          JOBO_models=1510,1520,1540,2520,2540,2550
           Catalog_checksum=PASS
           Catalog_atomic_update_rollback=PASS
           Catalog_selected_record_cache=PASS
           Offline_first=PASS
           SQLite_v0120_to_v0121=PASS
           databaseSchema=3
+          Backup_restore=PASS
           R2_R9_regression=PASS
           Timer_regression=PASS
           STAMPA_TO_PROVINO_REMOVAL=PASS
@@ -258,12 +154,6 @@ jobs:
           catalogBuiltinVersion=2
           catalogRemoteVersion=3
           EOF
-
-      - name: Configure Java 17
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '17'
 
       - name: Prepare Android SDK on GitHub runner only
         shell: bash
@@ -328,7 +218,10 @@ jobs:
             zipalign.txt
             apk-badging.txt
             genealogy.txt
+            release-guards.txt
             smart-search-tests.txt
+            sqlite-upgrade.txt
+            backup-restore.txt
             validation-report.txt
 
       - name: Record successful run metadata
@@ -351,14 +244,18 @@ jobs:
           catalogBuiltinVersion=2
           catalogRemoteVersion=3
           localRecords=32
+          remoteRecords=37
           films=7
           filmDevelopers=12
           tanks=6
+          recipes_inline_ux=PASS
+          development_log_inline_ux=PASS
           smart_search=PASS
           ux=PASS
           catalog=PASS
           offline=PASS
           sqlite_upgrade=PASS
+          backup_restore=PASS
           r2_r9_regression=PASS
           timer_regression=PASS
           build=SUCCESS
