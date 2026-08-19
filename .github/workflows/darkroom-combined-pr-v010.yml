@@ -52,7 +52,10 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: bash combined/ci_build.sh
+        run: |
+          set -euo pipefail
+          sed -i 's/adst_assistant_java/dst_assistant_java/g' combined/prepare_combined.py
+          bash combined/ci_build.sh
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
