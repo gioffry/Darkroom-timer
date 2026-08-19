@@ -1,0 +1,234 @@
+123-Pyro
+510-Pyro
+777
+A&B Lith
+ABC Pyro
+ACU-1
+Acufine
+Acurol-N
+Adotech III
+Adotech IV
+Adox HR-DEV
+Adox M-Q Borax
+ADX II
+Agfa 12
+Agfa 14
+Agfa Ansco 17
+Agfa Ansco 47
+Agfa Ansco 48M
+Agfa Ansco 72
+Amaloco AM74
+Arista Liquid
+Arista Premium
+Arista® 76 Powder
+Arista® Liquid
+Arista® Premium
+Arista® Premium Liquid
+Arista® Premium Powder
+Ars-Imago FD
+Ars-Imago FE
+Ars-Imago Monobath
+Atomal 49
+AVR-3
+Bellini B&W Ecofilm
+Bellini DF2 Duo Step
+Bellini Euro HC
+Bellini FX6a Monobath
+Bellini Hydrofen
+Bergger Superfine
+Berspeed
+Beutler
+Beutler-Pyro
+Black/White & Green
+Bluefire HR
+Burton 195
+BW-TNEG
+C-41
+Caffenol
+Caffenol C
+Caffenol C-H
+Caffenol C-H (rs)
+Caffenol C-L
+Caffenol C-L (cs)
+Caffenol C-M
+Caffenol C-M (+i)
+Caffenol C-M (rs)
+Caffenol Concoction
+Caffenol Delta Micro
+Caffenol Delta STD
+Caffenol Green Tea
+Caffenol LC+C
+Cawanol
+Cinestill Df96 Monobath
+D-11
+D-19
+D-23
+D-25
+D-72
+D-76
+D-76D
+D-8
+D-9
+D-96
+D-97
+D175
+D2D
+Dektol
+Diafine
+DiXactol Ultra
+DK-50
+DK-60a
+DK-76
+DK-76b
+Dokumol
+DS-10
+Eco Pro
+Ecoprint Universal
+Emofin
+Eukobrom
+Exactol Lux
+EXG1
+Extend Plus
+F76+
+FA-1027
+FD10
+FF No 1 Monobath
+Finol
+Foma Retro Special
+Foma Universal
+Foma W-17 Hydrofen
+Fomadon Excel
+Fomadon LQN
+Fomadon LQR
+Fomadon P
+Fomadon R09
+FotoApteka A-RSC
+Fuji Microfine
+FX-1
+FX-15
+FX-18
+FX-19
+FX-2
+FX-37
+FX-39
+FX-4
+FX-5
+FX-55
+Germain's Finegrain
+GSD-10
+GVB-194
+HC-110
+Hubl Glycin Paste
+Hypercat
+ID-11
+ID-62
+ID-68
+Ilford Multigrade
+Ilfosol 3
+Ilfotec DD
+Ilfotec DD-X
+Ilfotec HC
+Ilfotec LC29
+Ilfotec RT Rapid
+JOBO Alpha
+Kalogen
+LegacyPro® L-110
+Liquidol
+Lucky HB-17
+Marathon
+Melonal
+Meritol-Metol
+Metolal
+Microdol-X
+Microphen
+Mikratol-2
+Mocon
+Moersch eco
+MZB
+Nanodol
+Neofin Blue
+Neopress HC
+Neutol
+Nucleol BF200
+Obsidian Aqua
+Ornano Gradual ST20
+Paranol S
+Parodinal
+Parvofin
+PC-Glycol
+PC-TEA
+PCK
+Perceptol
+PMK
+POTA
+PQ Universal
+Prescysol
+Prescysol EF
+Promicrol
+Pyrocat
+Pyrocat-HD
+Pyrocat-HD-M
+Pyrocat-HDC
+Pyrocat-M
+Pyrocat-MC
+Rodinal
+Rollei ATP DC
+Rollei D74
+Rollei RHS DC
+Rollei RLC Low Contrast
+Rollei RLS Low Speed
+Rollei RPX-D
+Rollei RSL Superlith
+Rollei Supergrain
+Rollo Pyro
+Romek PQ7
+Romek PQ9
+Silberra Aphenol
+Silberra Ascorol
+Silberra Micro-F
+Silberra Microl
+Silberra Pyro-HD
+Silberra RDN-LQ
+Silberra S-76
+Silvermax
+SP-76EC
+SP-Ultra 4LF
+SPD
+Sprint Standard
+Spur Dokuspeed SL
+Spur Dokuspeed SL-N
+Spur HRX
+Spur Modular UR
+Spur Nanospeed
+Spur Nanotech UR
+Spur NHC
+Spur Omega X
+Spur PXD
+Spur SD 2525
+Spur SHADOWmax
+Spur SLD
+Spur Speed-Major
+Spur TRX 2000
+Spur UFP
+Stoeckler
+Studional
+Suprol
+Tanol
+Tanol Speed
+TD-3
+TFX-2
+TMax Dev
+TMax RS
+Ultrafin
+Ultrafin T-Plus
+Ultrafine Endurance
+Ultrafine Liquid
+Ultrafine Powder
+Uncle Mort's
+UPB-1
+WD2D+
+Wehner Developer
+Wiedermann RSC
+Windisch
+XT-3
+Xtol
