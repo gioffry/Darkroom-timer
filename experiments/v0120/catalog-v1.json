@@ -1,0 +1,8 @@
+{
+  "catalogVersion": 1,
+  "schemaVersion": 1,
+  "payload": {
+    "note": "Catalogo tecnico integrato v1; l'app resta pienamente operativa offline."
+  },
+  "payloadSha256": "2af3005bd43c4745cea172ca42f985cf04082ebfc8a0dec78dcea525f60ff908"
+}
