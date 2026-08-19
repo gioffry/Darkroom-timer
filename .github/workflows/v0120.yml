@@ -1,0 +1,418 @@
+name: Build Darkroom Timer v0.12.0
+
+on:
+  push:
+    branches: [ feature-v0120-darkroom-assistant-r7-r8-r9 ]
+    paths-ignore:
+      - 'experiments/v0120/latest_run.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: darkroom-v0120-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact v0.12.0 release branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature-v0120-darkroom-assistant-r7-r8-r9
+          fetch-depth: 0
+
+      - name: Prove direct genealogy from exact v0.11.0 HEAD
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_BASE=2323260110c92801095847198bcf4e5aaf712889
+          git fetch origin feature-v0110-darkroom-assistant-r5-r6
+          BASE_HEAD=$(git rev-parse origin/feature-v0110-darkroom-assistant-r5-r6)
+          test "$BASE_HEAD" = "$EXPECTED_BASE"
+          git merge-base --is-ancestor "$BASE_HEAD" HEAD
+          MERGE_BASE=$(git merge-base "$BASE_HEAD" HEAD)
+          test "$MERGE_BASE" = "$BASE_HEAD"
+          FIRST_NEW=$(git rev-list --reverse "$BASE_HEAD"..HEAD | head -1)
+          test -n "$FIRST_NEW"
+          test "$(git rev-parse "$FIRST_NEW^")" = "$BASE_HEAD"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          {
+            echo "base_branch=feature-v0110-darkroom-assistant-r5-r6"
+            echo "base_head=$BASE_HEAD"
+            echo "merge_base=$MERGE_BASE"
+            echo "first_v0120_commit=$FIRST_NEW"
+            echo "functional_commit=$GITHUB_SHA"
+          } | tee genealogy.txt
+          echo "BASE_HEAD=$BASE_HEAD" >> "$GITHUB_ENV"
+          echo "MERGE_BASE=$MERGE_BASE" >> "$GITHUB_ENV"
+
+      - name: Start exclusively from protected materialized v0.11.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          SNAP=base/v0.11.0-materialized
+          test -d "$SNAP/project"
+          grep -q '^versionName=0.11.0$' "$SNAP/BASE_PROVENANCE.txt"
+          grep -q '^versionCode=56$' "$SNAP/BASE_PROVENANCE.txt"
+          grep -q '^base_head=2323260110c92801095847198bcf4e5aaf712889$' "$SNAP/BASE_PROVENANCE.txt"
+          grep -q '^assistant_schema=2$' "$SNAP/BASE_PROVENANCE.txt"
+          rm -rf work && mkdir -p work
+          cp -a "$SNAP/project" work/project
+          cp "$SNAP/build_darkroom.py" work/build_darkroom.py
+          cp "$SNAP/v064_icon.py" work/v064_icon.py
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('work/project');java=root/'app/src/main/java/it/darkroom/timer'
+          manifest=(root/'app/src/main/AndroidManifest.xml').read_text()
+          gradle=(root/'app/build.gradle').read_text()
+          main=(java/'MainActivity.java').read_text()
+          split=(java/'SplitGradePlan.java').read_text()
+          schema=(java/'assistant/data/AssistantDataSchema.java').read_text()
+          assert 'android:versionName="0.11.0"' in manifest and 'android:versionCode="56"' in manifest
+          assert "versionName '0.11.0'" in gradle and 'versionCode 56' in gradle
+          assert 'private static final String APP_VERSION = "0.11.0";' in main
+          assert 'public static final int VERSION = 2;' in schema
+          for n in ['NUOVO PROVINO DA QUESTA STAMPA','testFromPrint','showPrintCorrectionEditor','maybeShowTestResultChooser','DODGE','BURN']: assert n in main,n
+          for n in ['public int softYellow = 60;','public int hardMagenta = 180;']: assert n in split,n
+          print('Protected v0.11.0 source snapshot accepted as sole functional base')
+          PY
+
+      - name: Apply v0.12.0 R7 R8 R9 and Timer changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            experiments/v0120/apply_v0120_darkroom_assistant_r7_r8_r9.py \
+            experiments/v0120/apply_v0120_integrity_fixups.py \
+            experiments/v0120/test_migration_v2_to_v3.py \
+            experiments/v0120/test_backup_restore.py
+          python3 experiments/v0120/apply_v0120_darkroom_assistant_r7_r8_r9.py work
+          python3 experiments/v0120/apply_v0120_integrity_fixups.py work
+
+      - name: Test Timer removal Split Grade TTS and regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          java=Path('work/project/app/src/main/java/it/darkroom/timer')
+          main=(java/'MainActivity.java').read_text()
+          split=(java/'SplitGradePlan.java').read_text()
+          service=(java/'SonoffArmService.java').read_text()
+          for n in ['testFromPrint','NUOVO PROVINO DA QUESTA STAMPA','returnPrintToTest','testMigrationSummary','PROVINO DA SPLIT GRADE','TEMPI DAL PUNTO DI STAMPA']:
+              assert n not in main,n
+          for n in ['maybeShowTestResultChooser','setMode(MODE_PRINT);','showPrintCorrectionEditor','DODGE','BURN','TimingMath.cumulativeSeries(timingMethod, testWidthMs, testCount)']:
+              assert n in main,n
+          for n in ['ACTION_ARM_PRINT','ACTION_ARM_TEST','EXTRA_TEST_TARGETS','ACTION_CANCEL']:
+              assert n in service,n
+          for n in ['public int softYellow = 60;','public int hardMagenta = 180;','softYellow + "Y / 0M','0Y / " + hardMagenta + "M']:
+              assert n in split,n
+          assert '"Azzera il magenta e imposta giallo " + softYellow' in split
+          assert '"Azzera il giallo e imposta magenta " + hardMagenta' in split
+          assert 'Azzera il magenta e imposta giallo 60' not in split
+          assert 'Azzera il giallo e imposta magenta 180' not in split
+          assert 'CHIMICA SESSIONE' in main
+          print('Timer: STAMPA->PROVINO removed; PROVINO->STAMPA/corrections/SONOFF preserved; Split defaults unchanged: OK')
+          PY
+          mkdir -p /tmp/splitclasses /tmp/splitsrc/it/darkroom/timer
+          cp work/project/app/src/main/java/it/darkroom/timer/SplitGradePlan.java /tmp/splitsrc/it/darkroom/timer/
+          cat >/tmp/splitsrc/TestSplit.java <<'JAVA'
+          import it.darkroom.timer.SplitGradePlan;
+          public class TestSplit { public static void main(String[] a) {
+            SplitGradePlan p=new SplitGradePlan();
+            if(p.softYellow!=60 || p.hardMagenta!=180) throw new RuntimeException("default Split changed");
+            if(!p.softPrompt().equals("Azzera il magenta e imposta giallo 60. Poi premi il pulsante.")) throw new RuntimeException(p.softPrompt());
+            if(!p.hardPrompt().equals("Azzera il giallo e imposta magenta 180. Poi premi il pulsante.")) throw new RuntimeException(p.hardPrompt());
+            p.softYellow=50;p.hardMagenta=160;
+            if(!p.softPrompt().contains("giallo 50.")) throw new RuntimeException("custom soft TTS");
+            if(!p.hardPrompt().contains("magenta 160.")) throw new RuntimeException("custom hard TTS");
+            System.out.println("Split Grade UI state 60/180 + dynamic TTS 50/160: OK");
+          }}
+          JAVA
+          javac -d /tmp/splitclasses /tmp/splitsrc/it/darkroom/timer/SplitGradePlan.java /tmp/splitsrc/TestSplit.java
+          java -cp /tmp/splitclasses TestSplit
+
+      - name: Test consolidated R2 R3 R4 R5 R6 behavior
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('work/project/app/src/main/java/it/darkroom/timer/assistant')
+          cat=(root/'development/DevelopmentCatalog.java').read_text()
+          chem=(root/'chemistry/ChemistryCalculator.java').read_text()
+          result=(root/'development/DevelopmentResultActivity.java').read_text()
+          db=(root/'data/AssistantDatabase.java').read_text()
+          schema=(root/'data/AssistantDataSchema.java').read_text()
+          mychem=(root/'chemistry/inventory/MyChemistryActivity.java').read_text()
+          equip=(root/'equipment/MyEquipmentActivity.java').read_text()
+          planner=(root/'equipment/TankPlanner.java').read_text()
+          newdev=(root/'development/NewDevelopmentActivity.java').read_text()
+          log=(root/'log/DevelopmentLogActivity.java').read_text()
+          recipes=(root/'recipes/MyRecipesActivity.java').read_text()
+          for n in ['DATO DIRETTO','DATO ADATTATO / CALCOLATO','JOBO CPE2','rotazione continua','tempAdjusted * 0.85']: assert n in cat,n
+          for n in ['CPE2_MAX_ML = 600.0','NUMERIC_DILUTION','CAPACITY_UNKNOWN','Rapporto di diluizione non ancora disponibile dalla fonte']: assert n in chem,n
+          for n in ['findPreferred','recipeFromLog','resetOriginal','sameTemperature','recipes_original_immutable']: assert n in db+schema,n
+          for n in ['RIPRISTINA ORIGINALE','PREFERITA']: assert n in recipes,n
+          for n in ['Quantità prodotto: non determinata','Quantità acqua: non determinata']: assert n in log,n
+          for n in ['AGGIUNGI ALLA MIA CHIMICA','PRODOTTO PERSONALE / DATI INSERITI DALL\'UTENTE','DILUIZIONE PERSONALE','CAPACITÀ NON DOCUMENTATA','STORICO UTILIZZI CHIMICA']: assert n in mychem,n
+          for n in ['REGISTRA UTILIZZO CHIMICA','solo confermando','nulla verrà sottratto automaticamente']: assert n in result,n
+          for n in ['JOBO 2520','minRotationMl=270','capacity35=2','capacity120=2','DATI INSERITI DALL\'UTENTE']: assert n in equip,n
+          for n in ['chooseBest','cycles','CPE2_MAX_ML','minor volume valido','chimica insufficiente']: assert n in planner,n
+          for n in ['SCEGLI TANK','TANK MIGLIORE','chooseTankBest','tankPlanSummary']: assert n in newdev,n
+          assert 'DROP TABLE' not in schema and 'DROP TABLE' not in db
+          print('R2/R3/R4/R5/R6 consolidated source behavior: OK')
+          PY
+          mkdir -p /tmp/r3classes /tmp/r3src/it/darkroom/timer/assistant/chemistry
+          cp work/project/app/src/main/java/it/darkroom/timer/assistant/chemistry/ChemistryCalculator.java /tmp/r3src/it/darkroom/timer/assistant/chemistry/
+          cat >/tmp/r3src/TestChem.java <<'JAVA'
+          import it.darkroom.timer.assistant.chemistry.ChemistryCalculator;
+          public class TestChem { public static void main(String[] a) {
+            ChemistryCalculator.Result r=ChemistryCalculator.calculate("FOMA Universal","1+3",340,"120",1);
+            if(!r.dilutionKnown || Math.abs(r.productMl-85)>0.001 || Math.abs(r.waterMl-255)>0.001) throw new RuntimeException("FOMA 340/85/255 failed");
+            ChemistryCalculator.Result u=ChemistryCalculator.calculate("X","B",340,"120",1);
+            if(u.dilutionKnown) throw new RuntimeException("unknown dilution invented");
+            if(ChemistryCalculator.CPE2_MAX_ML!=600.0) throw new RuntimeException("CPE2 limit changed");
+            System.out.println("R3: FOMA 1+3 340=85+255; UNKNOWN preserved; CPE2=600: OK");
+          }}
+          JAVA
+          javac -d /tmp/r3classes /tmp/r3src/it/darkroom/timer/assistant/chemistry/ChemistryCalculator.java /tmp/r3src/TestChem.java
+          java -cp /tmp/r3classes TestChem
+          python3 experiments/v0110/test_migration_v1_to_v2.py
+
+      - name: Test Release 7 operational assistant
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('work/project/app/src/main/java/it/darkroom/timer/assistant')
+          op=(root/'operational/OperationalAssistantActivity.java').read_text()
+          planner=(root/'equipment/TankPlanner.java').read_text()
+          result=(root/'development/DevelopmentResultActivity.java').read_text()
+          for n in ['CONTROLLO PRE-SVILUPPO','OK','ATTENZIONE','NON DETERMINABILE','BLOCCANTE','VERIFICA MANUALE NECESSARIA','AVVIA SVILUPPO','TEMPO NON DOCUMENTATO','PREPARAZIONE','SVILUPPO','ARRESTO','FISSAGGIO','LAVAGGIO','IMBIBENTE','CONCLUSIONE','CICLO ','PAUSA','RIPRENDI','RESET SESSIONE','FASE SUCCESSIVA','GUIDA VOCALE','SALVA SVILUPPO NEL LOG','REGISTRA UTILIZZO CHIMICA','session_key','deadline']:
+              assert n in op,n
+          assert 'SonoffArmService' not in op and 'ACTION_ARM_PRINT' not in op and 'ACTION_ARM_TEST' not in op
+          assert 'OperationalAssistantActivity.class' in result and 'plannedSeconds' in result
+          for n in ['chimica insufficiente','volume richiesto','capacità tank insufficiente','cycles']:
+              assert n in planner,n
+          print('R7 preflight/blocking/warnings/multi-cycle/dedicated timer/TTS/explicit log+usage/recreation state: OK')
+          PY
+
+      - name: Test Release 8 paper chemistry and print integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          java=Path('work/project/app/src/main/java/it/darkroom/timer')
+          paper=(java/'assistant/paper/PaperChemistryActivity.java').read_text()
+          store=(java/'assistant/paper/PaperChemistryStore.java').read_text()
+          pdata=(java/'assistant/paper/PaperProductData.java').read_text()
+          main=(java/'MainActivity.java').read_text();entry=(java/'LogEntry.java').read_text();logs=(java/'LogStore.java').read_text();split=(java/'SplitGradePlan.java').read_text()
+          for n in ['SESSIONE DI STAMPA','RIVELATORE CARTA','ARRESTO','FISSAGGIO','CALCOLA PREPARAZIONE','DATI DOCUMENTATI','DATI PERSONALI','CAPACITÀ NON DOCUMENTATA','Nessun tempo di esposizione STAMPA']:
+              assert n in paper,n
+          for n in ['PAPER_DEFAULT="Fomaspeed Variant 311"','String[] p=d.split','productMl','waterMl','DILUIZIONE NON DOCUMENTATA','activeSnapshot']:
+              assert n in store,n
+          for n in ['temperatureC=null','timeSeconds=null','capacityValue=null','solutionLife','useMode','sourceType']:
+              assert n in pdata,n
+          assert 'CHIMICA SESSIONE' in main and 'PaperChemistryActivity.class' in main
+          assert 'paperChemistrySnapshot' in entry and 'paperChemistrySnapshot' in logs and 'PaperChemistryStore.activeSnapshot(this)' in main
+          assert 'public int softYellow = 60;' in split and 'public int hardMagenta = 180;' in split
+          print('R8 products/personal+catalog origins/generic dilution/session/optional STAMPA/snapshot/capacity unknown/Split unchanged: OK')
+          PY
+
+      - name: Test Release 9 sources offline catalog backup restore and migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 experiments/v0120/test_migration_v2_to_v3.py
+          python3 experiments/v0120/test_backup_restore.py
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          root=Path('work/project/app/src/main/java/it/darkroom/timer/assistant')
+          prov=(root/'system/DataProvenance.java').read_text();dm=(root/'system/DataManagementActivity.java').read_text();cat=(root/'system/CatalogManager.java').read_text();backup=(root/'system/BackupEngine.java').read_text();schema=(root/'data/AssistantDataSchema.java').read_text();db=(root/'data/AssistantDatabase.java').read_text()
+          for n in ['FONTE UFFICIALE','FONTE SECONDARIA','DATO INTERNO VERIFICATO','CALCOLO','ADATTAMENTO','DATO PERSONALE','NON DOCUMENTATO']:
+              assert n in prov,n
+          for n in ['CONTROLLA AGGIORNAMENTI DATI','MODALITÀ OFFLINE','BACKUP DATI','RIPRISTINA BACKUP','UNISCI','SOSTITUISCI DATI PERSONALI']:
+              assert n in dm,n
+          for n in ['BUILTIN_VERSION=1','payloadSha256','checksum catalogo','rollbackToBuiltin','catalog.previous.json']:
+              assert n in cat,n
+          for n in ['FORMAT_VERSION=1','APP_VERSION="0.12.0"','VERSION_CODE=57','payloadSha256','beginTransaction','CONFLICT_IGNORE']:
+              assert n in backup,n
+          assert 'technical_source_cache' not in backup and 'catalog_meta' not in backup
+          assert 'ANDROID_KEYSTORE' not in backup and 'KEY_PASSWORD' not in backup and 'GITHUB' not in backup
+          assert 'public static final int VERSION = 3;' in schema and 'if(oldVersion<3)' in db
+          assert 'DROP TABLE' not in schema and 'DROP TABLE' not in db
+          # Internet is optional and isolated to the explicit catalog updater inside Assistant.
+          for p in root.rglob('*.java'):
+              if p.name=='CatalogManager.java': continue
+              assert 'java.net.HttpURLConnection' not in p.read_text(),str(p)
+          remote=json.loads(Path('experiments/v0120/catalog-v1.json').read_text())
+          raw=json.dumps(remote['payload'],separators=(',',':'),ensure_ascii=False)
+          assert hashlib.sha256(raw.encode()).hexdigest()==remote['payloadSha256']
+          print('R9 provenance/calculation distinction/offline/catalog validation+rollback/backup+restore/schema v3: OK')
+          PY
+
+      - name: Read and verify final version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION_NAME=$(python3 - <<'PY'
+          import re
+          from pathlib import Path
+          t=Path('work/project/app/src/main/AndroidManifest.xml').read_text()
+          print(re.search(r'android:versionName="([^"]+)"',t).group(1))
+          PY
+          )
+          test "$VERSION_NAME" = "0.12.0"
+          grep -q 'android:versionCode="57"' work/project/app/src/main/AndroidManifest.xml
+          grep -q 'package="it.darkroom.timer"' work/project/app/src/main/AndroidManifest.xml
+          grep -q 'public static final int VERSION = 3;' work/project/app/src/main/java/it/darkroom/timer/assistant/data/AssistantDataSchema.java
+          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          cat > validation-report.txt <<'EOF'
+          Timer regression=PASS
+          STAMPA_TO_PROVINO_REMOVAL=PASS
+          SplitGrade_TTS_dynamic=PASS
+          R2=PASS
+          R3=PASS
+          R4=PASS
+          R5=PASS
+          R6=PASS
+          R7=PASS
+          R8=PASS
+          R9=PASS
+          SQLite_v1_to_v2=PASS
+          SQLite_v2_to_v3=PASS
+          Offline_architecture=PASS
+          Backup_restore=PASS
+          package=it.darkroom.timer
+          versionName=0.12.0
+          versionCode=57
+          databaseSchema=3
+          catalogVersion=1
+          EOF
+
+      - name: Configure Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepare Android SDK on GitHub runner only
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Prepare same stable signing configuration
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
+
+      - name: Build sign zipalign verify package version and SHA-256
+        shell: bash
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+        run: |
+          set -euo pipefail
+          APK="DarkroomTimer-DIY-v${VERSION_NAME}.apk"
+          python3 work/build_darkroom.py work/project \
+            --output "$APK" \
+            --keystore "$RUNNER_TEMP/darkroom-signing.p12" \
+            --alias "$KEY_ALIAS" --storepass "$KEYSTORE_PASSWORD" --keypass "$KEY_PASSWORD"
+          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -c -v 4 "$APK" | tee zipalign.txt
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" | tee certificate.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging "$APK" | tee apk-badging.txt
+          grep -q "package: name='it.darkroom.timer' versionCode='57' versionName='0.12.0'" apk-badging.txt
+          sha256sum "$APK" | tee apk.sha256
+          APK_SHA=$(cut -d' ' -f1 apk.sha256)
+          CERT_FP=$(grep -m1 'certificate SHA-256 digest:' certificate.txt | sed 's/.*: *//')
+          test -n "$APK_SHA" && test -n "$CERT_FP"
+          echo "APK_SHA=$APK_SHA" >> "$GITHUB_ENV"
+          echo "CERT_FP=$CERT_FP" >> "$GITHUB_ENV"
+          {
+            echo "Build=SUCCESS"
+            echo "zipalign=SUCCESS"
+            echo "signature=SUCCESS"
+            echo "certificate_SHA256=$CERT_FP"
+            echo "apk_SHA256=$APK_SHA"
+            echo "artifact=DarkroomTimer-DIY-v0.12.0"
+          } >> validation-report.txt
+
+      - name: Upload final APK and verification report
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: DarkroomTimer-DIY-v0.12.0
+          path: |
+            DarkroomTimer-DIY-v0.12.0.apk
+            apk.sha256
+            certificate.txt
+            zipalign.txt
+            apk-badging.txt
+            genealogy.txt
+            validation-report.txt
+
+      - name: Record successful run metadata
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/v0120
+          cat > experiments/v0120/latest_run.txt <<EOF
+          run_id=$GITHUB_RUN_ID
+          base_branch=feature-v0110-darkroom-assistant-r5-r6
+          base_head=$BASE_HEAD
+          new_branch=feature-v0120-darkroom-assistant-r7-r8-r9
+          merge_base=$MERGE_BASE
+          functional_commit=$GITHUB_SHA
+          versionName=0.12.0
+          versionCode=57
+          databaseSchema=3
+          catalogVersion=1
+          timer_tests=PASS
+          stampa_to_provino_removal=PASS
+          split_grade_tts=PASS
+          R2=PASS
+          R3=PASS
+          R4=PASS
+          R5=PASS
+          R6=PASS
+          R7=PASS
+          R8=PASS
+          R9=PASS
+          sqlite_migration=PASS
+          offline=PASS
+          backup_restore=PASS
+          build=SUCCESS
+          zipalign=SUCCESS
+          signature=SUCCESS
+          certificate_SHA256=$CERT_FP
+          artifact=DarkroomTimer-DIY-v0.12.0
+          artifact_id=$ARTIFACT_ID
+          apk_SHA256=$APK_SHA
+          EOF
+          git config user.name "Darkroom Timer Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add experiments/v0120/latest_run.txt
+          git commit -m "Record v0.12.0 successful build $GITHUB_RUN_ID [skip ci]"
+          git push origin HEAD:feature-v0120-darkroom-assistant-r7-r8-r9
