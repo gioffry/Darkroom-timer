@@ -1,7 +1,6 @@
-run_id=32220473639
-commit=3870707c4f5ec12c247bde261abc3d32c8017b73
-status=FAIL
-failed_stage=build
+run_id=32220498428
+commit=1df093eaa766257b31bb60d307dbcb96abd4afe8
+status=PASS
 --- builddiag-transform.txt ---
 v0.12.1 OK build VERSION_NAME
 v0.12.1 OK build VERSION_CODE
@@ -68,7 +67,7 @@ v0.12.3 OK disable manual creation globally
 v0.12.3 OK live Internet fallback
 v0.12.3 OK web-found confirmation and correction
 v0.12.3 TRANSFORM OK — ISO propagation + automatic live web discovery + correction-after-import
-v0.12.3 OK manual product creation removed completely
+v0.12.3 OK manual creation removed and Java newline literals escaped
 --- builddiag-sdk.txt ---
 Loading package information...                                                  Loading local repository...                                                     [                                       ] 3% Loading local repository...        [                                       ] 3% Fetch remote repository...         [=                                      ] 3% Fetch remote repository...         [=                                      ] 4% Fetch remote repository...         [=                                      ] 5% Fetch remote repository...         [==                                     ] 5% Fetch remote repository...         [==                                     ] 6% Fetch remote repository...         [==                                     ] 7% Fetch remote repository...         [==                                     ] 7% Computing updates...               [===                                    ] 8% Computing updates...               [===                                    ] 10% Computing updates...              [=======================================] 100% Computing updates...             
 
@@ -80,94 +79,50 @@ Loading package information...                                                  
 [Darkroom v0.12.3] Preflight v0.12.3 OK: manifest/versione/requisiti SONOFF invarianti verificati
 [Darkroom v0.7.5] Icona v0.7.2 preparata dal workflow prima della firma
 [Darkroom v0.12.3] 1/7 Compilo risorse con aapt2
-[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/aapt2 compile --dir /home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/res -o /tmp/darkroom-v058-7cqxowq5/build/compiled.zip
+[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/aapt2 compile --dir /home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/res -o /tmp/darkroom-v058-9kk6a6ut/build/compiled.zip
 [Darkroom v0.12.3] 2/7 Link risorse + genero R.java
-[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/aapt2 link -I /usr/local/lib/android/sdk/platforms/android-34/android.jar --manifest /home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/AndroidManifest.xml -o /tmp/darkroom-v058-7cqxowq5/build/base.apk /tmp/darkroom-v058-7cqxowq5/build/compiled.zip --java /tmp/darkroom-v058-7cqxowq5/build/gen --auto-add-overlay --min-sdk-version 26 --target-sdk-version 34 --version-code 60 --version-name 0.12.3
+[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/aapt2 link -I /usr/local/lib/android/sdk/platforms/android-34/android.jar --manifest /home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/AndroidManifest.xml -o /tmp/darkroom-v058-9kk6a6ut/build/base.apk /tmp/darkroom-v058-9kk6a6ut/build/compiled.zip --java /tmp/darkroom-v058-9kk6a6ut/build/gen --auto-add-overlay --min-sdk-version 26 --target-sdk-version 34 --version-code 60 --version-name 0.12.3
 [Darkroom v0.12.3] 3/7 Compilo Java
-[Darkroom v0.12.3] > /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64/bin/javac -encoding UTF-8 -source 8 -target 8 -cp /usr/local/lib/android/sdk/platforms/android-34/android.jar -d /tmp/darkroom-v058-7cqxowq5/build/classes @/tmp/darkroom-v058-7cqxowq5/build/sources.txt
+[Darkroom v0.12.3] > /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64/bin/javac -encoding UTF-8 -source 8 -target 8 -cp /usr/local/lib/android/sdk/platforms/android-34/android.jar -d /tmp/darkroom-v058-9kk6a6ut/build/classes @/tmp/darkroom-v058-9kk6a6ut/build/sources.txt
 warning: [options] bootstrap class path not set in conjunction with -source 8
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:107: error: unclosed string literal
-    private void confirmWebItem(SmartSearchEngine.Item item){String d=WebProductResolver.dilutionCsv(item),url=WebProductResolver.sourceUrl(item);StringBuilder msg=new StringBuilder();msg.append(item.name);if(!item.manufacturer.isEmpty())msg.append("
-                                                                                                                                                                                                                                                         ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:108: error: not a statement
-Produttore: ").append(item.manufacturer);msg.append("
-            ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:108: error: ';' expected
-Produttore: ").append(item.manufacturer);msg.append("
-                                                     ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:109: error: ';' expected
-Diluizioni trovate: ").append(d.isEmpty()?"non estratte — nessun dato inventato":d);if(!url.isEmpty())msg.append("
-                  ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:109: error: illegal character: '\u2014'
-Diluizioni trovate: ").append(d.isEmpty()?"non estratte — nessun dato inventato":d);if(!url.isEmpty())msg.append("
-                                                        ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:109: error: ';' expected
-Diluizioni trovate: ").append(d.isEmpty()?"non estratte — nessun dato inventato":d);if(!url.isEmpty())msg.append("
-                                                                     ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:109: error: not a statement
-Diluizioni trovate: ").append(d.isEmpty()?"non estratte — nessun dato inventato":d);if(!url.isEmpty())msg.append("
-                                                                      ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:109: error: ';' expected
-Diluizioni trovate: ").append(d.isEmpty()?"non estratte — nessun dato inventato":d);if(!url.isEmpty())msg.append("
-                                                                               ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:111: error: not a statement
-Fonte: ").append(url);msg.append("
-       ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:111: error: ';' expected
-Fonte: ").append(url);msg.append("
-                                  ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: ';' expected
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-          ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: ';' expected
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                 ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: ';' expected
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: unclosed character literal
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                               ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: not a statement
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                            ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: ';' expected
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                                           ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: ';' expected
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                                                    ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: ';' expected
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                                                                        ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: ';' expected
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                                                                                                                                                ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: not a statement
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                                                                                                                                                 ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: ';' expected
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                                                                                                                                                       ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: ';' expected
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                                                                                                                                                                                                                ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: not a statement
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                                                                                                                                                                                                                                                                   ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: ';' expected
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                                                                                                                                                                                                                                                                           ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: unclosed string literal
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                                                                                                                                                                                                                                                                                                                                 ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:113: error: not a statement
-Puoi usare i dati trovati oppure correggerli. L'originale e la fonte verranno conservati.");new android.app.AlertDialog.Builder(this).setTitle("PRODOTTO TROVATO ONLINE").setMessage(msg.toString()).setPositiveButton("USA DATI",(x,w)->returnItemDirect(item)).setNeutralButton("CORREGGI",(x,w)->editWebItem(item)).setNegativeButton("ANNULLA",null).show();}
-                                                                                                                                                                                                                                                                                                                                          ^
-/home/runner/work/Darkroom-timer/Darkroom-timer/work/project/app/src/main/java/it/darkroom/timer/assistant/search/SmartSearchActivity.java:114: error: illegal start of expression
-    private void editWebItem(SmartSearchEngine.Item item){final EditText name=AssistantUi.field(this,"Nome prodotto");name.setText(item.name);final EditText maker=AssistantUi.field(this,"Produttore");maker.setText(item.manufacturer);final EditText dil=AssistantUi.field(this,"Diluizioni separate da virgola");dil.setText(WebProductResolver.dilutionCsv(item));LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);int p=AssistantUi.dp(this,16);box.setPadding(p,p,p,0);box.addView(name,AssistantUi.margin(this,-1,AssistantUi.dp(this,52),0,0,0,8));box.addView(maker,AssistantUi.margin(this,-1,AssistantUi.dp(this,52),0,0,0,8));box.addView(dil,AssistantUi.margin(this,-1,AssistantUi.dp(this,52),0,0,0,0));new android.app.AlertDialog.Builder(this).setTitle("CORREGGI DATI TROVATI").setMessage("Non stai creando un prodotto da zero: stai correggendo la scheda trovata online. La versione originale resta memorizzata insieme alla fonte.").setView(box).setPositiveButton("SALVA CORREZIONI",(x,w)->{try{JSONObject r=WebProductResolver.correctedCopy(item,name.getText().toString(),maker.getText().toString(),dil.getText().toString());returnItemDirect(WebProductResolver.itemFromRecord(r));}catch(Exception e){status.setText("Correzione non salvata: "+e.getMessage());}}).setNegativeButton("ANNULLA",null).show();}
-    ^
-27 errors
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
 1 warning
+[Darkroom v0.12.3] > /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64/bin/jar cf /tmp/darkroom-v058-9kk6a6ut/build/classes.jar -C /tmp/darkroom-v058-9kk6a6ut/build/classes .
+[Darkroom v0.12.3] 4/7 Converto bytecode Java in DEX
+[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/d8 --lib /usr/local/lib/android/sdk/platforms/android-34/android.jar --min-api 26 --output /tmp/darkroom-v058-9kk6a6ut/build/dex /tmp/darkroom-v058-9kk6a6ut/build/classes.jar
+[Darkroom v0.12.3] 5/7 Inserisco classes.dex nell'APK
+[Darkroom v0.12.3] 6/7 Zipalign
+[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/zipalign -f 4 /tmp/darkroom-v058-9kk6a6ut/build/app-work.apk /tmp/darkroom-v058-9kk6a6ut/build/app-aligned.apk
+[Darkroom v0.12.3] 7/7 Firma APK
+[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/apksigner sign --ks /home/runner/work/_temp/darkroom-signing.p12 --ks-key-alias darkroomtimer --ks-pass pass:2TmevY0wTyrUtLhABIQG0OXUI75hwrWa --key-pass pass:2TmevY0wTyrUtLhABIQG0OXUI75hwrWa --v1-signing-enabled true --v2-signing-enabled true --out /home/runner/work/Darkroom-timer/Darkroom-timer/DarkroomTimer-DIY-v0.12.3.apk /tmp/darkroom-v058-9kk6a6ut/build/app-aligned.apk
+[Darkroom v0.12.3] Verifica zipalign
+[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/zipalign -c -v 4 /home/runner/work/Darkroom-timer/Darkroom-timer/DarkroomTimer-DIY-v0.12.3.apk
+[Darkroom v0.12.3] Verifica firma
+[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/apksigner verify --verbose --print-certs /home/runner/work/Darkroom-timer/Darkroom-timer/DarkroomTimer-DIY-v0.12.3.apk
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Darkroom Timer, OU=App Signing, O=Darkroom Timer, C=IT
+Signer #1 certificate SHA-256 digest: fbead305657584b50a9d8892aa19bd9844b412d77db316e7daa5593c94e2a02f
+Signer #1 certificate SHA-1 digest: e8571de937e649ab714669c03c44b1bfa67e1cba
+Signer #1 certificate MD5 digest: 47cfa41624cacafef63a5c339ddd668a
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 4096
+Signer #1 public key SHA-256 digest: 192768f7fe3a92c4697fe98f1e65d7173bff4c4a497b038207dd79d6f2af48a4
+Signer #1 public key SHA-1 digest: 5c1f2c34c4c63bb994ae413416d4a38e9609afde
+Signer #1 public key MD5 digest: cca83fde59ccf34c37086ce7408006f4
+[Darkroom v0.12.3] Verifica package/versione
+[Darkroom v0.12.3] > /usr/local/lib/android/sdk/build-tools/34.0.0/aapt2 dump badging /home/runner/work/Darkroom-timer/Darkroom-timer/DarkroomTimer-DIY-v0.12.3.apk
+package: name='it.darkroom.timer' versionCode='60' versionName='0.12.3' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'
+[Darkroom v0.12.3] APK COMPLETATO: /home/runner/work/Darkroom-timer/Darkroom-timer/DarkroomTimer-DIY-v0.12.3.apk
+[Darkroom v0.12.3] Dimensione: 397,867 byte
+[Darkroom v0.12.3] SHA-256: fd50642f931fb78551c214bce0f8e44f923117b3dc3c0cc41226989829eeef85
 
-ERRORE: Comando fallito (1): /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-8/x64/bin/javac -encoding UTF-8 -source 8 -target 8 -cp /usr/local/lib/android/sdk/platforms/android-34/android.jar -d /tmp/darkroom-v058-7cqxowq5/build/classes @/tmp/darkroom-v058-7cqxowq5/build/sources.txt
+OK. Installa questo file sul telefono:
+/home/runner/work/Darkroom-timer/Darkroom-timer/DarkroomTimer-DIY-v0.12.3.apk
