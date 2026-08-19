@@ -1,0 +1,96 @@
+name: Materialize exact v0.12.0 base for v0.12.1
+
+on:
+  push:
+    branches: [ feature-v0121-assistant-ux-smart-catalog ]
+    paths:
+      - '.github/workflows/v0121-materialize-base.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout v0.12.1 branch derived from v0.12.0
+        uses: actions/checkout@v4
+        with:
+          ref: feature-v0121-assistant-ux-smart-catalog
+          fetch-depth: 0
+
+      - name: Prove v0.12.0 release ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_V0120_HEAD=3f820cea9f53f9196e81bd05d552679b31177249
+          git fetch origin feature-v0120-darkroom-assistant-r7-r8-r9
+          ACTUAL=$(git rev-parse origin/feature-v0120-darkroom-assistant-r7-r8-r9)
+          test "$ACTUAL" = "$EXPECTED_V0120_HEAD"
+          git merge-base --is-ancestor "$EXPECTED_V0120_HEAD" HEAD
+          test "$(git merge-base "$EXPECTED_V0120_HEAD" HEAD)" = "$EXPECTED_V0120_HEAD"
+          FIRST_NEW=$(git rev-list --reverse "$EXPECTED_V0120_HEAD"..HEAD | sed -n '1p')
+          test -n "$FIRST_NEW"
+          test "$(git rev-parse "$FIRST_NEW^")" = "$EXPECTED_V0120_HEAD"
+          printf 'base_branch=feature-v0120-darkroom-assistant-r7-r8-r9\nbase_head=%s\nmerge_base=%s\n' "$ACTUAL" "$(git merge-base "$EXPECTED_V0120_HEAD" HEAD)"
+
+      - name: Materialize exact tested v0.12.0 release output
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf work base/v0.12.0-materialized
+          mkdir -p work
+          # The v0.12.0 branch is transform-based. Replay its own release definition once,
+          # then freeze the resulting source tree as the sole v0.12.1 functional base.
+          cp -a base/v0.11.0-materialized/project work/project
+          cp base/v0.11.0-materialized/build_darkroom.py work/build_darkroom.py
+          cp base/v0.11.0-materialized/v064_icon.py work/v064_icon.py
+          python3 experiments/v0120/apply_v0120_darkroom_assistant_r7_r8_r9.py work
+          python3 experiments/v0120/apply_v0120_integrity_fixups.py work
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('work/project')
+          java=root/'app/src/main/java/it/darkroom/timer'
+          manifest=(root/'app/src/main/AndroidManifest.xml').read_text(encoding='utf-8')
+          gradle=(root/'app/build.gradle').read_text(encoding='utf-8')
+          main=(java/'MainActivity.java').read_text(encoding='utf-8')
+          split=(java/'SplitGradePlan.java').read_text(encoding='utf-8')
+          schema=(java/'assistant/data/AssistantDataSchema.java').read_text(encoding='utf-8')
+          assistant=(java/'assistant/AssistantActivity.java').read_text(encoding='utf-8')
+          assert 'android:versionName="0.12.0"' in manifest and 'android:versionCode="57"' in manifest
+          assert "versionName '0.12.0'" in gradle and 'versionCode 57' in gradle
+          assert 'private static final String APP_VERSION = "0.12.0";' in main
+          assert 'public static final int VERSION = 3;' in schema
+          assert 'DARKROOM ASSISTANT 9/9 COMPLETATO' in assistant
+          assert 'testFromPrint' not in main and 'NUOVO PROVINO DA QUESTA STAMPA' not in main
+          assert 'Azzera il magenta e imposta giallo ' in split
+          assert 'Azzera il giallo e imposta magenta ' in split
+          for rel in ['assistant/operational/OperationalAssistantActivity.java','assistant/paper/PaperChemistryActivity.java','assistant/system/BackupEngine.java','assistant/system/CatalogManager.java']:
+              assert (java/rel).exists(), rel
+          print('Exact v0.12.0 functional output verified before freezing')
+          PY
+          mkdir -p base/v0.12.0-materialized
+          cp -a work/project base/v0.12.0-materialized/project
+          cp work/build_darkroom.py base/v0.12.0-materialized/build_darkroom.py
+          cp work/v064_icon.py base/v0.12.0-materialized/v064_icon.py
+          cat > base/v0.12.0-materialized/BASE_PROVENANCE.txt <<'EOF'
+          versionName=0.12.0
+          versionCode=57
+          assistant=9/9
+          assistant_schema=3
+          catalog_version=1
+          base_branch=feature-v0120-darkroom-assistant-r7-r8-r9
+          base_head=3f820cea9f53f9196e81bd05d552679b31177249
+          validated_functional_commit=9abbcf5a399289ac1df91a5d7e96e008f69e532c
+          validated_run_id=32203521996
+          EOF
+
+      - name: Commit protected materialized v0.12.0 snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "Darkroom Timer Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add base/v0.12.0-materialized
+          git commit -m "Freeze exact v0.12.0 source base for v0.12.1 [skip ci]"
+          git push origin HEAD:feature-v0121-assistant-ux-smart-catalog
