@@ -1,5 +1,5 @@
 name: Monitor v0.12.1 final workflow
-# retry after exact inherited builder-regex correction
+# monitor exact post-transform builder-preflight fix
 
 on:
   push:
