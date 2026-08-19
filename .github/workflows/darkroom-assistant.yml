@@ -3,7 +3,7 @@ name: Build Darkroom Assistant APK
 on:
   push:
     branches:
-      - feature-darkroom-assistant-v035-format-stop-fix
+      - feature-darkroom-assistant-v036-inline-results
   pull_request:
     branches:
       - main
@@ -83,11 +83,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Rende robusto il punto d'inserimento FORMATO rispetto alla lista risultati
-          # introdotta dalle patch precedenti.
           python3 - <<'PY'
           from pathlib import Path
-          import re
           p=Path('assistant/patch_v035_format_stop_fix.py')
           s=p.read_text()
           start=s.index('# Nel flusso pellicola aggiungi FORMATO')
@@ -108,7 +105,13 @@ jobs:
           PY
           python3 assistant/patch_v035_format_stop_fix.py
 
-      - name: Verifica contratto offline v0.3.5
+      - name: Applica risultati visibili v0.3.6
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 assistant/patch_v036_inline_results.py
+
+      - name: Verifica contratto offline v0.3.6
         shell: bash
         run: |
           set -euo pipefail
@@ -120,8 +123,11 @@ jobs:
           grep -q 'Bellini FX100' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
           grep -q 'formatSpinner' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
           grep -q 'localProductMatchesForRole' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
-          grep -q "versionName '0.3.5'" assistant/build.gradle
-          grep -q 'versionCode 19' assistant/build.gradle
+          grep -q 'LinearLayout resultsBox' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+          grep -q 'ScrollView resultsScroll' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+          grep -q 'Tocca prima uno dei prodotti nell.elenco' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+          grep -q "versionName '0.3.6'" assistant/build.gradle
+          grep -q 'versionCode 20' assistant/build.gradle
           grep -q 'return MdcOfflineStore.searchDevelopers(query, 80)' assistant/src/main/java/it/darkroom/assistant/OnlineCatalogSearch.java
           grep -q 'Nessuna combinazione esatta nel database offline Digitaltruth' assistant/src/main/java/it/darkroom/assistant/DevTimeEngine.java
           ! grep -q 'uses-permission android:name="android.permission.INTERNET"' assistant/src/main/AndroidManifest.xml
@@ -129,11 +135,18 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           s=Path('assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java').read_text()
+          a=s.index('    private void showAddProductDialog() {')
+          b=s.index('    private void enrichProductThenAdd(', a)
+          method=s[a:b]
+          assert 'showDropDown' not in method
+          assert 'simple_dropdown_item_1line' not in method
+          assert 'resultsBox.addView(item)' in method
+          assert 'resultsScroll' in method
           stops=['Adox Adostop ECO','Adox Adostop ECO P','Ilford Ilfostop','Rollei RCS Citro Stop','MACO Eco Citrostop','Compard Stop Bath 60%','Fomacitro','Bellini ECOSTOP','Bellini INDEXSTOP','Bellini STOP (Acetic Acid)']
           fixes=['Compard Fix Ag Plus','Ilford Rapid Fixer','Ilford Hypam','Fomafix','Adox Adofix Plus','Rollei RXA Fix Acid','Rollei RXN Fix Neutral','Bellini FX100','MACO Ecofix','Bellini FX5 Fixer & Hardener']
           for x in stops+fixes: assert x in s, x
           assert len(stops)==10 and len(fixes)==10
-          print('Curated chemistry verified: 10 stop + 10 fixer')
+          print('v0.3.6 UI verified: inline scrollable result rows, 10 stop + 10 fixer')
           PY
 
       - name: Prepara firma stabile
@@ -155,7 +168,7 @@ jobs:
         run: |
           set -euo pipefail
           gradle :assistant:assembleRelease --stacktrace
-          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.3.5.apk
+          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.3.6.apk
 
       - name: Verifica APK
         shell: bash
@@ -163,17 +176,17 @@ jobs:
           set -euo pipefail
           APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
           AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.3.5.apk
-          "$AAPT" dump badging DarkroomAssistant-v0.3.5.apk | head -20
-          unzip -l DarkroomAssistant-v0.3.5.apk | grep -q 'assets/mdc_full.sqlite'
-          if "$AAPT" dump permissions DarkroomAssistant-v0.3.5.apk | grep -q 'android.permission.INTERNET'; then
+          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.3.6.apk
+          "$AAPT" dump badging DarkroomAssistant-v0.3.6.apk | head -20
+          unzip -l DarkroomAssistant-v0.3.6.apk | grep -q 'assets/mdc_full.sqlite'
+          if "$AAPT" dump permissions DarkroomAssistant-v0.3.6.apk | grep -q 'android.permission.INTERNET'; then
             echo 'ERRORE: APK chiede ancora INTERNET' >&2
             exit 1
           fi
-          echo 'APK v0.3.5 verificato: DB Digitaltruth incluso, formati DB, catalogo stop/fix, nessun Internet'
+          echo 'APK v0.3.6 verificato: risultati inline, DB Digitaltruth, stop/fix, nessun Internet'
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.3.5
-          path: DarkroomAssistant-v0.3.5.apk
+          name: DarkroomAssistant-v0.3.6
+          path: DarkroomAssistant-v0.3.6.apk
