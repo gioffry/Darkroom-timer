@@ -1,5 +1,5 @@
 name: Monitor v0.12.1 final workflow
-# monitor structural builder-preflight line fix
+# monitor exact normalized builder preflight condition
 
 on:
   push:
