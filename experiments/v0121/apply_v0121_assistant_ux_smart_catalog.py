@@ -28,7 +28,10 @@ main_before=rd(main)
 # Version only in build/manifest/Timer footer. Package and Timer behavior stay intact.
 rep(build,'VERSION_NAME = "0.12.0"','VERSION_NAME = "0.12.1"','build VERSION_NAME')
 rep(build,'VERSION_CODE = "57"','VERSION_CODE = "58"','build VERSION_CODE')
-s=rd(build).replace('[Darkroom v0.12.0]','[Darkroom v0.12.1]').replace('versionCode 57','versionCode 58').replace('0.12.0','0.12.1');wr(build,s)
+s=rd(build).replace('[Darkroom v0.12.0]','[Darkroom v0.12.1]').replace('versionCode 57','versionCode 58').replace('0.12.0','0.12.1')
+# v0.12.0 builder also contains a raw-regex preflight with a literal 57; update it only in the v0.12.1 working copy.
+s=s.replace(r'versionCode\s+57\b',r'versionCode\s+58\b')
+wr(build,s)
 rep(gradle,"versionCode 57\n        versionName '0.12.0'","versionCode 58\n        versionName '0.12.1'",'Gradle version')
 rep(manifest,'android:versionCode="57"\n    android:versionName="0.12.0"','android:versionCode="58"\n    android:versionName="0.12.1"','manifest version')
 rep(main,'private static final String APP_VERSION = "0.12.0";','private static final String APP_VERSION = "0.12.1";','Timer footer version')
