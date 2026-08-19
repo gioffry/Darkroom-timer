@@ -1,7 +1,6 @@
-run_id=32220141562
-commit=619d4f166a43bce8b700ebed99c5b103fa43222a
-status=FAIL
-failed_stage=verify
+run_id=32220176802
+commit=2a3d58b27c906deac12883339250ecaf31b6d72a
+status=PASS
 --- diag-v0121.txt ---
 v0.12.1 OK build VERSION_NAME
 v0.12.1 OK build VERSION_CODE
@@ -80,9 +79,15 @@ PASS Timer footer version only
 PASS backup metadata
 PASS selected film propagates nominal/exposed ISO
 PASS unknown product invokes automatic live web lookup
-PASS manual creation disabled
+PASS manual creation disabled and removed
 PASS correction offered only after web discovery
 PASS original discovered record preserved before correction
 PASS real Internet search engines configured
 PASS resolver follows retrieved web sources
-FAIL documented dilution extraction
+PASS documented dilution extraction
+PASS web source provenance stored
+PASS web data explicitly marked
+PASS database schema unchanged
+PASS STAMPA -> PROVINO remains removed
+PASS package unchanged
+v0.12.3 RELEASE GUARDS PASS
