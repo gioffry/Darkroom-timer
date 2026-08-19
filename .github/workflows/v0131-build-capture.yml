@@ -1,0 +1,141 @@
+name: Capture Build Darkroom Timer v0.13.1
+
+on:
+  push:
+    branches: [ feature-v0131-fstop-subtractive-teststrip ]
+    paths-ignore:
+      - 'experiments/v0131/build_capture.txt'
+      - 'experiments/v0131/build_diagnostic.txt'
+      - 'experiments/v0131/diagnostic.txt'
+      - 'experiments/v0131/latest_run.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: darkroom-v0131-capture-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature-v0131-fstop-subtractive-teststrip
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Execute complete build without hiding failure stage
+        id: buildall
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set +e
+          FAIL=""
+          rm -rf work && mkdir -p work
+          cp -a base/v0.12.0-materialized/project work/project >capture.log 2>&1 || FAIL="copy_base"
+          [ -n "$FAIL" ] || cp base/v0.12.0-materialized/build_darkroom.py work/build_darkroom.py >>capture.log 2>&1 || FAIL="copy_builder"
+          [ -n "$FAIL" ] || cp base/v0.12.0-materialized/v064_icon.py work/v064_icon.py >>capture.log 2>&1 || FAIL="copy_icon"
+          [ -n "$FAIL" ] || python3 experiments/v0121/apply_v0121_assistant_ux_smart_catalog.py work >>capture.log 2>&1 || FAIL="apply_v0121"
+          [ -n "$FAIL" ] || python3 experiments/v0122/apply_v0122_real_device_repair.py work >>capture.log 2>&1 || FAIL="apply_v0122"
+          [ -n "$FAIL" ] || python3 experiments/v0123/apply_v0123_live_web_repair.py work >>capture.log 2>&1 || FAIL="apply_v0123"
+          [ -n "$FAIL" ] || python3 experiments/v0123/apply_v0123_no_manual_cleanup.py work >>capture.log 2>&1 || FAIL="cleanup_v0123"
+          [ -n "$FAIL" ] || python3 experiments/v0130/apply_v0130_timer_only_reset.py work >>capture.log 2>&1 || FAIL="apply_v0130"
+          [ -n "$FAIL" ] || python3 experiments/v0131/apply_v0131_fstop_subtractive_teststrip.py work >>capture.log 2>&1 || FAIL="apply_v0131"
+          if [ -z "$FAIL" ]; then
+            ROOT=work/project/app/src/main/java/it/darkroom/timer
+            rm -rf /tmp/timingtest && mkdir -p /tmp/timingtest
+            javac -encoding UTF-8 -d /tmp/timingtest "$ROOT/TimingMath.java" experiments/v0131/TimingMathRegressionTest.java >>capture.log 2>&1 && java -cp /tmp/timingtest it.darkroom.timer.TimingMathRegressionTest >>capture.log 2>&1 || FAIL="timing_test"
+          fi
+          if [ -z "$FAIL" ]; then
+            SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"; [ -x "$SDKMANAGER" ] || SDKMANAGER="$(command -v sdkmanager)"
+            "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0" >>capture.log 2>&1 || FAIL="sdk"
+          fi
+          if [ -z "$FAIL" ]; then
+            if [ -z "$KEYSTORE_B64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then FAIL="signing_secrets"; else
+              echo "::add-mask::$KEYSTORE_PASSWORD"; echo "::add-mask::$KEY_PASSWORD"
+              printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12" || FAIL="keystore"
+            fi
+          fi
+          if [ -z "$FAIL" ]; then
+            python3 work/build_darkroom.py work/project --output DarkroomTimer-DIY-v0.13.1.apk --keystore "$RUNNER_TEMP/darkroom-signing.p12" --alias "$KEY_ALIAS" --storepass "$KEYSTORE_PASSWORD" --keypass "$KEY_PASSWORD" >>capture.log 2>&1 || FAIL="build"
+          fi
+          if [ -z "$FAIL" ]; then
+            "$ANDROID_HOME/build-tools/34.0.0/zipalign" -c -v 4 DarkroomTimer-DIY-v0.13.1.apk >zipalign.txt 2>&1 || FAIL="zipalign"
+          fi
+          if [ -z "$FAIL" ]; then
+            "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs DarkroomTimer-DIY-v0.13.1.apk >certificate.txt 2>&1 || FAIL="signature"
+          fi
+          if [ -z "$FAIL" ]; then
+            "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging DarkroomTimer-DIY-v0.13.1.apk >apk-badging.txt 2>&1 || FAIL="badging"
+          fi
+          if [ -z "$FAIL" ]; then
+            grep -q "package: name='it.darkroom.timer' versionCode='62' versionName='0.13.1'" apk-badging.txt || FAIL="package_version"
+          fi
+          if [ -z "$FAIL" ]; then
+            CERT_FP=$(grep -m1 'certificate SHA-256 digest:' certificate.txt | sed 's/.*: *//')
+            [ "$CERT_FP" = "fbead305657584b50a9d8892aa19bd9844b412d77db316e7daa5593c94e2a02f" ] || FAIL="certificate_continuity"
+          fi
+          if [ -z "$FAIL" ]; then
+            sha256sum DarkroomTimer-DIY-v0.13.1.apk >apk.sha256
+            echo "apk_sha=$(cut -d' ' -f1 apk.sha256)" >> "$GITHUB_OUTPUT"
+            echo "cert_fp=$CERT_FP" >> "$GITHUB_OUTPUT"
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "stage=SUCCESS" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "stage=$FAIL" >> "$GITHUB_OUTPUT"
+          fi
+          tail -200 capture.log >capture-tail.txt
+          exit 0
+      - name: Upload APK when complete build passed
+        if: steps.buildall.outputs.ok == 'true'
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: DarkroomTimer-DIY-v0.13.1-capture
+          path: |
+            DarkroomTimer-DIY-v0.13.1.apk
+            apk.sha256
+            certificate.txt
+            apk-badging.txt
+            capture-tail.txt
+      - name: Always record captured outcome
+        if: always()
+        shell: bash
+        env:
+          OK: ${{ steps.buildall.outputs.ok }}
+          STAGE: ${{ steps.buildall.outputs.stage }}
+          APK_SHA: ${{ steps.buildall.outputs.apk_sha }}
+          CERT_FP: ${{ steps.buildall.outputs.cert_fp }}
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          set -e
+          mkdir -p experiments/v0131
+          {
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "commit=$GITHUB_SHA"
+            echo "status=${OK:-false}"
+            echo "stage=${STAGE:-unknown}"
+            echo "versionName=0.13.1"
+            echo "versionCode=62"
+            echo "artifact_id=${ARTIFACT_ID:-}"
+            echo "apk_SHA256=${APK_SHA:-}"
+            echo "certificate_SHA256=${CERT_FP:-}"
+            echo "--- capture tail ---"
+            cat capture-tail.txt 2>/dev/null || true
+          } > experiments/v0131/build_capture.txt
+          git config user.name "Darkroom Timer Build Capture"
+          git config user.email "actions@users.noreply.github.com"
+          git add experiments/v0131/build_capture.txt
+          git commit -m "Record v0.13.1 build capture $GITHUB_RUN_ID [skip ci]" || true
+          git pull --rebase origin feature-v0131-fstop-subtractive-teststrip || true
+          git push origin HEAD:feature-v0131-fstop-subtractive-teststrip || true
