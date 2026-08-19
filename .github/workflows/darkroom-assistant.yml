@@ -83,6 +83,29 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Rende robusto il punto d'inserimento FORMATO rispetto alla lista risultati
+          # introdotta dalle patch precedenti.
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('assistant/patch_v035_format_stop_fix.py')
+          s=p.read_text()
+          start=s.index('# Nel flusso pellicola aggiungi FORMATO')
+          end=s.index('# Listener formato:', start)
+          block=r'''# Nel flusso pellicola aggiungi FORMATO prima del campo ISO.
+          needle = '        isoField = edit("", InputType.TYPE_CLASS_NUMBER);'
+          repl = ''' + "'''" + '''        formatSpinner = spinner(new String[]{"Seleziona prima la pellicola"});
+          page.addView(fieldBlock("FORMATO", formatSpinner));
+
+          isoField = edit("", InputType.TYPE_CLASS_NUMBER);''' + "'''" + r'''
+          if needle not in s:
+              raise SystemExit('film ISO insertion marker missing')
+          s = s.replace(needle, repl, 1)
+
+          '''
+          s=s[:start]+block+s[end:]
+          p.write_text(s)
+          PY
           python3 assistant/patch_v035_format_stop_fix.py
 
       - name: Verifica contratto offline v0.3.5
