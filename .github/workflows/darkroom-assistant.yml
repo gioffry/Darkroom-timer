@@ -3,10 +3,7 @@ name: Build Darkroom Assistant APK
 on:
   push:
     branches:
-      - feature-darkroom-assistant-v001-dark-mockup
-  pull_request:
-    branches:
-      - main
+      - feature-darkroom-assistant-v011-functional
   workflow_dispatch:
 
 jobs:
@@ -44,10 +41,10 @@ jobs:
         run: |
           set -euo pipefail
           gradle :assistant:assembleDebug --stacktrace
-          cp assistant/build/outputs/apk/debug/assistant-debug.apk DarkroomAssistant-v0.1.0.apk
+          cp assistant/build/outputs/apk/debug/assistant-debug.apk DarkroomAssistant-v0.1.1.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.1.0
-          path: DarkroomAssistant-v0.1.0.apk
+          name: DarkroomAssistant-v0.1.1
+          path: DarkroomAssistant-v0.1.1.apk
