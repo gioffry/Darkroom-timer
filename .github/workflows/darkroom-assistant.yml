@@ -3,7 +3,7 @@ name: Build Darkroom Assistant APK
 on:
   push:
     branches:
-      - feature-darkroom-assistant-v036-inline-results
+      - feature-darkroom-assistant-v037-time-search-capacity
   pull_request:
     branches:
       - main
@@ -39,6 +39,13 @@ jobs:
           assert 250 <= films <= 450
           assert 180 <= devs <= 234
           assert rows >= 3000 and dbv == 2 and rod == 1 and ferr == 1 and noise == 0 and qc == 'ok'
+          # I nomi Kodak principali sono formule senza il marchio: servono gli alias UI.
+          for d in ['D-76','HC-110','Xtol']:
+              assert con.execute('select count(*) from developers where lower(name)=?', (d.lower(),)).fetchone()[0] == 1, d
+          # Digitaltruth non ha FP4+ + Foma Universal: il fallback locale deve coprire proprio questo buco.
+          gap=con.execute("select count(*) from times where lower(film)='ilford fp4+' and lower(developer)='foma universal' and dilution='1+3' and iso=125").fetchone()[0]
+          print('FP4/Foma Universal exact MDC rows:', gap)
+          assert gap == 0
           con.close()
           PY
 
@@ -111,42 +118,44 @@ jobs:
           set -euo pipefail
           python3 assistant/patch_v036_inline_results.py
 
-      - name: Verifica contratto offline v0.3.6
+      - name: Applica correzioni tempo ricerca capacita v0.3.7
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 assistant/patch_v037_time_search_capacity.py
+
+      - name: Verifica contratto offline v0.3.7
         shell: bash
         run: |
           set -euo pipefail
           grep -q 'mdc_offline_v034.sqlite' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
           grep -q 'private static final int DB_VERSION = 2;' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
           grep -q 'static String\[\] formatsForFilm' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
-          grep -q 'curatedAuxChemistry' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
-          grep -q 'Adox Adostop ECO' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
-          grep -q 'Bellini FX100' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
-          grep -q 'formatSpinner' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
-          grep -q 'localProductMatchesForRole' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
-          grep -q 'LinearLayout resultsBox' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
-          grep -q 'ScrollView resultsScroll' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
-          grep -q 'Tocca prima uno dei prodotti nell.elenco' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
-          grep -q "versionName '0.3.6'" assistant/build.gradle
-          grep -q 'versionCode 20' assistant/build.gradle
-          grep -q 'return MdcOfflineStore.searchDevelopers(query, 80)' assistant/src/main/java/it/darkroom/assistant/OnlineCatalogSearch.java
-          grep -q 'Nessuna combinazione esatta nel database offline Digitaltruth' assistant/src/main/java/it/darkroom/assistant/DevTimeEngine.java
+          grep -q 'addKnownDevelopers' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
+          grep -q 'combinationDiagnostic' assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
+          grep -q 'LocalRecipeEngine.lookup' assistant/src/main/java/it/darkroom/assistant/DevTimeEngine.java
+          grep -q 'Ricetta locale approvata' assistant/src/main/java/it/darkroom/assistant/LocalRecipeEngine.java
+          grep -q 'REGISTRA UTILIZZO BAGNI' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+          grep -q 'scheda Compard 1+4: 20–40 pellicole/L' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+          grep -q 'viraggio dell.indicatore verso verde/blu' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+          grep -q 'new String\[\]{"1+4"}, new String\[\]{"1+9"}, "1+4"' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+          grep -q "versionName '0.3.7'" assistant/build.gradle
+          grep -q 'versionCode 21' assistant/build.gradle
           ! grep -q 'uses-permission android:name="android.permission.INTERNET"' assistant/src/main/AndroidManifest.xml
           test -f assistant/src/main/assets/mdc_full.sqlite
           python3 - <<'PY'
           from pathlib import Path
-          s=Path('assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java').read_text()
-          a=s.index('    private void showAddProductDialog() {')
-          b=s.index('    private void enrichProductThenAdd(', a)
-          method=s[a:b]
-          assert 'showDropDown' not in method
-          assert 'simple_dropdown_item_1line' not in method
-          assert 'resultsBox.addView(item)' in method
-          assert 'resultsScroll' in method
-          stops=['Adox Adostop ECO','Adox Adostop ECO P','Ilford Ilfostop','Rollei RCS Citro Stop','MACO Eco Citrostop','Compard Stop Bath 60%','Fomacitro','Bellini ECOSTOP','Bellini INDEXSTOP','Bellini STOP (Acetic Acid)']
-          fixes=['Compard Fix Ag Plus','Ilford Rapid Fixer','Ilford Hypam','Fomafix','Adox Adofix Plus','Rollei RXA Fix Acid','Rollei RXN Fix Neutral','Bellini FX100','MACO Ecofix','Bellini FX5 Fixer & Hardener']
-          for x in stops+fixes: assert x in s, x
-          assert len(stops)==10 and len(fixes)==10
-          print('v0.3.6 UI verified: inline scrollable result rows, 10 stop + 10 fixer')
+          a=Path('assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java').read_text()
+          m=Path('assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java').read_text()
+          d=Path('assistant/src/main/java/it/darkroom/assistant/DevTimeEngine.java').read_text()
+          r=Path('assistant/src/main/java/it/darkroom/assistant/LocalRecipeEngine.java').read_text()
+          assert '"D-76", "HC-110", "Xtol"' in m
+          assert 'LocalRecipeEngine.lookup' in d
+          assert '9 * 60 + 30' in r and 'JOBO_FACTOR = 0.85' in r
+          assert 'p.reuseMode != ChemistrySpecEngine.REUSE_REUSABLE' in a
+          assert 'REGISTRA QUESTO SVILUPPO' not in a
+          assert 'capacity numeric' not in a.lower()
+          print('v0.3.7 contract verified')
           PY
 
       - name: Prepara firma stabile
@@ -168,7 +177,7 @@ jobs:
         run: |
           set -euo pipefail
           gradle :assistant:assembleRelease --stacktrace
-          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.3.6.apk
+          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.3.7.apk
 
       - name: Verifica APK
         shell: bash
@@ -176,17 +185,17 @@ jobs:
           set -euo pipefail
           APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
           AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.3.6.apk
-          "$AAPT" dump badging DarkroomAssistant-v0.3.6.apk | head -20
-          unzip -l DarkroomAssistant-v0.3.6.apk | grep -q 'assets/mdc_full.sqlite'
-          if "$AAPT" dump permissions DarkroomAssistant-v0.3.6.apk | grep -q 'android.permission.INTERNET'; then
+          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.3.7.apk
+          "$AAPT" dump badging DarkroomAssistant-v0.3.7.apk | head -20
+          unzip -l DarkroomAssistant-v0.3.7.apk | grep -q 'assets/mdc_full.sqlite'
+          if "$AAPT" dump permissions DarkroomAssistant-v0.3.7.apk | grep -q 'android.permission.INTERNET'; then
             echo 'ERRORE: APK chiede ancora INTERNET' >&2
             exit 1
           fi
-          echo 'APK v0.3.6 verificato: risultati inline, DB Digitaltruth, stop/fix, nessun Internet'
+          echo 'APK v0.3.7 verificato: DB offline, alias marche, fallback tempo, capacita bagni, nessun Internet'
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.3.6
-          path: DarkroomAssistant-v0.3.6.apk
+          name: DarkroomAssistant-v0.3.7
+          path: DarkroomAssistant-v0.3.7.apk
