@@ -7,61 +7,120 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Broker delle fonti. Non contiene un catalogo di singoli prodotti: risolve marca,
- * fonte ufficiale e indici tecnici (Massive Dev Chart) in modo generale.
+ * Broker live delle fonti per Darkroom Assistant.
+ *
+ * Regole:
+ * - pellicole e rivelatori pellicola vengono scoperti ONLINE dall'indice live
+ *   del Massive Dev Chart (Digitaltruth), non da un catalogo hardcoded;
+ * - la ricerca lavora per prefisso/token (es. "rod" -> Rodinal,
+ *   "superg" -> Rollei Supergrain, "fuji" -> Fuji/Fujifilm...);
+ * - un elemento proveniente dall'indice Developers di Digitaltruth e' SEMPRE
+ *   classificato come rivelatore pellicola: non puo' diventare fixer/stop per
+ *   parole casuali trovate in una pagina;
+ * - per dati di prodotto (stock, carta, stop, fix, scadenza) si cerca prima la
+ *   fonte del produttore; se un dato non e' esplicito resta non determinato.
  */
 final class SourceBroker {
+    private static final String MDC_INDEX = "https://www.digitaltruth.com/chart/print.php";
+    private static final long INDEX_TTL_MS = 15L * 60L * 1000L;
+
     private static final class Brand {
         final String name;
         final String[] aliases;
         final String[] domains;
         Brand(String name, String[] aliases, String[] domains) {
-            this.name = name; this.aliases = aliases; this.domains = domains;
+            this.name = name;
+            this.aliases = aliases;
+            this.domains = domains;
         }
     }
 
+    // Sono fonti, non cataloghi di singoli prodotti. I prodotti vengono scoperti online.
     private static final Brand[] BRANDS = new Brand[]{
             new Brand("Ilford/Harman", new String[]{"ilford","harman","kentmere"}, new String[]{"ilfordphoto.com","harmantechnology.com"}),
             new Brand("Foma", new String[]{"foma","fomapan","fomadon","fomafix","fomaspeed"}, new String[]{"foma.cz"}),
-            new Brand("Adox", new String[]{"adox","rodinal","adonal","fx-39","fx39","adoxal"}, new String[]{"adox.de","fotoimpex.com"}),
+            new Brand("Adox", new String[]{"adox","rodinal","adonal","adonal r09","fx-39","fx39","adoxal"}, new String[]{"adox.de","fotoimpex.com"}),
             new Brand("Kodak", new String[]{"kodak","d-76","d76","xtol","hc-110","hc110","t-max","tmax","tri-x","trix"}, new String[]{"kodak.com","kodakalaris.com"}),
-            new Brand("Rollei", new String[]{"rollei","supergrain","rpx","retro","superpan","low contrast","low speed","high contrast","print neutral","print warmtone"}, new String[]{"rolleianalog.com"}),
-            new Brand("Bellini", new String[]{"bellini","bell","hydrofen","ecofilm","euro hc","nucleol","gradual","bwdek","f205","fx100","aminophenol"}, new String[]{"bellinifoto.it"}),
-            new Brand("Fujifilm", new String[]{"fuji","fujifilm","neopan","acros"}, new String[]{"fujifilm.com"}),
-            new Brand("Ferrania", new String[]{"ferrania","p30","orto"}, new String[]{"filmferrania.com"}),
+            new Brand("Rollei", new String[]{"rollei","supergrain","rpx","retro","superpan","print neutral","print warmtone","citro stop","fix acid","fix neutral"}, new String[]{"rolleianalog.com"}),
+            new Brand("Bellini", new String[]{"bellini","bell","hydrofen","ecofilm","euro hc","nucleol","gradual","bwdek","f205","fx100","aminophenol","ecostop","indexstop"}, new String[]{"bellinifoto.it"}),
+            new Brand("Fujifilm", new String[]{"fuji","fujifilm","neopan","acros","microfine"}, new String[]{"fujifilm.com"}),
+            new Brand("Ferrania", new String[]{"ferrania","p30","p33","orto"}, new String[]{"filmferrania.com"}),
+            new Brand("AgfaPhoto", new String[]{"agfa","agfaphoto","apx"}, new String[]{"agfaphoto.com"}),
             new Brand("Bergger", new String[]{"bergger","pancro","ber49"}, new String[]{"bergger.com"}),
-            new Brand("CineStill", new String[]{"cinestill","df96","d96"}, new String[]{"cinestillfilm.com"}),
-            new Brand("LegacyPro", new String[]{"legacypro","legacy pro"}, new String[]{"freestylephoto.com"})
+            new Brand("CineStill", new String[]{"cinestill","df96","d96","bwxx"}, new String[]{"cinestillfilm.com"}),
+            new Brand("Ars-Imago", new String[]{"ars imago","ars-imago"}, new String[]{"ars-imago.com"}),
+            new Brand("Moersch", new String[]{"moersch"}, new String[]{"moersch-photochemie.de"}),
+            new Brand("Tetenal", new String[]{"tetenal"}, new String[]{"tetenal.com"})
     };
+
+    private static final class IndexItem {
+        final String name;
+        final String url;
+        final boolean developer;
+        IndexItem(String name, String url, boolean developer) {
+            this.name = name;
+            this.url = url;
+            this.developer = developer;
+        }
+    }
+
+    private static volatile long indexLoadedAt = 0L;
+    private static volatile List<IndexItem> cachedFilms = new ArrayList<>();
+    private static volatile List<IndexItem> cachedDevelopers = new ArrayList<>();
 
     static List<OnlineCatalogSearch.SearchResult> searchChemicals(String query) {
         LinkedHashMap<String, OnlineCatalogSearch.SearchResult> out = new LinkedHashMap<>();
-        for (OnlineCatalogSearch.SearchResult r : digitalTruthDevelopers(query)) put(out, r);
-        for (OnlineCatalogSearch.SearchResult r : officialSearch(query, true)) put(out, r);
+
+        // Prima fonte: indice LIVE dei rivelatori del Massive Dev Chart.
+        for (IndexItem i : searchMdc(query, true, 14)) {
+            put(out, new OnlineCatalogSearch.SearchResult(
+                    i.name,
+                    i.url,
+                    "Massive Dev Chart · FILM_DEVELOPER · indice live Digitaltruth"));
+        }
+
+        // Seconda fonte: produttori, utile anche per stop/fix/rivelatori carta.
+        if (out.size() < 12) {
+            for (OnlineCatalogSearch.SearchResult r : officialSearch(query, true, 14 - out.size())) put(out, r);
+        }
+
         return new ArrayList<>(out.values());
     }
 
     static List<OnlineCatalogSearch.SearchResult> searchFilms(String query) {
         LinkedHashMap<String, OnlineCatalogSearch.SearchResult> out = new LinkedHashMap<>();
-        for (OnlineCatalogSearch.SearchResult r : digitalTruthFilms(query)) put(out, r);
-        for (OnlineCatalogSearch.SearchResult r : officialSearch(query, false)) put(out, r);
+
+        for (IndexItem i : searchMdc(query, false, 16)) {
+            put(out, new OnlineCatalogSearch.SearchResult(
+                    i.name,
+                    i.url,
+                    "Massive Dev Chart · FILM · indice live Digitaltruth"));
+        }
+
+        if (out.size() < 12) {
+            for (OnlineCatalogSearch.SearchResult r : officialSearch(query, false, 14 - out.size())) put(out, r);
+        }
         return new ArrayList<>(out.values());
     }
 
     static boolean isManufacturerUrl(String url) {
         String u = norm(url);
-        for (Brand b : BRANDS) for (String d : b.domains) if (u.contains(norm(d))) return true;
+        for (Brand b : BRANDS) {
+            for (String d : b.domains) if (u.contains(norm(d))) return true;
+        }
         return false;
     }
 
@@ -75,155 +134,439 @@ final class SourceBroker {
 
     static String resolveOfficialUrl(String productName, boolean chemical, String initialUrl) {
         if (isManufacturerUrl(initialUrl)) return initialUrl;
-        List<OnlineCatalogSearch.SearchResult> candidates = officialSearch(productName, chemical);
+        List<OnlineCatalogSearch.SearchResult> candidates = officialSearch(productName, chemical, 10);
         String pn = norm(productName);
         OnlineCatalogSearch.SearchResult best = null;
-        double bestScore = 0;
+        int bestScore = 0;
         for (OnlineCatalogSearch.SearchResult r : candidates) {
             if (!isManufacturerUrl(r.url)) continue;
-            double score = similarity(pn, norm(r.title));
-            if (score > bestScore) { bestScore = score; best = r; }
+            int s = productMatchScore(pn, norm(r.title + " " + r.url));
+            if (s > bestScore) { bestScore = s; best = r; }
         }
-        return best != null && bestScore >= 0.34 ? best.url : initialUrl;
+        return best != null && bestScore >= 500 ? best.url : initialUrl;
     }
 
     static OnlineCatalogSearch.ChemicalData enrichChemical(OnlineCatalogSearch.SearchResult r) {
         if (r == null) return null;
+
+        boolean mdcDeveloper = isMdcDeveloper(r);
         String official = resolveOfficialUrl(r.title, true, r.url);
-        String text = "";
-        try { text = SourceText.fetchText(official, 700000); } catch (Exception ignored) {}
-        if (text.isEmpty() && r.url != null && !r.url.equals(official)) {
-            try { text = SourceText.fetchText(r.url, 700000); } catch (Exception ignored) {}
+        String officialText = "";
+        if (isManufacturerUrl(official)) {
+            try { officialText = SourceText.fetchText(official, 500000); } catch (Exception ignored) {}
         }
-        String all = r.title + " " + r.snippet + " " + text;
-        int roles = inferRoles(all);
-        List<String> dilutions = extractDilutions(all);
-        boolean stock = containsAny(norm(all), "powder", "polvere", "stock solution", "soluzione stock", "dissolve", "sciogli");
-        String instructions = stock ? extractInstruction(all) : null;
-        int expiry = extractExpiryDays(all);
-        String[] film = (roles & OnlineCatalogSearch.ROLE_FILM_DEV) != 0 ? dilutions.toArray(new String[0]) : new String[0];
-        String[] paper = (roles & OnlineCatalogSearch.ROLE_PAPER_DEV) != 0 ? dilutions.toArray(new String[0]) : new String[0];
-        String working = ((roles & (OnlineCatalogSearch.ROLE_STOP | OnlineCatalogSearch.ROLE_FIX)) != 0 && !dilutions.isEmpty()) ? dilutions.get(0) : null;
-        if (roles == 0 && dilutions.isEmpty() && text.isEmpty()) return null;
-        return new OnlineCatalogSearch.ChemicalData(cleanProductTitle(r.title), roles, stock, film, paper,
-                working, instructions, expiry, official == null ? "" : official);
+
+        if (mdcDeveloper) {
+            // Questo e' il punto fondamentale: identita' dal database tecnico, non dal testo casuale.
+            int roles = OnlineCatalogSearch.ROLE_FILM_DEV;
+            String strict = r.title + " " + first(officialText, 12000);
+            if (explicitPaperDeveloper(strict)) roles |= OnlineCatalogSearch.ROLE_PAPER_DEV;
+
+            List<String> filmDil = extractMdcDeveloperDilutions(r.url);
+            if (filmDil.isEmpty() && !officialText.isEmpty()) filmDil = extractDilutionsStrict(officialText);
+
+            List<String> paperDil = new ArrayList<>();
+            if ((roles & OnlineCatalogSearch.ROLE_PAPER_DEV) != 0) paperDil = extractDilutionsStrict(officialText);
+
+            boolean stock = explicitStockPreparation(officialText);
+            String instruction = stock ? extractInstruction(officialText) : null;
+            int expiry = extractExpiryDays(officialText);
+            String src = isManufacturerUrl(official) ? official : r.url;
+
+            return new OnlineCatalogSearch.ChemicalData(
+                    cleanProductTitle(r.title), roles, stock,
+                    filmDil.toArray(new String[0]), paperDil.toArray(new String[0]),
+                    null, instruction, expiry, src);
+        }
+
+        // Prodotto non proveniente dall'indice MDC: classificazione volutamente restrittiva.
+        String page = "";
+        String source = official;
+        if (source == null || source.isEmpty()) source = r.url;
+        try { page = SourceText.fetchText(source, 500000); } catch (Exception ignored) {}
+
+        String evidence = r.title + " " + r.snippet + " " + first(page, 14000);
+        int roles = strictRole(evidence);
+        if (roles == 0) return null; // meglio non determinato che un fissaggio inventato
+
+        List<String> dils = extractDilutionsStrict(evidence);
+        boolean stock = explicitStockPreparation(evidence);
+        String[] film = (roles & OnlineCatalogSearch.ROLE_FILM_DEV) != 0 ? dils.toArray(new String[0]) : new String[0];
+        String[] paper = (roles & OnlineCatalogSearch.ROLE_PAPER_DEV) != 0 ? dils.toArray(new String[0]) : new String[0];
+        String working = ((roles & (OnlineCatalogSearch.ROLE_STOP | OnlineCatalogSearch.ROLE_FIX)) != 0 && !dils.isEmpty()) ? dils.get(0) : null;
+
+        return new OnlineCatalogSearch.ChemicalData(
+                cleanProductTitle(r.title), roles, stock,
+                film, paper, working,
+                stock ? extractInstruction(evidence) : null,
+                extractExpiryDays(evidence),
+                source == null ? "" : source);
     }
 
     static OnlineCatalogSearch.FilmData enrichFilm(OnlineCatalogSearch.SearchResult r) {
         if (r == null) return null;
+        boolean mdcFilm = isMdcFilm(r);
         String official = resolveOfficialUrl(r.title, false, r.url);
-        String text = "";
-        try { text = SourceText.fetchText(official, 500000); } catch (Exception ignored) {}
-        String all = r.title + " " + r.snippet + " " + text;
-        int iso = extractIso(all);
-        String format = extractFormat(all);
-        if (iso <= 0) iso = isoFromSnippet(r.snippet);
-        if (iso <= 0 && text.isEmpty()) return null;
-        return new OnlineCatalogSearch.FilmData(cleanProductTitle(r.title), iso, format,
-                official == null ? "" : official);
+        String page = "";
+        if (isManufacturerUrl(official)) {
+            try { page = SourceText.fetchText(official, 400000); } catch (Exception ignored) {}
+        }
+
+        int iso = nominalIsoFromName(r.title);
+        if (iso <= 0) iso = extractExplicitIso(r.snippet + " " + first(page, 10000));
+        String format = extractFormat(r.title + " " + r.snippet + " " + first(page, 10000));
+
+        // Per una pellicola presente nel MDC il nome e' valido anche se l'ISO nominale non e' ricavabile.
+        if (!mdcFilm && iso <= 0 && page.isEmpty()) return null;
+        return new OnlineCatalogSearch.FilmData(
+                cleanProductTitle(r.title), iso, format,
+                isManufacturerUrl(official) ? official : r.url);
     }
 
-    private static List<OnlineCatalogSearch.SearchResult> officialSearch(String query, boolean chemical) {
-        List<OnlineCatalogSearch.SearchResult> out = new ArrayList<>();
+    // ---------------------------------------------------------------------
+    // Massive Dev Chart live index
+    // ---------------------------------------------------------------------
+
+    private static List<IndexItem> searchMdc(String query, boolean developers, int max) {
+        ensureMdcIndex();
+        String q = norm(query);
+        List<IndexItem> source = developers ? cachedDevelopers : cachedFilms;
+        List<IndexItem> hits = new ArrayList<>();
+        for (IndexItem i : source) {
+            if (mdcMatchScore(q, norm(i.name)) > 0) hits.add(i);
+        }
+        Collections.sort(hits, new Comparator<IndexItem>() {
+            @Override public int compare(IndexItem a, IndexItem b) {
+                int sa = mdcMatchScore(q, norm(a.name));
+                int sb = mdcMatchScore(q, norm(b.name));
+                if (sa != sb) return Integer.compare(sb, sa);
+                return a.name.compareToIgnoreCase(b.name);
+            }
+        });
+        return hits.size() > max ? new ArrayList<>(hits.subList(0, max)) : hits;
+    }
+
+    private static synchronized void ensureMdcIndex() {
+        long now = System.currentTimeMillis();
+        if (!cachedFilms.isEmpty() && !cachedDevelopers.isEmpty() && now - indexLoadedAt < INDEX_TTL_MS) return;
+        try {
+            String html = fetch(MDC_INDEX, 1400000);
+            List<IndexItem> films = new ArrayList<>();
+            List<IndexItem> devs = new ArrayList<>();
+            Matcher a = Pattern.compile("(?is)<a[^>]+href=[\\\"']([^\\\"']+)[\\\"'][^>]*>(.*?)</a>").matcher(html);
+            Set<String> seenFilms = new LinkedHashSet<>();
+            Set<String> seenDevs = new LinkedHashSet<>();
+            while (a.find()) {
+                String href = decodeEntities(a.group(1));
+                String title = clean(a.group(2));
+                if (title.length() < 2) continue;
+                boolean isDev = href.contains("Developer=") || href.contains("developer=");
+                boolean isFilm = href.contains("Film=") || href.contains("film=");
+                if (!isDev && !isFilm) continue;
+                String abs = absoluteDigitaltruth(href);
+                if (isDev && seenDevs.add(norm(title))) devs.add(new IndexItem(title, abs, true));
+                if (isFilm && seenFilms.add(norm(title))) films.add(new IndexItem(title, abs, false));
+            }
+            if (!films.isEmpty()) cachedFilms = films;
+            if (!devs.isEmpty()) cachedDevelopers = devs;
+            if (!films.isEmpty() || !devs.isEmpty()) indexLoadedAt = now;
+        } catch (Exception ignored) {
+            // Mantieni l'ultima cache valida, se disponibile.
+        }
+    }
+
+    private static int mdcMatchScore(String q, String name) {
+        if (q == null || q.length() < 3 || name == null) return 0;
+        if (name.equals(q)) return 1000;
+        if (name.startsWith(q)) return 950;
+        for (String token : name.split(" ")) if (token.startsWith(q)) return 900;
+        if (name.contains(" " + q)) return 850;
+        if (name.contains(q)) return 760;
+        Set<String> qt = tokens(q);
+        if (!qt.isEmpty()) {
+            boolean all = true;
+            for (String t : qt) {
+                boolean hit = name.contains(t);
+                if (!hit) { all = false; break; }
+            }
+            if (all) return 700;
+        }
+        return 0;
+    }
+
+    private static List<String> extractMdcDeveloperDilutions(String url) {
+        LinkedHashSet<String> out = new LinkedHashSet<>();
+        try {
+            String html = fetch(url, 1200000);
+            Matcher row = Pattern.compile("(?is)<tr[^>]*>(.*?)</tr>").matcher(html);
+            while (row.find() && out.size() < 16) {
+                List<String> c = cells(row.group(1));
+                if (c.size() < 3) continue;
+                String d = normalizeDilution(c.get(2));
+                if (d != null) out.add(d);
+            }
+        } catch (Exception ignored) {}
+        return new ArrayList<>(out);
+    }
+
+    // ---------------------------------------------------------------------
+    // Manufacturer discovery
+    // ---------------------------------------------------------------------
+
+    private static List<OnlineCatalogSearch.SearchResult> officialSearch(String query, boolean chemical, int max) {
+        LinkedHashMap<String, OnlineCatalogSearch.SearchResult> out = new LinkedHashMap<>();
         Brand b = brandForQuery(query);
-        List<String> domains = new ArrayList<>();
+
         if (b != null) {
-            for (String d : b.domains) domains.add(d);
-        } else {
-            for (Brand x : BRANDS) for (String d : x.domains) domains.add(d);
-        }
-        // Per marca nota: query mirata. Per prodotto senza marca: due cluster per non fare troppe richieste.
-        if (b != null) {
-            for (String d : domains) {
-                out.addAll(webSearch("site:" + d + " \"" + query + "\" " + (chemical ? "developer fixer stop photographic chemistry" : "film ISO 35mm 120")));
-                if (out.size() >= 14) break;
+            for (String domain : b.domains) {
+                for (OnlineCatalogSearch.SearchResult r : sitemapSearch(domain, query, chemical, max)) put(out, r);
+                if (out.size() >= max) break;
+            }
+            if (out.size() < max) {
+                for (String domain : b.domains) {
+                    String suffix = chemical ? " photographic chemistry developer fixer stop bath" : " photographic film ISO";
+                    for (OnlineCatalogSearch.SearchResult r : webSearch("site:" + domain + " \"" + query + "\"" + suffix)) {
+                        if (isManufacturerUrl(r.url)) put(out, r);
+                        if (out.size() >= max) break;
+                    }
+                    if (out.size() >= max) break;
+                }
             }
         } else {
-            StringBuilder c1 = new StringBuilder(), c2 = new StringBuilder();
-            for (int i = 0; i < domains.size(); i++) {
-                String clause = "site:" + domains.get(i);
-                if (i < domains.size()/2) { if (c1.length()>0) c1.append(" OR "); c1.append(clause); }
-                else { if (c2.length()>0) c2.append(" OR "); c2.append(clause); }
+            // Nome/marca mai visti prima: ricerca aperta. Non richiede aggiornare l'app.
+            String suffix = chemical
+                    ? " photographic chemistry developer fixer stop bath darkroom"
+                    : " photographic film ISO black white 35mm 120";
+            for (OnlineCatalogSearch.SearchResult r : webSearch("\"" + query + "\"" + suffix)) {
+                if (looksLikeTechnicalProductResult(query, r, chemical)) put(out, r);
+                if (out.size() >= max) break;
             }
-            String suffix = chemical ? " photographic developer chemistry" : " photographic film ISO";
-            out.addAll(webSearch("\"" + query + "\" (" + c1 + ")" + suffix));
-            if (out.size() < 8) out.addAll(webSearch("\"" + query + "\" (" + c2 + ")" + suffix));
         }
-        List<OnlineCatalogSearch.SearchResult> filtered = new ArrayList<>();
-        for (OnlineCatalogSearch.SearchResult r : out) {
-            if (!isManufacturerUrl(r.url)) continue;
-            if (!overlap(query, r.title + " " + r.url + " " + r.snippet) && !matchesQueryDomain(query, r.url)) continue;
-            filtered.add(r);
-            if (filtered.size() >= 14) break;
-        }
-        return filtered;
+        return new ArrayList<>(out.values());
     }
 
-    private static List<OnlineCatalogSearch.SearchResult> digitalTruthDevelopers(String query) {
+    private static List<OnlineCatalogSearch.SearchResult> sitemapSearch(String domain, String query, boolean chemical, int max) {
         List<OnlineCatalogSearch.SearchResult> out = new ArrayList<>();
-        try {
-            String url = "https://www.digitaltruth.com/chart/search_text.php?Developer=" + URLEncoder.encode(query, "UTF-8");
-            String html = fetch(url, 900000);
-            Matcher row = Pattern.compile("(?is)<tr[^>]*>(.*?)</tr>").matcher(html);
-            Set<String> names = new LinkedHashSet<>();
-            while (row.find() && names.size() < 18) {
-                List<String> cells = cells(row.group(1));
-                if (cells.size() < 2) continue;
-                String dev = clean(cells.get(1));
-                if (dev.length() < 3 || dev.toLowerCase(Locale.ROOT).contains("developer")) continue;
-                if (!prefixOrOverlap(query, dev)) continue;
-                names.add(dev);
-            }
-            for (String n : names) out.add(new OnlineCatalogSearch.SearchResult(n, url,
-                    "Massive Dev Chart · developer index · technical combination data"));
-        } catch (Exception ignored) {}
+        String[] roots = new String[]{
+                "https://" + domain + "/wp-sitemap.xml",
+                "https://" + domain + "/sitemap_index.xml",
+                "https://" + domain + "/sitemap.xml"
+        };
+        LinkedHashSet<String> locations = new LinkedHashSet<>();
+        for (String root : roots) {
+            try {
+                String xml = fetch(root, 700000);
+                List<String> loc = xmlLocations(xml);
+                if (loc.isEmpty()) continue;
+                int childCount = 0;
+                for (String u : loc) {
+                    if (u.toLowerCase(Locale.ROOT).endsWith(".xml")) {
+                        if (childCount++ >= 8) break;
+                        try { locations.addAll(xmlLocations(fetch(u, 700000))); } catch (Exception ignored) {}
+                    } else {
+                        locations.add(u);
+                    }
+                }
+                if (!locations.isEmpty()) break;
+            } catch (Exception ignored) {}
+        }
+
+        String q = norm(query);
+        for (String u : locations) {
+            if (out.size() >= max) break;
+            String decoded = decodeUrl(u);
+            String slug = titleFromUrl(decoded);
+            int score = productMatchScore(q, norm(slug + " " + decoded));
+            boolean brandOnly = brandForQuery(query) != null && q.length() <= 9;
+            if (score < 500 && !brandOnly) continue;
+            if (!looksProductUrl(decoded)) continue;
+            String snippet = "Fonte produttore · pagina prodotto";
+            out.add(new OnlineCatalogSearch.SearchResult(slug, decoded, snippet));
+        }
         return out;
     }
 
-    private static List<OnlineCatalogSearch.SearchResult> digitalTruthFilms(String query) {
-        List<OnlineCatalogSearch.SearchResult> out = new ArrayList<>();
-        try {
-            String url = "https://www.digitaltruth.com/devchart.php?Film=" + URLEncoder.encode(query, "UTF-8") + "&TempUnits=C&TimeUnits=T&mdc=Search";
-            String html = fetch(url, 1100000);
-            Matcher row = Pattern.compile("(?is)<tr[^>]*>(.*?)</tr>").matcher(html);
-            Map<String,Integer> films = new LinkedHashMap<>();
-            while (row.find() && films.size() < 20) {
-                List<String> cells = cells(row.group(1));
-                if (cells.size() < 4) continue;
-                String film = clean(cells.get(0));
-                if (film.length() < 3 || film.toLowerCase(Locale.ROOT).contains("film")) continue;
-                if (!prefixOrOverlap(query, film)) continue;
-                int iso = parseInt(cells.get(3));
-                if (!films.containsKey(film)) films.put(film, iso);
+    private static boolean looksLikeTechnicalProductResult(String query, OnlineCatalogSearch.SearchResult r, boolean chemical) {
+        String all = norm(r.title + " " + r.snippet + " " + r.url);
+        if (productMatchScore(norm(query), all) <= 0) return false;
+        if (chemical) {
+            return containsAny(all, "developer","rivelatore","fixer","fixing","stop bath","chemistry","darkroom","photo chemical","safety data","data sheet");
+        }
+        return containsAny(all, "film","pellicola","35mm","35 mm","120","iso","asa","datasheet","data sheet");
+    }
+
+    private static boolean looksProductUrl(String u) {
+        String n = norm(u);
+        return containsAny(n, "/product/", "/products/", "/prodotto/", "/produkt/", "/chem", "/film", "/datasheet", "/download")
+                || !n.endsWith(" xml");
+    }
+
+    // ---------------------------------------------------------------------
+    // Strict type/data extraction
+    // ---------------------------------------------------------------------
+
+    private static boolean isMdcDeveloper(OnlineCatalogSearch.SearchResult r) {
+        String x = (r.url + " " + r.snippet).toLowerCase(Locale.ROOT);
+        return x.contains("digitaltruth.com") && (x.contains("developer=") || x.contains("film_developer"));
+    }
+
+    private static boolean isMdcFilm(OnlineCatalogSearch.SearchResult r) {
+        String x = (r.url + " " + r.snippet).toLowerCase(Locale.ROOT);
+        return x.contains("digitaltruth.com") && (x.contains("film=") || x.contains("· film ·"));
+    }
+
+    private static int strictRole(String evidence) {
+        String s = norm(evidence);
+        // Le parole devono essere esplicite. Nessuna deduzione da un generico "fix" nella pagina.
+        if (containsAny(s, "stop bath", "bagno d arresto", "bagno arresto", "arresto fotografico", "stoppbad"))
+            return OnlineCatalogSearch.ROLE_STOP;
+        if (containsAny(s, "film fixer", "paper fixer", "universal fixer", "photographic fixer", "fixing bath", "fissaggio fotografico", "bagno di fissaggio"))
+            return OnlineCatalogSearch.ROLE_FIX;
+
+        int role = 0;
+        if (containsAny(s, "film developer", "negative developer", "developer for film", "sviluppo pellicola", "rivelatore pellicola", "entwickler film"))
+            role |= OnlineCatalogSearch.ROLE_FILM_DEV;
+        if (containsAny(s, "paper developer", "print developer", "developer for paper", "sviluppo carta", "rivelatore carta", "papierentwickler"))
+            role |= OnlineCatalogSearch.ROLE_PAPER_DEV;
+        if (containsAny(s, "universal developer", "rivelatore universale") && containsAny(s, "film", "pellicola"))
+            role |= OnlineCatalogSearch.ROLE_FILM_DEV;
+        if (containsAny(s, "universal developer", "rivelatore universale") && containsAny(s, "paper", "carta"))
+            role |= OnlineCatalogSearch.ROLE_PAPER_DEV;
+        return role;
+    }
+
+    private static boolean explicitPaperDeveloper(String s) {
+        String n = norm(s);
+        return containsAny(n, "paper developer", "print developer", "sviluppo carta", "rivelatore carta", "papierentwickler", "universal developer");
+    }
+
+    private static List<String> extractDilutionsStrict(String text) {
+        LinkedHashSet<String> out = new LinkedHashSet<>();
+        if (text == null) return new ArrayList<>(out);
+        Matcher m = Pattern.compile("(?i)\\b(1\\s*[+:]\\s*\\d{1,3})\\b").matcher(text);
+        while (m.find() && out.size() < 12) {
+            int from = Math.max(0, m.start() - 180);
+            int to = Math.min(text.length(), m.end() + 180);
+            String ctx = norm(text.substring(from, to));
+            if (!containsAny(ctx, "dilut", "working solution", "developer", "rivelatore", "fixer", "stop bath", "mix", "miscel", "concentrate")) continue;
+            out.add(m.group(1).replace(" ", "").replace(':', '+'));
+        }
+        return new ArrayList<>(out);
+    }
+
+    private static String normalizeDilution(String raw) {
+        if (raw == null) return null;
+        String s = clean(raw).toLowerCase(Locale.ROOT).replace(" ", "").replace(':', '+');
+        if (s.equals("stock")) return "stock";
+        if (s.matches("1\\+\\d{1,3}")) return s;
+        if (s.matches("\\d+\\+\\d+\\+\\d+")) return s;
+        return null;
+    }
+
+    private static boolean explicitStockPreparation(String text) {
+        String s = norm(text);
+        return containsAny(s, "powder", "polvere", "pulver", "dissolve", "sciogli", "stock solution", "soluzione stock")
+                && containsAny(s, "water", "acqua", "litre", "liter", "litro", "ml");
+    }
+
+    private static String extractInstruction(String text) {
+        if (text == null || text.isEmpty()) return null;
+        String flat = text.replaceAll("\\s+", " ").trim();
+        String n = norm(flat);
+        String[] keys = {"preparation", "preparazione", "stock solution", "soluzione stock", "dissolve", "sciogli", "mixing instructions"};
+        int best = -1;
+        for (String k : keys) {
+            int i = n.indexOf(norm(k));
+            if (i >= 0 && (best < 0 || i < best)) best = i;
+        }
+        if (best < 0) return null;
+        int from = Math.max(0, best - 150);
+        int to = Math.min(flat.length(), best + 900);
+        String chunk = flat.substring(from, to).trim();
+        return chunk.length() > 750 ? chunk.substring(0, 750) + "…" : chunk;
+    }
+
+    private static int extractExpiryDays(String text) {
+        if (text == null) return -1;
+        Matcher m = Pattern.compile("(?i)(?:shelf life|storage life|durata|conservazione)[^0-9]{0,80}(\\d{1,2})\\s*(months?|mesi)").matcher(text);
+        if (m.find()) try { return Integer.parseInt(m.group(1)) * 30; } catch (Exception ignored) {}
+        m = Pattern.compile("(?i)(?:shelf life|storage life|durata|conservazione)[^0-9]{0,80}(\\d{1,2})\\s*(years?|anni)").matcher(text);
+        if (m.find()) try { return Integer.parseInt(m.group(1)) * 365; } catch (Exception ignored) {}
+        return -1;
+    }
+
+    private static int extractExplicitIso(String text) {
+        if (text == null) return 0;
+        Matcher m = Pattern.compile("(?i)\\b(?:ISO|ASA)\\s*[:=]?\\s*(25|32|40|50|64|80|100|125|160|200|250|320|400|500|640|800|1000|1250|1600|3200)\\b").matcher(text);
+        if (m.find()) try { return Integer.parseInt(m.group(1)); } catch (Exception ignored) {}
+        return 0;
+    }
+
+    private static int nominalIsoFromName(String title) {
+        String t = title == null ? "" : title;
+        Matcher m = Pattern.compile("(?<!\\d)(25|32|40|50|64|80|100|125|160|200|250|320|400|500|640|800|1000|1250|1600|3200)(?!\\d)").matcher(t);
+        int best = 0;
+        while (m.find()) {
+            try {
+                int v = Integer.parseInt(m.group(1));
+                if (best == 0 || (v >= 50 && v <= 3200)) best = v;
+            } catch (Exception ignored) {}
+        }
+        return best;
+    }
+
+    private static String extractFormat(String text) {
+        String s = norm(text);
+        boolean f35 = containsAny(s, "35mm", "35 mm", "135 film", "135 format");
+        boolean f120 = Pattern.compile("(?<!\\d)120(?!\\d)").matcher(s).find();
+        if (f35 && !f120) return "35";
+        if (f120 && !f35) return "120";
+        return null;
+    }
+
+    // ---------------------------------------------------------------------
+    // Search/fetch helpers
+    // ---------------------------------------------------------------------
+
+    private static Brand brandForQuery(String query) {
+        String q = norm(query);
+        Brand best = null;
+        int score = 0;
+        for (Brand b : BRANDS) {
+            for (String alias : b.aliases) {
+                String a = norm(alias);
+                if (q.contains(a) || a.startsWith(q) || q.startsWith(a)) {
+                    int s = Math.min(q.length(), a.length());
+                    if (s > score) { score = s; best = b; }
+                }
             }
-            for (Map.Entry<String,Integer> e : films.entrySet()) {
-                String sn = "Massive Dev Chart · film index" + (e.getValue()>0 ? " · ISO " + e.getValue() : "");
-                out.add(new OnlineCatalogSearch.SearchResult(e.getKey(), url, sn));
-            }
-        } catch (Exception ignored) {}
-        return out;
+        }
+        return score >= 3 ? best : null;
     }
 
     private static List<OnlineCatalogSearch.SearchResult> webSearch(String query) {
         List<OnlineCatalogSearch.SearchResult> out = new ArrayList<>();
         try {
             String u = "https://www.bing.com/search?format=rss&setlang=en&q=" + URLEncoder.encode(query, "UTF-8");
-            String xml = fetch(u, 500000);
+            String xml = fetch(u, 550000);
             Matcher m = Pattern.compile("(?is)<item>(.*?)</item>").matcher(xml);
             while (m.find() && out.size() < 20) {
-                String item = m.group(1);
-                String title = tag(item, "title"), link = tag(item, "link"), desc = tag(item, "description");
-                if (http(link) && title.length()>2) out.add(new OnlineCatalogSearch.SearchResult(title, link, desc));
+                String block = m.group(1);
+                String title = tag(block, "title");
+                String link = tag(block, "link");
+                String desc = tag(block, "description");
+                if (http(link) && title.length() > 2) out.add(new OnlineCatalogSearch.SearchResult(title, link, desc));
             }
         } catch (Exception ignored) {}
         if (out.size() < 5) {
             try {
                 String u = "https://lite.duckduckgo.com/lite/?q=" + URLEncoder.encode(query, "UTF-8");
                 String html = fetch(u, 450000);
-                Matcher m = Pattern.compile("(?is)<a[^>]+href=[\"']([^\"']+)[\"'][^>]*>(.*?)</a>").matcher(html);
+                Matcher m = Pattern.compile("(?is)<a[^>]+href=[\\\"']([^\\\"']+)[\\\"'][^>]*>(.*?)</a>").matcher(html);
                 while (m.find() && out.size() < 20) {
-                    String href = decodeDuck(m.group(1)), title = clean(m.group(2));
-                    if (http(href) && title.length()>2 && !href.contains("duckduckgo.com"))
+                    String href = decodeDuck(m.group(1));
+                    String title = clean(m.group(2));
+                    if (http(href) && title.length() > 2 && !href.contains("duckduckgo.com"))
                         out.add(new OnlineCatalogSearch.SearchResult(title, href, ""));
                 }
             } catch (Exception ignored) {}
@@ -231,86 +574,162 @@ final class SourceBroker {
         return out;
     }
 
-    private static Brand brandForQuery(String query) {
-        String q = norm(query);
-        Brand best = null; int score = 0;
-        for (Brand b : BRANDS) for (String a : b.aliases) {
-            String n = norm(a);
-            boolean hit = q.contains(n) || n.startsWith(q) || q.startsWith(n);
-            if (hit) {
-                int s = Math.min(q.length(), n.length());
-                if (s > score) { score = s; best = b; }
+    private static int productMatchScore(String q, String text) {
+        if (q == null || q.length() < 3 || text == null) return 0;
+        if (text.equals(q)) return 1000;
+        if (text.startsWith(q)) return 900;
+        for (String t : text.split(" ")) if (t.startsWith(q)) return 850;
+        if (text.contains(q)) return 700;
+        Set<String> qt = tokens(q);
+        if (!qt.isEmpty()) {
+            boolean all = true;
+            for (String t : qt) if (!text.contains(t)) { all = false; break; }
+            if (all) return 650;
+        }
+        return 0;
+    }
+
+    private static List<String> xmlLocations(String xml) {
+        List<String> out = new ArrayList<>();
+        if (xml == null) return out;
+        Matcher m = Pattern.compile("(?is)<loc>\\s*(.*?)\\s*</loc>").matcher(xml);
+        while (m.find() && out.size() < 5000) out.add(decodeEntities(clean(m.group(1))));
+        return out;
+    }
+
+    private static String titleFromUrl(String u) {
+        if (u == null) return "";
+        String s = u;
+        int q = s.indexOf('?'); if (q >= 0) s = s.substring(0, q);
+        while (s.endsWith("/")) s = s.substring(0, s.length()-1);
+        int slash = s.lastIndexOf('/');
+        if (slash >= 0) s = s.substring(slash + 1);
+        try { s = URLDecoder.decode(s, "UTF-8"); } catch (Exception ignored) {}
+        s = s.replace('-', ' ').replace('_', ' ').replaceAll("\\s+", " ").trim();
+        if (s.isEmpty()) return "Prodotto";
+        StringBuilder b = new StringBuilder();
+        for (String w : s.split(" ")) {
+            if (w.isEmpty()) continue;
+            if (b.length() > 0) b.append(' ');
+            b.append(Character.toUpperCase(w.charAt(0))).append(w.substring(1));
+        }
+        return b.toString();
+    }
+
+    private static List<String> cells(String row) {
+        List<String> out = new ArrayList<>();
+        Matcher m = Pattern.compile("(?is)<t[dh][^>]*>(.*?)</t[dh]>").matcher(row);
+        while (m.find()) out.add(clean(m.group(1)));
+        return out;
+    }
+
+    private static String absoluteDigitaltruth(String href) {
+        if (href.startsWith("http://") || href.startsWith("https://")) return href;
+        if (href.startsWith("/")) return "https://www.digitaltruth.com" + href;
+        return "https://www.digitaltruth.com/chart/" + href;
+    }
+
+    private static String decodeUrl(String u) {
+        try { return URLDecoder.decode(u, "UTF-8"); } catch (Exception ignored) { return u; }
+    }
+
+    private static String tag(String block, String tag) {
+        Matcher m = Pattern.compile("(?is)<" + tag + ">(?:<!\\[CDATA\\[)?(.*?)(?:]]>)?</" + tag + ">").matcher(block);
+        return m.find() ? clean(m.group(1)) : "";
+    }
+
+    private static String decodeDuck(String href) {
+        if (href == null) return "";
+        try {
+            int i = href.indexOf("uddg=");
+            if (i >= 0) {
+                String v = href.substring(i + 5);
+                int amp = v.indexOf('&');
+                if (amp >= 0) v = v.substring(0, amp);
+                return URLDecoder.decode(v, "UTF-8");
             }
-        }
-        return score >= 3 ? best : null;
+            if (href.startsWith("//")) return "https:" + href;
+        } catch (Exception ignored) {}
+        return href;
     }
 
-    private static int inferRoles(String text) {
-        String s = norm(text);
-        if (containsAny(s,"stop bath","arresto","ecostop","indexstop")) return OnlineCatalogSearch.ROLE_STOP;
-        if (containsAny(s,"fixer","fixing bath","fissaggio","fomafix","fix acid","fix neutral")) return OnlineCatalogSearch.ROLE_FIX;
-        int r = 0;
-        if (containsAny(s,"film developer","negative developer","sviluppo pellicola","rivelatore pellicola","black white film developer")) r |= OnlineCatalogSearch.ROLE_FILM_DEV;
-        if (containsAny(s,"paper developer","print developer","sviluppo carta","rivelatore carta","photographic paper developer")) r |= OnlineCatalogSearch.ROLE_PAPER_DEV;
-        if (r == 0 && containsAny(s,"developer","rivelatore","entwickler")) {
-            if (containsAny(s,"film","negative","pellicola")) r |= OnlineCatalogSearch.ROLE_FILM_DEV;
-            if (containsAny(s,"paper","print","carta")) r |= OnlineCatalogSearch.ROLE_PAPER_DEV;
-        }
-        return r;
+    private static void put(LinkedHashMap<String, OnlineCatalogSearch.SearchResult> map, OnlineCatalogSearch.SearchResult r) {
+        if (r == null || r.title == null || r.title.trim().length() < 2) return;
+        String key = norm(r.title) + "|" + norm(r.url);
+        if (!map.containsKey(key)) map.put(key, r);
     }
 
-    private static List<String> extractDilutions(String text) {
+    private static Set<String> tokens(String s) {
         LinkedHashSet<String> out = new LinkedHashSet<>();
-        Matcher m = Pattern.compile("(?i)\\b1\\s*[+:]\\s*(\\d{1,3})\\b").matcher(text == null ? "" : text);
-        while (m.find() && out.size()<12) {
-            int from=Math.max(0,m.start()-240), to=Math.min(text.length(),m.end()+240);
-            String ctx=norm(text.substring(from,to));
-            if (containsAny(ctx,"dilut","working solution","developer","rivelatore","fixer","stop bath","mix","concentrate","concentrato"))
-                out.add("1+"+m.group(1));
-        }
-        return new ArrayList<>(out);
+        for (String t : norm(s).split(" ")) if (t.length() >= 2) out.add(t);
+        return out;
     }
 
-    private static String extractInstruction(String text) {
-        String flat=(text==null?"":text).replaceAll("\\s+"," ").trim();
-        String low=norm(flat); int best=-1;
-        String[] keys={"stock solution","mixing instructions","dissolve","preparation","prepare stock","soluzione stock","sciogli","polvere"};
-        for(String k:keys){int i=low.indexOf(k);if(i>=0&&(best<0||i<best))best=i;}
-        if(best<0)return null;
-        String chunk=flat.substring(Math.max(0,best-220),Math.min(flat.length(),best+1000));
-        return Pattern.compile("(?i)\\d+(?:[.,]\\d+)?\\s*(?:ml|l|litre|liter|litro|litri|°c)").matcher(chunk).find()?chunk:null;
+    private static String cleanProductTitle(String s) {
+        String t = clean(s);
+        t = t.replaceAll("(?i)\\s*[|–—]\\s*(official.*|data sheet.*|datasheet.*)$", "").trim();
+        return t.length() > 120 ? t.substring(0, 120).trim() : t;
     }
 
-    private static int extractExpiryDays(String text) {
-        if(text==null)return -1;
-        Matcher m=Pattern.compile("(?i)(?:shelf life|storage life|conservazione|durata)[^0-9]{0,80}(\\d{1,2})\\s*(months?|mesi)").matcher(text);
-        if(m.find())return parseInt(m.group(1))*30;
-        Matcher y=Pattern.compile("(?i)(?:shelf life|storage life|conservazione|durata)[^0-9]{0,80}(\\d{1,2})\\s*(years?|anni)").matcher(text);
-        if(y.find())return parseInt(y.group(1))*365;
-        return -1;
+    private static String first(String s, int n) {
+        if (s == null) return "";
+        return s.length() > n ? s.substring(0, n) : s;
     }
 
-    private static int extractIso(String text) {
-        Matcher m=Pattern.compile("(?i)\\b(?:ISO|ASA|EI)\\s*[:=]?\\s*(\\d{2,4})\\b").matcher(text==null?"":text);
-        return m.find()?parseInt(m.group(1)):0;
+    private static String norm(String s) {
+        return clean(s).toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9à-ÿ+./]+", " ")
+                .replaceAll("\\s+", " ").trim();
     }
-    private static int isoFromSnippet(String s){return extractIso(s);}
-    private static String extractFormat(String text){String s=norm(text);boolean a=s.contains("35mm")||s.contains("35 mm")||s.contains("135 format")||s.contains("135 film");boolean b=Pattern.compile("(?:^| )120(?: |$)").matcher(s).find();if(a&&!b)return"35";if(b&&!a)return"120";return null;}
 
-    private static boolean overlap(String q,String t){Set<String> a=tokens(q);if(a.isEmpty())return false;String n=norm(t);int h=0;for(String x:a)if(n.contains(x))h++;return h>=Math.max(1,(int)Math.ceil(a.size()*0.5));}
-    private static boolean prefixOrOverlap(String q,String t){String nq=norm(q),nt=norm(t);if(nq.length()>=3&&(nt.contains(nq)||nt.startsWith(nq)))return true;for(String x:nt.split(" "))if(x.startsWith(nq)&&nq.length()>=3)return true;return overlap(q,t);}
-    private static double similarity(String a,String b){Set<String>x=tokens(a),y=tokens(b);if(x.isEmpty()||y.isEmpty())return 0;int h=0;for(String t:x)for(String z:y)if(t.equals(z)||t.startsWith(z)||z.startsWith(t)){h++;break;}return h/(double)Math.max(x.size(),y.size());}
-    private static Set<String> tokens(String s){LinkedHashSet<String>o=new LinkedHashSet<>();for(String t:norm(s).split(" "))if(t.length()>=3&&!containsAny(t,"the","and","film","photo","photographic","developer","official","data","sheet"))o.add(t);return o;}
-    private static void put(Map<String,OnlineCatalogSearch.SearchResult> m,OnlineCatalogSearch.SearchResult r){if(r==null)return;String k=norm(r.title);if(!m.containsKey(k))m.put(k,r);}
-    private static List<String> cells(String row){List<String>o=new ArrayList<>();Matcher m=Pattern.compile("(?is)<t[dh][^>]*>(.*?)</t[dh]>").matcher(row);while(m.find())o.add(clean(m.group(1)));return o;}
-    private static String tag(String block,String tag){Matcher m=Pattern.compile("(?is)<"+tag+">(?:<!\\[CDATA\\[)?(.*?)(?:]]>)?</"+tag+">").matcher(block);return m.find()?clean(m.group(1)):"";}
-    private static String cleanProductTitle(String s){String t=clean(s);t=t.replaceAll("(?i)\\s*[|–—]\\s*(official|data sheet|datasheet|downloads?).*$","").trim();return t.length()>120?t.substring(0,120):t;}
-    private static String clean(String s){if(s==null)return"";return s.replaceAll("(?is)<script.*?</script>"," ").replaceAll("(?is)<style.*?</style>"," ").replaceAll("(?s)<[^>]+>"," ").replace("&amp;","&").replace("&quot;","\"").replace("&#39;","'").replace("&nbsp;"," ").replaceAll("\\s+"," ").trim();}
-    private static String norm(String s){return clean(s).toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9à-ÿ+.-]+"," ").replaceAll("\\s+"," ").trim();}
-    private static boolean containsAny(String s,String...x){if(s==null)return false;for(String a:x)if(s.contains(a))return true;return false;}
-    private static int parseInt(String s){try{return Integer.parseInt((s==null?"":s).replaceAll("[^0-9]",""));}catch(Exception e){return 0;}}
-    private static boolean http(String s){return s!=null&&(s.startsWith("http://")||s.startsWith("https://"));}
-    private static String decodeDuck(String h){try{h=h.replace("&amp;","&");int i=h.indexOf("uddg=");if(i>=0){String v=h.substring(i+5);int a=v.indexOf('&');if(a>=0)v=v.substring(0,a);return URLDecoder.decode(v,"UTF-8");}if(h.startsWith("//"))return"https:"+h;}catch(Exception ignored){}return h;}
-    private static String fetch(String u,int max)throws Exception{HttpURLConnection c=(HttpURLConnection)new URL(u).openConnection();c.setConnectTimeout(8000);c.setReadTimeout(10000);c.setInstanceFollowRedirects(true);c.setRequestProperty("User-Agent","Mozilla/5.0 (Android) DarkroomAssistant/0.2.0");c.setRequestProperty("Accept-Encoding","identity");int code=c.getResponseCode();if(code<200||code>=400)throw new IllegalStateException("HTTP "+code);InputStream in=c.getInputStream();BufferedReader br=new BufferedReader(new InputStreamReader(in));StringBuilder sb=new StringBuilder();char[]buf=new char[4096];int n;while((n=br.read(buf))>0&&sb.length()<max)sb.append(buf,0,n);br.close();return sb.toString();}
-    private SourceBroker(){}
+    private static String clean(String s) {
+        if (s == null) return "";
+        return decodeEntities(s)
+                .replaceAll("(?is)<script.*?</script>", " ")
+                .replaceAll("(?is)<style.*?</style>", " ")
+                .replaceAll("(?s)<[^>]+>", " ")
+                .replaceAll("\\s+", " ").trim();
+    }
+
+    private static String decodeEntities(String s) {
+        if (s == null) return "";
+        return s.replace("&amp;", "&").replace("&quot;", "\"")
+                .replace("&#39;", "'").replace("&apos;", "'")
+                .replace("&nbsp;", " ").replace("&ndash;", "–")
+                .replace("&mdash;", "—").replace("&deg;", "°")
+                .replace("&lt;", "<").replace("&gt;", ">");
+    }
+
+    private static boolean containsAny(String s, String... terms) {
+        if (s == null) return false;
+        for (String t : terms) if (s.contains(t)) return true;
+        return false;
+    }
+
+    private static boolean http(String s) {
+        return s != null && (s.startsWith("https://") || s.startsWith("http://"));
+    }
+
+    private static String fetch(String urlString, int maxChars) throws Exception {
+        HttpURLConnection c = (HttpURLConnection) new URL(urlString).openConnection();
+        c.setConnectTimeout(9000);
+        c.setReadTimeout(13000);
+        c.setInstanceFollowRedirects(true);
+        c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 Chrome/140 Mobile Safari/537.36 DarkroomAssistant/0.2.1");
+        c.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml,text/xml,*/*;q=0.5");
+        c.setRequestProperty("Accept-Language", "it-IT,it;q=0.9,en;q=0.8");
+        c.setRequestProperty("Accept-Encoding", "identity");
+        int code = c.getResponseCode();
+        if (code < 200 || code >= 400) throw new IllegalStateException("HTTP " + code);
+        InputStream in = c.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+        StringBuilder sb = new StringBuilder();
+        char[] buf = new char[4096];
+        int n;
+        while ((n = br.read(buf)) > 0 && sb.length() < maxChars) sb.append(buf, 0, n);
+        br.close();
+        return sb.toString();
+    }
+
+    private SourceBroker() {}
 }
