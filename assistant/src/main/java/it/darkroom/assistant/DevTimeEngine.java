@@ -393,12 +393,13 @@ final class DevTimeEngine {
     private static String normalizeName(String s) {
         if (s == null) return "";
         return s.toLowerCase(Locale.ROOT)
-                .replace("plus", "+")
+                .replace("plus", "")
+                .replace("+", "")
                 .replace("–", " ")
                 .replace("—", " ")
                 .replaceAll("\\b35\\s*mm\\b", " ")
                 .replaceAll("\\b120\\b(?=\\s*$)", " ")
-                .replaceAll("[^a-z0-9+]+", " ")
+                .replaceAll("[^a-z0-9]+", " ")
                 .trim();
     }
 
