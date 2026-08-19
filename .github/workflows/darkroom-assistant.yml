@@ -3,7 +3,7 @@ name: Build Darkroom Assistant APK
 on:
   push:
     branches:
-      - feature-darkroom-assistant-v021-live-index
+      - feature-darkroom-assistant-v030-offline-mdc
   pull_request:
     branches:
       - main
@@ -16,6 +16,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Scarico completo Digitaltruth di verifica
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 assistant/validate_mdc_full_download.py
 
       - name: Java 17
         uses: actions/setup-java@v5
@@ -38,17 +44,6 @@ jobs:
           curl -L --fail --retry 3 -o "$RUNNER_TEMP/gradle.zip" https://services.gradle.org/distributions/gradle-8.13-bin.zip
           unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
           echo "$RUNNER_TEMP/gradle-8.13/bin" >> "$GITHUB_PATH"
-
-      - name: Verifica contratto motore live-index
-        shell: bash
-        run: |
-          set -euo pipefail
-          grep -q 'https://www.digitaltruth.com/chart/print.php' assistant/src/main/java/it/darkroom/assistant/SourceBroker.java
-          grep -q 'FILM_DEVELOPER' assistant/src/main/java/it/darkroom/assistant/SourceBroker.java
-          grep -q 'searchMdc(query, true' assistant/src/main/java/it/darkroom/assistant/SourceBroker.java
-          grep -q 'searchMdc(query, false' assistant/src/main/java/it/darkroom/assistant/SourceBroker.java
-          grep -q 'strictRole' assistant/src/main/java/it/darkroom/assistant/SourceBroker.java
-          echo 'Live-index source contract OK'
 
       - name: Applica fix risultati ricerca visibili
         shell: bash
@@ -79,9 +74,17 @@ jobs:
         run: |
           set -euo pipefail
           python3 assistant/patch_v022_strict_entities.py
-          grep -q 'strictChemicalEntity' assistant/src/main/java/it/darkroom/assistant/SourceBroker.java
-          grep -q 'strictChemicalWebResults' assistant/src/main/java/it/darkroom/assistant/OnlineCatalogSearch.java
-          grep -q 'addProductScroll' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+
+      - name: Applica database offline v0.3.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 assistant/patch_v030_offline_mdc.py
+          grep -q 'MdcOfflineStore.searchDevelopers' assistant/src/main/java/it/darkroom/assistant/OnlineCatalogSearch.java
+          grep -q 'MdcOfflineStore.lookup' assistant/src/main/java/it/darkroom/assistant/DevTimeEngine.java
+          grep -q 'ensureOfflineDatabase' assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+          test -f assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
+          test -f assistant/src/main/assets/mdc_developers_seed.txt
 
       - name: Prepara firma stabile
         shell: bash
@@ -102,7 +105,7 @@ jobs:
         run: |
           set -euo pipefail
           gradle :assistant:assembleRelease --stacktrace
-          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.2.2.apk
+          cp assistant/build/outputs/apk/release/assistant-release.apk DarkroomAssistant-v0.3.0.apk
 
       - name: Verifica APK prima dell'upload
         shell: bash
@@ -110,11 +113,11 @@ jobs:
           set -euo pipefail
           APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
           AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.2.2.apk
-          "$AAPT" dump badging DarkroomAssistant-v0.2.2.apk | head -20
+          "$APKSIGNER" verify --verbose --print-certs DarkroomAssistant-v0.3.0.apk
+          "$AAPT" dump badging DarkroomAssistant-v0.3.0.apk | head -20
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomAssistant-v0.2.2
-          path: DarkroomAssistant-v0.2.2.apk
+          name: DarkroomAssistant-v0.3.0
+          path: DarkroomAssistant-v0.3.0.apk
