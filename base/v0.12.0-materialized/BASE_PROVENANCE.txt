@@ -1,0 +1,9 @@
+versionName=0.12.0
+versionCode=57
+assistant=9/9
+assistant_schema=3
+catalog_version=1
+base_branch=feature-v0120-darkroom-assistant-r7-r8-r9
+base_head=3f820cea9f53f9196e81bd05d552679b31177249
+validated_functional_commit=9abbcf5a399289ac1df91a5d7e96e008f69e532c
+validated_run_id=32203521996
