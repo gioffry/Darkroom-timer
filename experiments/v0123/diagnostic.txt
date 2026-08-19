@@ -1,5 +1,5 @@
-run_id=32220176802
-commit=2a3d58b27c906deac12883339250ecaf31b6d72a
+run_id=32220269611
+commit=9c0179f4aa1bcab148ea0d3be28258050a78eb51
 status=PASS
 --- diag-v0121.txt ---
 v0.12.1 OK build VERSION_NAME
