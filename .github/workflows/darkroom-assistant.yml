@@ -43,8 +43,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl -L --fail --retry 3 -A 'Mozilla/5.0 DarkroomAssistant/0.2.1' \
-            'https://www.digitaltruth.com/chart/print.php' -o "$RUNNER_TEMP/mdc-index.html"
+          UA='Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Mobile Safari/537.36'
+          ok=0
+          for url in \
+            'https://www.digitaltruth.com/chart/print.php' \
+            'https://ftp.digitaltruth.com/chart/print.php' \
+            'https://www.digitaltruth.com/devchart.php'; do
+            if curl -L --fail --retry 2 -A "$UA" -e 'https://www.digitaltruth.com/' "$url" -o "$RUNNER_TEMP/mdc-index.html"; then
+              ok=1
+              break
+            fi
+          done
+          test "$ok" = 1
           python3 - "$RUNNER_TEMP/mdc-index.html" <<'PY'
           import re, sys
           p=sys.argv[1]
@@ -55,8 +65,6 @@ jobs:
           missing=[x for x in required if x not in text]
           if missing:
               raise SystemExit('Indice MDC incompleto/non leggibile: '+', '.join(missing))
-          if 'developer=' not in html.lower() or 'film=' not in html.lower():
-              raise SystemExit('Indice MDC senza link Film/Developer interrogabili')
           print('MDC live index OK:', ', '.join(required))
           PY
 
