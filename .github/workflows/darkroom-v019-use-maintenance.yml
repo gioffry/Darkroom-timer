@@ -61,12 +61,17 @@ jobs:
         run: |
           set -euo pipefail
           cat combined/v015_assets/home_bottom_parts/00.part combined/v015_assets/home_bottom_parts/01.part combined/v015_assets/home_bottom_parts/02.part combined/v015_assets/home_bottom_parts/03.part > combined/v015_assets/home_bottom.jpg
-          bash combined/build_v019.sh
+          set +e
+          bash combined/build_v019.sh 2>&1 | tee build-v019.log
+          BUILD_RC=${PIPESTATUS[0]}
+          set -e
+          if [ "$BUILD_RC" -ne 0 ]; then exit "$BUILD_RC"; fi
           test -f Darkroom-v0.1.9.apk
           test -f Darkroom-v0.1.9.sha256
           cat validation-v015.txt
 
       - name: Upload APK artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: Darkroom-v0.1.9
@@ -83,12 +88,30 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p build-output/v019
+          rm -f build-output/v019/BUILD_FAILED.txt
           cp Darkroom-v0.1.9.apk build-output/v019/Darkroom-v0.1.9.apk
           cp Darkroom-v0.1.9.sha256 build-output/v019/Darkroom-v0.1.9.sha256
           cp validation-v015.txt build-output/v019/validation-v0.1.9.txt
           cp apk-badging-v015.txt build-output/v019/apk-badging-v0.1.9.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- build-output/v019/Darkroom-v0.1.9.apk build-output/v019/Darkroom-v0.1.9.sha256 build-output/v019/validation-v0.1.9.txt build-output/v019/apk-badging-v0.1.9.txt
+          git add -- build-output/v019/Darkroom-v0.1.9.apk build-output/v019/Darkroom-v0.1.9.sha256 build-output/v019/validation-v0.1.9.txt build-output/v019/apk-badging-v0.1.9.txt build-output/v019/BUILD_FAILED.txt
           git commit -m "Publish Darkroom v0.1.9 APK [skip ci]"
+          git push origin HEAD:feature-darkroom-v019-use-maintenance
+
+      - name: Publish build diagnostic on failure
+        if: failure()
+        run: |
+          set -euo pipefail
+          mkdir -p build-output/v019
+          {
+            echo 'Darkroom v0.1.9 BUILD FAILED'
+            echo "commit=${GITHUB_SHA}"
+            echo '--- tail build-v019.log ---'
+            if [ -f build-v019.log ]; then tail -n 220 build-v019.log; else echo 'build-v019.log unavailable: failure occurred before build step'; fi
+          } > build-output/v019/BUILD_FAILED.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- build-output/v019/BUILD_FAILED.txt
+          git commit -m "Record Darkroom v0.1.9 build failure [skip ci]" || exit 0
           git push origin HEAD:feature-darkroom-v019-use-maintenance
