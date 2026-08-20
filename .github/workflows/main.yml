@@ -2,7 +2,8 @@ name: Build Darkroom v0.1.6 Cambio Ingrandimento
 
 on:
   push:
-    branches: [ feature-darkroom-v016-enlargement ]
+    branches:
+      - feature-darkroom-v016-enlargement
   workflow_dispatch:
 
 permissions:
