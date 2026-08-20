@@ -49,11 +49,27 @@ Path('/tmp/patch_v013_home_code_only.py').write_text(src, encoding='utf-8')
 PY
 python3 /tmp/patch_v013_home_code_only.py
 
-# Sostituisce ESCLUSIVAMENTE l'asset raster con il mockup originale 864x1536
-# caricato dall'utente, ricomposto senza ricampionamenti aggiuntivi.
-HD_DIR=combined/v014_assets/home_hd
-test "$(find "$HD_DIR" -maxdepth 1 -type f -name '*.part' | wc -l)" -eq 8
-cat "$HD_DIR"/0{0..7}.part | tr -d '\r\n' | base64 --decode > combined/src/main/res/drawable-nodpi/home_vintage.webp
+# Sostituisce ESCLUSIVAMENTE l'asset raster con il mockup HD 864x1536.
+# Le parti contengono un'unica stringa Base64 spezzata: normalizza spazi e padding.
+python3 - <<'PY'
+from pathlib import Path
+import base64
+hd = Path('combined/v014_assets/home_hd')
+parts = sorted(hd.glob('*.part'))
+if len(parts) != 8:
+    raise SystemExit(f'asset HD: attese 8 parti, trovate {len(parts)}')
+encoded = ''.join(''.join(p.read_text(encoding='utf-8').split()) for p in parts)
+encoded += '=' * (-len(encoded) % 4)
+try:
+    data = base64.b64decode(encoded, validate=True)
+except Exception as exc:
+    raise SystemExit('asset HD Base64 non valido: ' + str(exc))
+if len(data) <= 80000 or data[:4] != b'RIFF' or data[8:12] != b'WEBP':
+    raise SystemExit('asset HD WebP non valido')
+out = Path('combined/src/main/res/drawable-nodpi/home_vintage.webp')
+out.write_bytes(data)
+print('HD_BYTES=' + str(len(data)))
+PY
 HD_BYTES=$(stat -c%s combined/src/main/res/drawable-nodpi/home_vintage.webp)
 test "$HD_BYTES" -gt 80000
 test "$(head -c 4 combined/src/main/res/drawable-nodpi/home_vintage.webp)" = "RIFF"
