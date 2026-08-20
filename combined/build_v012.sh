@@ -36,6 +36,20 @@ grep -q 'android:versionCode="2"' combined/src/main/AndroidManifest.xml
 grep -q "versionName '0.1.1'" combined/build.gradle
 grep -q 'versionCode 2' combined/build.gradle
 
+# Il vecchio asset 0.1.3 serve soltanto alla patch che genera la Home sicura.
+# Normalizza il Base64 legacy; subito dopo viene comunque sostituito dal mockup HD 864x1536.
+python3 - <<'PY'
+from pathlib import Path
+parts = sorted(Path('combined/v012_assets/home_mockup').glob('*.part'))
+if len(parts) != 2:
+    raise SystemExit('asset legacy Home: attese 2 parti')
+encoded = ''.join(''.join(p.read_text(encoding='utf-8').split()) for p in parts)
+encoded += '=' * (-len(encoded) % 4)
+cut = len(''.join(parts[0].read_text(encoding='utf-8').split()))
+parts[0].write_text(encoded[:cut], encoding='utf-8')
+parts[1].write_text(encoded[cut:], encoding='utf-8')
+PY
+
 # Mantiene la Home sicura già verificata della 0.1.3 (routing/hotspot invariati).
 python3 combined/patch_v012_vintage_home.py
 
