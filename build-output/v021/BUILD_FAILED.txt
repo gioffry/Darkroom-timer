@@ -1,5 +1,5 @@
 Darkroom v0.2.1 BUILD FAILED
-commit=75abfd734240447e88c957ff6e3f31187a7e2a7e
+commit=93214f26e4898c95d8c6ab911f2c8647aa27baa9
 --- tail build-v021.log ---
 v0.12.1 OK backup catalog version
 v0.12.1 OK backup app version
@@ -144,19 +144,19 @@ v0.13.7 OK lighter nav typography
 v0.13.7 OK nav indicator setter
 v0.13.7 OK draw active line
 v0.13.7 TRANSFORM OK — flat mockup-style bottom nav; PROVINO default preserved; timing untouched
-progress 20/234 developers, raw_rows=683, failed=0
+progress 20/234 developers, raw_rows=602, failed=0
 progress 40/234 developers, raw_rows=1465, failed=0
-progress 60/234 developers, raw_rows=1662, failed=0
-progress 80/234 developers, raw_rows=2958, failed=0
-progress 100/234 developers, raw_rows=4412, failed=0
-progress 120/234 developers, raw_rows=5508, failed=0
+progress 60/234 developers, raw_rows=1664, failed=0
+progress 80/234 developers, raw_rows=2925, failed=0
+progress 100/234 developers, raw_rows=4436, failed=0
+progress 120/234 developers, raw_rows=4881, failed=0
 progress 140/234 developers, raw_rows=7658, failed=0
 progress 160/234 developers, raw_rows=8712, failed=0
 progress 180/234 developers, raw_rows=10477, failed=0
 progress 200/234 developers, raw_rows=10899, failed=0
-progress 220/234 developers, raw_rows=12047, failed=0
+progress 220/234 developers, raw_rows=11879, failed=0
 progress 234/234 developers, raw_rows=14527, failed=0
-BUILT SQLITE V032: canonical_index=364 films=347 developers=232 rows=14504 failed=0 rodinal=1 ferrania_p30=1 noisy_films=0 quick_check=ok size=3960832
+BUILT SQLITE V032: canonical_index=364 films=347 developers=232 rows=14504 failed=0 rodinal=1 ferrania_p30=1 noisy_films=0 quick_check=ok size=3969024
 v0.1.8 visible-results patch applied
 v0.1.9 search enrichment patch applied
 v0.2.0 source-brain patch applied
@@ -174,14 +174,14 @@ v0.3.8 edit persistence + simpler reuse text applied
 Combined Darkroom sources prepared
 Darkroom v0.1.3 HOME SAFE OK — mockup approvato + 4 funzioni reali preservate
 WEBP_SOURCE_BYTES=112623
-[swscaler @ 0x5654471b7600] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x5654472a0b80] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x5654471b51c0] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x559e19bb0600] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x559e19c99b80] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x559e19bae1c0] deprecated pixel format used, make sure you did set range correctly
     Last message repeated 2 times
-[swscaler @ 0x5654472a0b40] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x559e19c99b40] deprecated pixel format used, make sure you did set range correctly
     Last message repeated 2 times
-[image2 @ 0x565447116a80] The specified filename 'combined/src/main/res/drawable-nodpi/home_vintage.jpg' does not contain an image sequence pattern or a pattern is invalid.
-[image2 @ 0x565447116a80] Use a pattern such as %03d for an image sequence or use the -update option (with -frames:v 1 if needed) to write a single image.
+[image2 @ 0x559e19b0fa80] The specified filename 'combined/src/main/res/drawable-nodpi/home_vintage.jpg' does not contain an image sequence pattern or a pattern is invalid.
+[image2 @ 0x559e19b0fa80] Use a pattern such as %03d for an image sequence or use the -update option (with -frames:v 1 if needed) to write a single image.
 v016 enlargement patch applied
 v017 polish applied
 settings scroll fix applied
@@ -190,14 +190,14 @@ Darkroom v0.1.9 Uso e Manutenzione patch ready
 Darkroom v0.2.0 enlargement/log flow patch ready
 Darkroom v0.2.0 legacy recipe compatibility patch ready
 Darkroom v0.2.0 visual coherence patch ready
-[swscaler @ 0x55b21e571600] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x55b21e65ab80] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x55b21e56f1c0] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x55de687a5600] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x55de6888eb80] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x55de687a31c0] deprecated pixel format used, make sure you did set range correctly
     Last message repeated 2 times
-[swscaler @ 0x55b21e65ab40] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x55de6888eb40] deprecated pixel format used, make sure you did set range correctly
     Last message repeated 2 times
-[image2 @ 0x55b21e4d0a80] The specified filename 'combined/src/main/res/drawable-nodpi/home_vintage.jpg' does not contain an image sequence pattern or a pattern is invalid.
-[image2 @ 0x55b21e4d0a80] Use a pattern such as %03d for an image sequence or use the -update option (with -frames:v 1 if needed) to write a single image.
+[image2 @ 0x55de68704a80] The specified filename 'combined/src/main/res/drawable-nodpi/home_vintage.jpg' does not contain an image sequence pattern or a pattern is invalid.
+[image2 @ 0x55de68704a80] Use a pattern such as %03d for an image sequence or use the -update option (with -frames:v 1 if needed) to write a single image.
 Darkroom v0.2.1 Home/font/LOG fix patch ready
 
 Welcome to Gradle 8.13!
@@ -217,10 +217,10 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :combined:stripReleaseDebugSymbols NO-SOURCE
 > Task :combined:extractReleaseNativeSymbolTables NO-SOURCE
 > Task :combined:mergeReleaseNativeDebugMetadata NO-SOURCE
-> Task :combined:javaPreCompileRelease
 > Task :combined:checkReleaseDuplicateClasses
-> Task :combined:checkReleaseAarMetadata
+> Task :combined:javaPreCompileRelease
 > Task :combined:generateReleaseResValues
+> Task :combined:checkReleaseAarMetadata
 > Task :combined:mapReleaseSourceSetPaths
 > Task :combined:generateReleaseResources
 > Task :combined:packageReleaseResources
@@ -238,6 +238,7 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:desugarReleaseFileDependencies
 > Task :combined:mergeReleaseStartupProfile
 > Task :combined:mergeReleaseArtProfile
+> Task :combined:processReleaseManifestForPackage
 > Task :combined:mergeReleaseShaders
 > Task :combined:compileReleaseShaders NO-SOURCE
 > Task :combined:generateReleaseAssets UP-TO-DATE
@@ -245,14 +246,8 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:extractReleaseVersionControlInfo
 > Task :combined:extractProguardFiles
 > Task :combined:processReleaseJavaRes NO-SOURCE
-> Task :combined:compressReleaseAssets
-> Task :combined:processReleaseManifestForPackage
-> Task :combined:collectReleaseDependencies
-> Task :combined:sdkReleaseDependencyData
-> Task :combined:validateSigningRelease
-> Task :combined:writeReleaseAppMetadata
-> Task :combined:writeReleaseSigningConfigVersions
 > Task :combined:processReleaseResources
+> Task :combined:compressReleaseAssets
 > Task :combined:mergeExtDexRelease
 > Task :combined:mergeReleaseJavaResource
 
@@ -265,6 +260,11 @@ Note: Recompile with -Xlint:deprecation for details.
 > Task :combined:generateReleaseLintVitalReportModel
 > Task :combined:mergeDexRelease
 > Task :combined:compileReleaseArtProfile
+> Task :combined:collectReleaseDependencies
+> Task :combined:sdkReleaseDependencyData
+> Task :combined:validateSigningRelease
+> Task :combined:writeReleaseAppMetadata
+> Task :combined:writeReleaseSigningConfigVersions
 > Task :combined:optimizeReleaseResources
 > Task :combined:lintVitalAnalyzeRelease
 > Task :combined:lintVitalReportRelease
@@ -281,7 +281,7 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 1m 26s
+BUILD SUCCESSFUL in 1m 25s
 43 actionable tasks: 43 executed
 Verifies
 Verified using v1 scheme (JAR signing): false
@@ -300,4 +300,4 @@ Signer #1 key size (bits): 4096
 Signer #1 public key SHA-256 digest: 192768f7fe3a92c4697fe98f1e65d7173bff4c4a497b038207dd79d6f2af48a4
 Signer #1 public key SHA-1 digest: 5c1f2c34c4c63bb994ae413416d4a38e9609afde
 Signer #1 public key MD5 digest: cca83fde59ccf34c37086ce7408006f4
-b257e3b77241f71d48a5a48a002684660a884b70626f9e2a0a1cbbf98ce707ba  Darkroom-v0.2.1.apk
+900f6b822b14cbd2ac389e044257cd4828706dd408a087f04839629c918c7eee  Darkroom-v0.2.1.apk
