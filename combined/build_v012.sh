@@ -45,8 +45,7 @@ Path('/tmp/patch_home_code_only.py').write_text(src, encoding='utf-8')
 PY
 python3 /tmp/patch_home_code_only.py
 
-# Ricostruisce l'asset HD già presente nel repository. Il WebP NON viene fornito ad Android:
-# viene usato solo come sorgente e convertito da ffmpeg in un JPEG standard Android-safe.
+# Ricostruisce il vecchio asset HD, valido nella parte alta, usandolo solo come sorgente.
 python3 - <<'PY'
 from pathlib import Path
 import base64
@@ -63,12 +62,23 @@ Path('/tmp/home_hd_source.webp').write_bytes(data)
 print('WEBP_SOURCE_BYTES=' + str(len(data)))
 PY
 
-# Decodifica tollerante del WebP e ricodifica JPEG baseline. Pad a 864x1536 per mantenere
-# esattamente la geometria/hotspot del mockup anche se il vecchio stream WebP ha la coda danneggiata.
+# Patch inferiore: ritaglio pulito 864x216 del mockup originale approvato, da y=1320 a 1536.
+BOTTOM=combined/v015_assets/home_bottom.jpg
+test -s "$BOTTOM"
+test "$(head -c 2 "$BOTTOM" | od -An -tx1 | tr -d ' \n')" = "ffd8"
+test "$(tail -c 2 "$BOTTOM" | od -An -tx1 | tr -d ' \n')" = "ffd9"
+ffmpeg -v error -xerror -i "$BOTTOM" -frames:v 1 -f null -
+BOTTOM_DIMS="$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$BOTTOM")"
+test "$BOTTOM_DIMS" = "864x216"
+
+# Android riceve SOLO un JPEG standard. Il fondo corrotto del vecchio WebP viene completamente
+# coperto con il ritaglio pulito originale a partire da y=1320.
 rm -f combined/src/main/res/drawable-nodpi/home_vintage.webp
-ffmpeg -y -v warning -err_detect ignore_err -i /tmp/home_hd_source.webp \
-  -frames:v 1 -vf "scale=864:-2,pad=864:1536:0:0:black" \
-  -pix_fmt yuvj420p -q:v 2 combined/src/main/res/drawable-nodpi/home_vintage.jpg
+ffmpeg -y -v warning -err_detect ignore_err \
+  -i /tmp/home_hd_source.webp -i "$BOTTOM" \
+  -filter_complex "[0:v]scale=864:-2,pad=864:1536:0:0:black[base];[base][1:v]overlay=0:1320:format=auto" \
+  -frames:v 1 -pix_fmt yuvj420p -q:v 2 \
+  combined/src/main/res/drawable-nodpi/home_vintage.jpg
 
 JPG=combined/src/main/res/drawable-nodpi/home_vintage.jpg
 test -s "$JPG"
@@ -128,6 +138,9 @@ sha256sum Darkroom-v0.1.5.apk | tee Darkroom-v0.1.5.sha256
   echo 'home_asset_format=JPEG'
   echo 'home_asset_dimensions=864x1536'
   echo 'home_jpeg_full_decode=PASS'
+  echo 'home_bottom_patch=PASS'
+  echo 'home_bottom_patch_y=1320'
+  echo 'home_bottom_patch_dimensions=864x216'
   echo 'home_webp_not_packaged=PASS'
   echo 'products_function=PASS'
   echo 'film_function=PASS'
