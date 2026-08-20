@@ -11,7 +11,7 @@ required = [
     'Darkroom-v0.1.8',
     'versionCode="9"',
     'versionName="0.1.8"',
-    'python3 combined/patch_v018_enlargement_fixes_r2.py\\n',
+    'python3 combined/patch_v018_enlargement_fixes_r2.py\\\\n',
 ]
 for marker in required:
     if marker not in s:
@@ -25,8 +25,8 @@ s = s.replace('versionName="0.1.8"', 'versionName="0.1.9"')
 s = s.replace("versionName '0.1.8'", "versionName '0.1.9'")
 s = s.replace("versionName='0.1.8'", "versionName='0.1.9'")
 
-needle = 'python3 combined/patch_v018_enlargement_fixes_r2.py\\n'
-replacement = needle + 'python3 combined/patch_v019_use_maintenance.py\\n'
+needle = 'python3 combined/patch_v018_enlargement_fixes_r2.py\\\\n'
+replacement = needle + 'python3 combined/patch_v019_use_maintenance.py\\\\n'
 if s.count(needle) != 1:
     raise SystemExit('v0.1.9 build wrapper: v0.1.8 patch insertion point ambiguous')
 s = s.replace(needle, replacement, 1)
