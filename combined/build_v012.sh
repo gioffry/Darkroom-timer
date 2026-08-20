@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # Darkroom v0.1.5: base canonica 0.1.1, Timer 0.13.7 + Assistant 0.3.8.
-# Cambia ESCLUSIVAMENTE la Home grafica: usa un JPEG Android-safe ad alta risoluzione.
-git fetch origin archive/timer-v0137-baseline archive/assistant-v038-baseline feature-darkroom-v012-vintage-home-r2
+# Cambia ESCLUSIVAMENTE la Home grafica: usa il JPEG HD approvato e Android-safe.
+git fetch origin archive/timer-v0137-baseline archive/assistant-v038-baseline feature-darkroom-v012-mockup-home
 
 git update-ref refs/remotes/origin/feature-v0137-flat-bottom-nav \
   "$(git rev-parse origin/archive/timer-v0137-baseline)"
@@ -48,30 +48,34 @@ Path('/tmp/patch_home_code_only.py').write_text(src, encoding='utf-8')
 PY
 python3 /tmp/patch_home_code_only.py
 
-# Ricostruisce la copia HD storica completa e la decodifica rigorosamente.
-SRC_REF=origin/feature-darkroom-v012-vintage-home-r2
-mapfile -t PARTS < <(git ls-tree -r --name-only "$SRC_REF" -- combined/v012_assets/home_mockup | sort)
-test "${#PARTS[@]}" -eq 9
+# Recupera il JPEG HD originale del mockup approvato dalla sua sorgente storica.
+# Questa sorgente è già JPEG baseline 864x1536: non passa più dal WebP corrotto.
+SRC_REF=origin/feature-darkroom-v012-mockup-home
+mapfile -t PARTS < <(git ls-tree -r --name-only "$SRC_REF" -- combined/home_mockup_parts | sort)
+test "${#PARTS[@]}" -eq 10
 : > /tmp/home_hd.b64
 for f in "${PARTS[@]}"; do
   git show "$SRC_REF:$f" >> /tmp/home_hd.b64
 done
 tr -d '\r\n\t ' < /tmp/home_hd.b64 > /tmp/home_hd.clean.b64
-base64 --decode /tmp/home_hd.clean.b64 > /tmp/home_hd_source.webp
+python3 - <<'PY'
+from pathlib import Path
+p = Path('/tmp/home_hd.clean.b64')
+s = p.read_text(encoding='ascii')
+p.write_text(s + '=' * (-len(s) % 4), encoding='ascii')
+PY
+base64 --decode /tmp/home_hd.clean.b64 > /tmp/home_hd_source.jpg
 
-test "$(head -c 4 /tmp/home_hd_source.webp)" = "RIFF"
-test "$(dd if=/tmp/home_hd_source.webp bs=1 skip=8 count=4 status=none)" = "WEBP"
-
-# Fallisce se il WebP è anche solo parzialmente corrotto.
-ffmpeg -v error -xerror -i /tmp/home_hd_source.webp -frames:v 1 -f null -
-
-DIMS="$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 /tmp/home_hd_source.webp)"
+# JPEG completo e decodificabile, non soltanto header formalmente valido.
+test "$(head -c 2 /tmp/home_hd_source.jpg | od -An -tx1 | tr -d ' \n')" = "ffd8"
+test "$(tail -c 2 /tmp/home_hd_source.jpg | od -An -tx1 | tr -d ' \n')" = "ffd9"
+ffmpeg -v error -xerror -i /tmp/home_hd_source.jpg -frames:v 1 -f null -
+DIMS="$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 /tmp/home_hd_source.jpg)"
 test "$DIMS" = "864x1536"
 
-# Android-safe: JPEG standard, nessun WebP nel pacchetto Home.
+# Installa direttamente il JPEG validato nella Home; nessun WebP resta nel pacchetto.
 rm -f combined/src/main/res/drawable-nodpi/home_vintage.webp
-ffmpeg -v error -xerror -i /tmp/home_hd_source.webp -frames:v 1 -q:v 2 \
-  combined/src/main/res/drawable-nodpi/home_vintage.jpg
+cp /tmp/home_hd_source.jpg combined/src/main/res/drawable-nodpi/home_vintage.jpg
 
 JPG=combined/src/main/res/drawable-nodpi/home_vintage.jpg
 test -s "$JPG"
@@ -130,7 +134,9 @@ sha256sum Darkroom-v0.1.5.apk | tee Darkroom-v0.1.5.sha256
   echo 'timer_version=0.13.7'
   echo 'assistant_version=0.3.8'
   echo 'home_asset_format=JPEG'
+  echo 'home_asset_source=approved_hd_jpeg'
   echo 'home_asset_dimensions=864x1536'
+  echo 'home_full_decode=PASS'
   echo 'home_webp_removed=PASS'
   echo 'products_function=PASS'
   echo 'film_function=PASS'
