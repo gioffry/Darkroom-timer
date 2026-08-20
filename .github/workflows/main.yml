@@ -1,23 +1,27 @@
-name: Build Darkroom Timer APK
+name: Build Darkroom v0.1.4 HD Home
 
 on:
   push:
-    branches: [ main ]
+    branches: [ feature-darkroom-v014-hd-home ]
+    paths-ignore:
+      - 'combined/v014_latest_run.txt'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   statuses: write
 
 jobs:
   build-apk:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Scarica repository
+      - name: Checkout exact branch
         uses: actions/checkout@v4
+        with:
+          ref: feature-darkroom-v014-hd-home
+          fetch-depth: 0
 
-      - name: Pubblica stato build avviata
+      - name: Publish pending status
         continue-on-error: true
         shell: bash
         env:
@@ -26,103 +30,96 @@ jobs:
           SHA: ${{ github.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          curl --fail --silent --show-error \
-            -X POST \
+          curl --fail --silent --show-error -X POST \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/$REPO/statuses/$SHA" \
-            -d "{\"state\":\"pending\",\"context\":\"darkroom-apk-build\",\"description\":\"Build APK in corso\",\"target_url\":\"$RUN_URL\"}" >/dev/null
+            -d "{\"state\":\"pending\",\"context\":\"darkroom-v014-hd-build\",\"description\":\"Build Darkroom 0.1.4 in corso\",\"target_url\":\"$RUN_URL\"}" >/dev/null
 
-      - name: Prepara base consolidata e patch attive
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf work
-          mkdir -p work
-          test -d base/v0.6.0/project
-          test -f base/v0.6.0/build_darkroom.py
-          echo "Uso base consolidata v0.6.0"
-          cp -a base/v0.6.0/project work/project
-          cp base/v0.6.0/build_darkroom.py work/build_darkroom.py
-
-          if [ -d patches/active ]; then
-            while IFS= read -r patch_file; do
-              echo "Applico patch attiva $patch_file"
-              patch -d work -p1 < "$patch_file"
-            done < <(find patches/active -maxdepth 1 -type f -name '*.patch' | sort)
-          fi
-
-      - name: Leggi versione risultante
-        id: version
-        shell: bash
-        run: |
-          VERSION_NAME=$(python3 - <<'PY'
-          import re
-          from pathlib import Path
-          text = Path('work/project/app/src/main/AndroidManifest.xml').read_text(encoding='utf-8')
-          m = re.search(r'android:versionName="([^"]+)"', text)
-          if not m:
-              raise SystemExit('versionName non trovato')
-          print(m.group(1))
-          PY
-          )
-          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
-          echo "Versione da compilare: $VERSION_NAME"
-
-      - name: Configura Java 17
+      - name: Java 17
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Prepara Android SDK
+      - name: Android SDK 34
         shell: bash
         run: |
+          set -euo pipefail
           SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          if [ ! -x "$SDKMANAGER" ]; then
-            SDKMANAGER="$(command -v sdkmanager)"
-          fi
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
           "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
 
-      - name: Prepara firma stabile
+      - name: Gradle 8.13
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 -o "$RUNNER_TEMP/gradle.zip" https://services.gradle.org/distributions/gradle-8.13-bin.zip
+          unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/gradle-8.13/bin" >> "$GITHUB_PATH"
+
+      - name: Prepare stable signing
         shell: bash
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          test -n "$KEYSTORE_B64"
-          test -n "$KEYSTORE_PASSWORD"
-          test -n "$KEY_ALIAS"
-          test -n "$KEY_PASSWORD"
+          test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_PASSWORD"
           printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
 
-      - name: Compila APK
+      - name: Build and validate Darkroom v0.1.4
         shell: bash
         env:
-          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          VERSION_NAME: ${{ steps.version.outputs.name }}
+          ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/darkroom-signing.p12
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          python3 work/build_darkroom.py \
-            work/project \
-            --output "DarkroomTimer-DIY-v${VERSION_NAME}.apk" \
-            --keystore "$RUNNER_TEMP/darkroom-signing.p12" \
-            --alias "$KEY_ALIAS" \
-            --storepass "$KEYSTORE_PASSWORD" \
-            --keypass "$KEY_PASSWORD"
+          set -euo pipefail
+          bash combined/build_v012.sh
+          cat validation-v014.txt
 
-      - name: Salva APK
+      - name: Upload APK
+        id: upload
         uses: actions/upload-artifact@v4
         with:
-          name: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}
-          path: DarkroomTimer-DIY-v${{ steps.version.outputs.name }}.apk
+          name: Darkroom-v0.1.4
+          if-no-files-found: error
+          path: |
+            Darkroom-v0.1.4.apk
+            Darkroom-v0.1.4.sha256
+            certificate-v014.txt
+            apk-badging-v014.txt
+            apk-listing-v014.txt
+            validation-v014.txt
 
-      - name: Pubblica esito build
+      - name: Record artifact metadata
+        if: success() && github.event_name == 'push'
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          set -euo pipefail
+          cat > combined/v014_latest_run.txt <<EOF
+          run_id=$GITHUB_RUN_ID
+          artifact_id=$ARTIFACT_ID
+          artifact=Darkroom-v0.1.4
+          branch=feature-darkroom-v014-hd-home
+          commit=$GITHUB_SHA
+          versionName=0.1.4
+          versionCode=5
+          build=SUCCESS
+          EOF
+          git config user.name "Darkroom Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- combined/v014_latest_run.txt
+          git commit -m "Record Darkroom v0.1.4 build $GITHUB_RUN_ID [skip ci]"
+          git push origin HEAD:feature-darkroom-v014-hd-home
+
+      - name: Publish final status
         if: always()
         continue-on-error: true
         shell: bash
@@ -133,20 +130,12 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           JOB_STATUS: ${{ job.status }}
         run: |
-          if [ "$JOB_STATUS" = "success" ]; then
-            STATE="success"
-            DESCRIPTION="Build APK completata"
-          elif [ "$JOB_STATUS" = "cancelled" ]; then
-            STATE="error"
-            DESCRIPTION="Build APK annullata"
-          else
-            STATE="failure"
-            DESCRIPTION="Build APK fallita"
-          fi
-          curl --fail --silent --show-error \
-            -X POST \
+          if [ "$JOB_STATUS" = "success" ]; then STATE="success"; DESCRIPTION="Darkroom 0.1.4 build completata";
+          elif [ "$JOB_STATUS" = "cancelled" ]; then STATE="error"; DESCRIPTION="Darkroom 0.1.4 build annullata";
+          else STATE="failure"; DESCRIPTION="Darkroom 0.1.4 build fallita"; fi
+          curl --fail --silent --show-error -X POST \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/$REPO/statuses/$SHA" \
-            -d "{\"state\":\"$STATE\",\"context\":\"darkroom-apk-build\",\"description\":\"$DESCRIPTION\",\"target_url\":\"$RUN_URL\"}" >/dev/null
+            -d "{\"state\":\"$STATE\",\"context\":\"darkroom-v014-hd-build\",\"description\":\"$DESCRIPTION\",\"target_url\":\"$RUN_URL\"}" >/dev/null
