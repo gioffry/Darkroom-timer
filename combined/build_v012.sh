@@ -49,22 +49,39 @@ PY
 python3 /tmp/patch_home_code_only.py
 
 # Recupera il JPEG HD originale del mockup approvato dalla sua sorgente storica.
-# Questa sorgente è già JPEG baseline 864x1536: non passa più dal WebP corrotto.
-SRC_REF=origin/feature-darkroom-v012-mockup-home
-mapfile -t PARTS < <(git ls-tree -r --name-only "$SRC_REF" -- combined/home_mockup_parts | sort)
-test "${#PARTS[@]}" -eq 10
-: > /tmp/home_hd.b64
-for f in "${PARTS[@]}"; do
-  git show "$SRC_REF:$f" >> /tmp/home_hd.b64
-done
-tr -d '\r\n\t ' < /tmp/home_hd.b64 > /tmp/home_hd.clean.b64
+# I blocchi storici sono decodificati singolarmente, poi concatenati come byte:
+# evita padding Base64 intermedio e preserva esattamente il JPEG originale.
 python3 - <<'PY'
 from pathlib import Path
-p = Path('/tmp/home_hd.clean.b64')
-s = p.read_text(encoding='ascii')
-p.write_text(s + '=' * (-len(s) % 4), encoding='ascii')
+import base64
+import re
+import subprocess
+
+ref = 'origin/feature-darkroom-v012-mockup-home'
+listing = subprocess.check_output([
+    'git', 'ls-tree', '-r', '--name-only', ref, '--', 'combined/home_mockup_parts'
+], text=True)
+parts = sorted(x.strip() for x in listing.splitlines() if x.strip())
+if len(parts) != 10:
+    raise SystemExit(f'JPEG HD: attesi 10 blocchi, trovati {len(parts)}')
+
+out = bytearray()
+for index, path in enumerate(parts):
+    text = subprocess.check_output(['git', 'show', f'{ref}:{path}'], text=True)
+    clean = ''.join(text.split())
+    if re.search(r'[^A-Za-z0-9+/=]', clean):
+        raise SystemExit(f'JPEG HD: carattere Base64 non valido nel blocco {path}')
+    clean += '=' * (-len(clean) % 4)
+    try:
+        block = base64.b64decode(clean, validate=True)
+    except Exception as exc:
+        raise SystemExit(f'JPEG HD: blocco {path} non decodificabile: {exc}')
+    out.extend(block)
+    print(f'JPEG_BLOCK={index + 1}/{len(parts)} bytes={len(block)}')
+
+Path('/tmp/home_hd_source.jpg').write_bytes(out)
+print(f'JPEG_TOTAL_BYTES={len(out)}')
 PY
-base64 --decode /tmp/home_hd.clean.b64 > /tmp/home_hd_source.jpg
 
 # JPEG completo e decodificabile, non soltanto header formalmente valido.
 test "$(head -c 2 /tmp/home_hd_source.jpg | od -An -tx1 | tr -d ' \n')" = "ffd8"
