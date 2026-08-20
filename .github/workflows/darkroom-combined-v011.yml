@@ -1,195 +1,41 @@
-name: Build Darkroom Combined v0.1.1
+name: Build Darkroom Combined v0.1.4 HD Home
 
 on:
   push:
     branches:
-      - feature-darkroom-combined-v011-timer0137-dilution
-  pull_request:
-    branches:
-      - main
+      - feature-darkroom-v014-hd-home
+    paths-ignore:
+      - 'combined/v014_latest_run.txt'
   workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: darkroom-v014-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-darkroom:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout exact feature branch
         uses: actions/checkout@v4
         with:
+          ref: feature-darkroom-v014-hd-home
           fetch-depth: 0
 
-      - name: Ricostruisci Timer v0.13.7 esatto
+      - name: Prove canonical Darkroom genealogy
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf work && mkdir -p work
-          cp -a base/v0.12.0-materialized/project work/project
-          cp base/v0.12.0-materialized/build_darkroom.py work/build_darkroom.py
-          cp base/v0.12.0-materialized/v064_icon.py work/v064_icon.py
-          python3 experiments/v0121/apply_v0121_assistant_ux_smart_catalog.py work
-          python3 experiments/v0122/apply_v0122_real_device_repair.py work
-          python3 experiments/v0123/apply_v0123_live_web_repair.py work
-          python3 experiments/v0123/apply_v0123_no_manual_cleanup.py work
-          python3 experiments/v0130/apply_v0130_timer_only_reset.py work
-          python3 experiments/v0131/apply_v0131_fstop_subtractive_teststrip.py work
-          python3 experiments/v0132/apply_v0132_consolidated_timer_fixes.py work
-          python3 experiments/v0133/apply_v0133_preferred_strip_pending.py work
-          python3 experiments/v0134/apply_v0134_preferred_strip_button_fix.py work
-          python3 experiments/v0135/apply_v0135_provino_contrast_note.py work
-          python3 experiments/v0136/apply_v0136_bottom_nav_provino_first.py work
-          python3 experiments/v0137/apply_v0137_flat_bottom_nav.py work
-          grep -q 'android:versionName="0.13.7"' work/project/app/src/main/AndroidManifest.xml
-          grep -q 'android:versionCode="68"' work/project/app/src/main/AndroidManifest.xml
-          grep -q 'private static final String APP_VERSION = "0.13.7";' work/project/app/src/main/java/it/darkroom/timer/MainActivity.java
-
-      - name: Genera Assistant v0.3.8 offline
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 assistant/build_mdc_sqlite_asset_v032.py
-          python3 assistant/patch_v018_visible_results.py
-          python3 assistant/patch_v019_search_enrichment.py
-          python3 assistant/patch_v020_source_brain.py
-          python3 assistant/patch_v021_index_fallback.py
-          python3 assistant/patch_v022_strict_entities.py
-          python3 assistant/patch_v030_offline_mdc.py
-          python3 assistant/patch_v031_bundled_db.py
-          python3 assistant/patch_v032_pure_offline.py
-          python3 assistant/patch_v033_startup_safe.py
-          python3 assistant/patch_v034_db_schema_match.py
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('assistant/patch_v035_format_stop_fix.py')
-          s=p.read_text()
-          start=s.index('# Nel flusso pellicola aggiungi FORMATO')
-          end=s.index('# Listener formato:', start)
-          block=r'''# Nel flusso pellicola aggiungi FORMATO prima del campo ISO.
-          needle = '        isoField = edit("", InputType.TYPE_CLASS_NUMBER);'
-          repl = ''' + "'''" + '''        formatSpinner = spinner(new String[]{"Seleziona prima la pellicola"});
-          page.addView(fieldBlock("FORMATO", formatSpinner));
-
-          isoField = edit("", InputType.TYPE_CLASS_NUMBER);''' + "'''" + r'''
-          if needle not in s:
-              raise SystemExit('film ISO insertion marker missing')
-          s = s.replace(needle, repl, 1)
-
-          '''
-          s=s[:start]+block+s[end:]
-          p.write_text(s)
-          PY
-          python3 assistant/patch_v035_format_stop_fix.py
-          python3 assistant/patch_v036_inline_results.py
-          python3 assistant/patch_v037_time_search_capacity.py
-          python3 assistant/patch_v038_edit_persistence_simplify.py
-          test -f assistant/src/main/assets/mdc_full.sqlite
-
-      - name: Prepara app unica e correggi memoria diluizione
-        shell: bash
-        run: |
-          set -euo pipefail
-          sed -i 's/adst_assistant_java/dst_assistant_java/g' combined/prepare_combined.py
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('combined/prepare_combined.py')
-          s=p.read_text(encoding='utf-8')
-
-          start=s.index('# onCreate: apre direttamente la sezione richiesta dalla Home unica.')
-          end=s.index('# Back = Home unica.', start)
-          block=r'''# onCreate: conserva tutte le inizializzazioni della v0.3.8 e sostituisce
-          # soltanto la showHome finale con il routing dalla Home combinata.
-          on_start = s.index('    @Override\\n    protected void onCreate(Bundle savedInstanceState) {')
-          on_end = s.index('\\n    @Override', on_start + 20)
-          on_seg = s[on_start:on_end]
-          old_home = '        showHome();'
-          if old_home not in on_seg:
-              raise SystemExit('Assistant onCreate showHome marker missing')
-          route = ''' + "'''" + '''        String target = getIntent().getStringExtra("darkroom_target");
-                  if ("products".equals(target)) showProducts();
-                  else if ("film".equals(target)) showFilm();
-                  else if ("paper".equals(target)) showPaper();
-                  else finish();''' + "'''" + r'''
-          on_seg = on_seg.replace(old_home, route, 1)
-          s = s[:on_start] + on_seg + s[on_end:]
-
-          '''
-          s=s[:start]+block+s[end:]
-
-          old_timer='''ts = ts.replace('compactButton("← HOME")', 'compactButton("⌂")')
-          ts = ts.replace('margin(lp(dp(94), dp(38)), 0, 0, 0, 4)',
-                          'margin(lp(dp(52), dp(38)), 0, 0, 0, 4)')'''
-          new_timer='''if 'homeButton.setText("←");' in ts:
-              ts = ts.replace('homeButton.setText("←");', 'homeButton.setText("⌂");', 1)
-          elif 'compactButton("← HOME")' in ts:
-              ts = ts.replace('compactButton("← HOME")', 'compactButton("⌂")', 1)
-          else:
-              raise SystemExit('Timer HOME control not found')'''
-          if old_timer not in s:
-              raise SystemExit('prepare_combined Timer marker missing')
-          s=s.replace(old_timer,new_timer,1)
-          s=s.replace("assert 'compactButton(\"⌂\")' in ts", "assert '⌂' in ts")
-
-          old='''        if (developerSpinner != null) developerSpinner.post(() ->
-                          selectSpinnerText(dilutionSpinner, prefs.getString("last_film_dil", "")));
-              }
-
-              private void restorePaperUiState() {'''
-          new='''        restoreSavedFilmDilution(0);
-              }
-
-              private void restoreSavedFilmDilution(int attempt) {
-                  String wanted = prefs.getString("last_film_dil", "");
-                  if (wanted.isEmpty() || dilutionSpinner == null) return;
-                  selectSpinnerText(dilutionSpinner, wanted);
-                  if (wanted.equals(spinnerText(dilutionSpinner))) return;
-                  if (attempt < 12) {
-                      dilutionSpinner.postDelayed(() -> restoreSavedFilmDilution(attempt + 1), 120L);
-                  }
-              }
-
-              private void restorePaperUiState() {'''
-          if old not in s:
-              raise SystemExit('film dilution restore marker missing')
-          s=s.replace(old,new,1)
-          p.write_text(s,encoding='utf-8')
-          PY
-          python3 combined/prepare_combined.py
-
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-          p=Path('combined/src/main/AndroidManifest.xml')
-          s=p.read_text(encoding='utf-8')
-          pat=r'''        <activity\s+android:name="\.MainActivity"\s+android:screenOrientation="portrait"\s+android:exported="true">\s+<intent-filter>\s+<action android:name="android.intent.action.MAIN" />\s+<category android:name="android.intent.category.LAUNCHER" />\s+</intent-filter>\s+</activity>'''
-          repl='''        <activity
-              android:name=".MainActivity"
-              android:screenOrientation="portrait"
-              android:exported="false" />
-
-          <activity
-              android:name=".home.HomeActivity"
-              android:screenOrientation="portrait"
-              android:exported="true">
-              <intent-filter>
-                  <action android:name="android.intent.action.MAIN" />
-                  <category android:name="android.intent.category.LAUNCHER" />
-              </intent-filter>
-          </activity>'''
-          s,n=re.subn(pat,repl,s,count=1,flags=re.S)
-          if n != 1:
-              raise SystemExit('MainActivity launcher block not found')
-          s=re.sub(r'android:versionCode="[^"]+"','android:versionCode="2"',s,count=1)
-          s=re.sub(r'android:versionName="[^"]+"','android:versionName="0.1.1"',s,count=1)
-          p.write_text(s,encoding='utf-8')
-          PY
-
-          grep -q 'PRODOTTI CHIMICI' combined/src/main/java/it/darkroom/timer/home/HomeActivity.java
-          grep -q 'SVILUPPO PELLICOLA' combined/src/main/java/it/darkroom/timer/home/HomeActivity.java
-          grep -q 'BAGNI STAMPA' combined/src/main/java/it/darkroom/timer/home/HomeActivity.java
-          grep -q 'TIMER STAMPA' combined/src/main/java/it/darkroom/timer/home/HomeActivity.java
-          grep -q 'private static final String APP_VERSION = "0.13.7";' combined/src/main/java/it/darkroom/timer/MainActivity.java
-          grep -q 'restoreSavedFilmDilution' combined/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
-          grep -q 'last_film_dil' combined/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
-          grep -q 'android:name=".home.HomeActivity"' combined/src/main/AndroidManifest.xml
+          EXPECTED_BASE=3246cda0c2356c7cac6da2e08cc2a2bbcd95b9d8
+          git fetch origin darkroom-main
+          git merge-base --is-ancestor "$EXPECTED_BASE" HEAD
+          MERGE_BASE=$(git merge-base "$EXPECTED_BASE" HEAD)
+          test "$MERGE_BASE" = "$EXPECTED_BASE"
+          grep -q 'Darkroom version: \*\*0.1.1\*\*' CURRENT_STATE.md
+          grep -q 'Canonical development branch: \*\*darkroom-main\*\*' CURRENT_STATE.md
 
       - name: Java 17
         uses: actions/setup-java@v5
@@ -213,16 +59,20 @@ jobs:
           unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
           echo "$RUNNER_TEMP/gradle-8.13/bin" >> "$GITHUB_PATH"
 
-      - name: Prepara firma stabile
+      - name: Prepare stable signing
         shell: bash
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          test -n "$KEYSTORE_B64"
+          test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_PASSWORD"
+          echo "::add-mask::$KEYSTORE_PASSWORD"
+          echo "::add-mask::$KEY_PASSWORD"
           printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
 
-      - name: Build APK combinato
+      - name: Build and validate Darkroom v0.1.4
         shell: bash
         env:
           ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/darkroom-signing.p12
@@ -231,27 +81,42 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          gradle :combined:assembleRelease --stacktrace
-          cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.1.1.apk
+          bash combined/build_v012.sh
+          cat validation-v014.txt
 
-      - name: Verifica APK finale
-        shell: bash
-        run: |
-          set -euo pipefail
-          APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
-          AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-          "$APKSIGNER" verify --verbose --print-certs Darkroom-v0.1.1.apk
-          BADGING=$("$AAPT" dump badging Darkroom-v0.1.1.apk)
-          echo "$BADGING" | head -30
-          echo "$BADGING" | grep -q "package: name='it.darkroom.darkroom' versionCode='2' versionName='0.1.1'"
-          echo "$BADGING" | grep -q "launchable-activity: name='it.darkroom.timer.home.HomeActivity'"
-          unzip -l Darkroom-v0.1.1.apk | grep -q 'assets/mdc_full.sqlite'
-          sha256sum Darkroom-v0.1.1.apk | tee Darkroom-v0.1.1.sha256
-
-      - name: Upload APK
+      - name: Upload Darkroom v0.1.4 APK
+        id: upload
         uses: actions/upload-artifact@v4
         with:
-          name: Darkroom-v0.1.1
+          name: Darkroom-v0.1.4
+          if-no-files-found: error
           path: |
-            Darkroom-v0.1.1.apk
-            Darkroom-v0.1.1.sha256
+            Darkroom-v0.1.4.apk
+            Darkroom-v0.1.4.sha256
+            certificate-v014.txt
+            apk-badging-v014.txt
+            apk-listing-v014.txt
+            validation-v014.txt
+
+      - name: Record successful v0.1.4 build
+        if: success() && github.event_name == 'push'
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          set -euo pipefail
+          cat > combined/v014_latest_run.txt <<EOF
+          run_id=$GITHUB_RUN_ID
+          artifact_id=$ARTIFACT_ID
+          artifact=Darkroom-v0.1.4
+          branch=feature-darkroom-v014-hd-home
+          commit=$GITHUB_SHA
+          versionName=0.1.4
+          versionCode=5
+          build=SUCCESS
+          EOF
+          git config user.name "Darkroom Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- combined/v014_latest_run.txt
+          git commit -m "Record Darkroom v0.1.4 build $GITHUB_RUN_ID [skip ci]"
+          git push origin HEAD:feature-darkroom-v014-hd-home
