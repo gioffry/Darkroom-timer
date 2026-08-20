@@ -83,6 +83,8 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
+          cat combined/v015_assets/home_bottom_parts/00.part combined/v015_assets/home_bottom_parts/01.part combined/v015_assets/home_bottom_parts/02.part combined/v015_assets/home_bottom_parts/03.part > combined/v015_assets/home_bottom.jpg
+          test "$(stat -c%s combined/v015_assets/home_bottom.jpg)" -eq 16216
           bash combined/build_v012.sh
           cat validation-v015.txt
 
