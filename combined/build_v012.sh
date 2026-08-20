@@ -49,8 +49,8 @@ PY
 python3 /tmp/patch_home_code_only.py
 
 # Recupera il JPEG HD originale del mockup approvato dalla sua sorgente storica.
-# I blocchi storici sono decodificati singolarmente, poi concatenati come byte:
-# evita padding Base64 intermedio e preserva esattamente il JPEG originale.
+# I file in home_mockup_parts sono segmenti consecutivi DELLA STESSA stringa Base64:
+# vanno quindi concatenati prima e decodificati una sola volta.
 python3 - <<'PY'
 from pathlib import Path
 import base64
@@ -65,22 +65,24 @@ parts = sorted(x.strip() for x in listing.splitlines() if x.strip())
 if len(parts) != 10:
     raise SystemExit(f'JPEG HD: attesi 10 blocchi, trovati {len(parts)}')
 
-out = bytearray()
+segments = []
 for index, path in enumerate(parts):
     text = subprocess.check_output(['git', 'show', f'{ref}:{path}'], text=True)
     clean = ''.join(text.split())
     if re.search(r'[^A-Za-z0-9+/=]', clean):
         raise SystemExit(f'JPEG HD: carattere Base64 non valido nel blocco {path}')
-    clean += '=' * (-len(clean) % 4)
-    try:
-        block = base64.b64decode(clean, validate=True)
-    except Exception as exc:
-        raise SystemExit(f'JPEG HD: blocco {path} non decodificabile: {exc}')
-    out.extend(block)
-    print(f'JPEG_BLOCK={index + 1}/{len(parts)} bytes={len(block)}')
+    segments.append(clean)
+    print(f'JPEG_SEGMENT={index + 1}/{len(parts)} chars={len(clean)}')
 
-Path('/tmp/home_hd_source.jpg').write_bytes(out)
-print(f'JPEG_TOTAL_BYTES={len(out)}')
+encoded = ''.join(segments)
+encoded += '=' * (-len(encoded) % 4)
+try:
+    data = base64.b64decode(encoded, validate=True)
+except Exception as exc:
+    raise SystemExit(f'JPEG HD: stream Base64 completo non decodificabile: {exc}')
+
+Path('/tmp/home_hd_source.jpg').write_bytes(data)
+print(f'JPEG_TOTAL_BYTES={len(data)}')
 PY
 
 # JPEG completo e decodificabile, non soltanto header formalmente valido.
