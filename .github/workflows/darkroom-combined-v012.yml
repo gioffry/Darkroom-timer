@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feature-darkroom-v012-vintage-home-r2
+  pull_request:
+    branches:
+      - darkroom-main
   workflow_dispatch:
 
 permissions:
