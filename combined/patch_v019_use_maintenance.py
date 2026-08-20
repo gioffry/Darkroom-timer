@@ -1,0 +1,476 @@
+#!/usr/bin/env python3
+from pathlib import Path
+
+root = Path('combined')
+home = root / 'src/main/java/it/darkroom/timer/home/HomeActivity.java'
+manifest = root / 'src/main/AndroidManifest.xml'
+maintenance_dir = root / 'src/main/java/it/darkroom/timer/maintenance'
+drawable_dir = root / 'src/main/res/drawable'
+
+for p in (home, manifest):
+    if not p.exists():
+        raise SystemExit('v0.1.9: base generated file missing: ' + str(p))
+
+old_home = home.read_text(encoding='utf-8')
+for marker in [
+    'openAssistant("products")',
+    'openAssistant("film")',
+    'openAssistant("paper")',
+    'MainActivity.class',
+    'R.drawable.home_vintage',
+    'ART_W = 432f',
+    'ART_H = 768f',
+]:
+    if marker not in old_home:
+        raise SystemExit('v0.1.9: Home baseline not recognized: ' + marker)
+
+maintenance_dir.mkdir(parents=True, exist_ok=True)
+drawable_dir.mkdir(parents=True, exist_ok=True)
+
+wrench = '''<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#B58B52"
+        android:pathData="M22.7,19l-9.1,-9.1c0.9,-2.3 0.4,-5 -1.5,-6.9C10.1,1 7.1,0.6 4.7,1.7L9,6 6,9 1.6,4.7C0.4,7.1 0.9,10.1 2.9,12.1c1.9,1.9 4.6,2.4 6.9,1.5l9.1,9.1c0.4,0.4 1,0.4 1.4,0l2.4,-2.4c0.4,-0.4 0.4,-1 0,-1.3z" />
+</vector>
+'''
+(drawable_dir / 'ic_wrench_bronze.xml').write_text(wrench, encoding='utf-8')
+
+home_source = r'''package it.darkroom.timer.home;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import it.darkroom.timer.MainActivity;
+import it.darkroom.timer.R;
+import it.darkroom.assistant.AssistantActivityV2;
+import it.darkroom.timer.maintenance.UseMaintenanceActivity;
+
+/** Home unica Darkroom: quattro funzioni primarie + accesso secondario Uso e Manutenzione. */
+public final class HomeActivity extends Activity {
+    private static final float ART_W = 432f;
+    private static final float ART_H = 768f;
+    private static final int BRONZE = Color.rgb(181, 139, 82);
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setNavigationBarColor(Color.BLACK);
+
+        FrameLayout frame = new FrameLayout(this);
+        frame.setBackgroundColor(Color.BLACK);
+
+        ImageView artwork = new ImageView(this);
+        artwork.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        artwork.setAdjustViewBounds(false);
+        artwork.setImageResource(R.drawable.home_vintage);
+        frame.addView(artwork, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+
+        View products = hotspot("Prodotti chimici");
+        View film = hotspot("Sviluppo pellicola");
+        View paper = hotspot("Bagni stampa");
+        View timer = hotspot("Timer stampa");
+        TextView maintenance = secondaryButton();
+        TextView version = versionLabel();
+
+        products.setOnClickListener(v -> openAssistant("products"));
+        film.setOnClickListener(v -> openAssistant("film"));
+        paper.setOnClickListener(v -> openAssistant("paper"));
+        timer.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
+        maintenance.setOnClickListener(v -> startActivity(new Intent(this, UseMaintenanceActivity.class)));
+
+        frame.addView(products, new FrameLayout.LayoutParams(1, 1));
+        frame.addView(film, new FrameLayout.LayoutParams(1, 1));
+        frame.addView(paper, new FrameLayout.LayoutParams(1, 1));
+        frame.addView(timer, new FrameLayout.LayoutParams(1, 1));
+        frame.addView(maintenance, new FrameLayout.LayoutParams(1, 1));
+        frame.addView(version, new FrameLayout.LayoutParams(1, 1));
+
+        final View[] primary = new View[]{products, film, paper, timer};
+        frame.addOnLayoutChangeListener((v, left, top, right, bottom,
+                                         oldLeft, oldTop, oldRight, oldBottom) ->
+                placeHomeControls(frame, primary, maintenance, version));
+
+        setContentView(frame);
+
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
+
+    private View hotspot(String description) {
+        View v = new View(this);
+        v.setBackground(new ColorDrawable(Color.TRANSPARENT));
+        v.setClickable(true);
+        v.setFocusable(true);
+        v.setContentDescription(description);
+        return v;
+    }
+
+    private TextView secondaryButton() {
+        TextView v = new TextView(this);
+        v.setText("USO E MANUTENZIONE");
+        v.setTextColor(Color.rgb(224, 205, 173));
+        v.setTextSize(13f);
+        v.setGravity(Gravity.CENTER);
+        v.setAllCaps(false);
+        v.setLetterSpacing(0.08f);
+        v.setCompoundDrawablePadding(dp(9));
+        v.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_wrench_bronze, 0, 0, 0);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(Color.argb(220, 24, 19, 16));
+        bg.setStroke(dp(1), BRONZE);
+        bg.setCornerRadius(dp(9));
+        v.setBackground(bg);
+        v.setClickable(true);
+        v.setFocusable(true);
+        v.setContentDescription("Uso e manutenzione");
+        return v;
+    }
+
+    private TextView versionLabel() {
+        TextView v = new TextView(this);
+        v.setText(readInstalledVersion());
+        v.setTextColor(Color.argb(185, 215, 198, 174));
+        v.setTextSize(10f);
+        v.setGravity(Gravity.CENTER);
+        v.setLetterSpacing(0.08f);
+        return v;
+    }
+
+    private String readInstalledVersion() {
+        try {
+            PackageInfo p = getPackageManager().getPackageInfo(getPackageName(), 0);
+            return "v" + p.versionName;
+        } catch (Exception ignored) {
+            return "v—";
+        }
+    }
+
+    private void placeHomeControls(FrameLayout frame, View[] v, View maintenance, View version) {
+        int w = frame.getWidth();
+        int h = frame.getHeight();
+        if (w <= 0 || h <= 0 || v.length != 4) return;
+
+        float scale = Math.max(w / ART_W, h / ART_H);
+        float dx = (w - ART_W * scale) * 0.5f;
+        float dy = (h - ART_H * scale) * 0.5f;
+
+        place(v[0], dx, dy, scale, 52f, 238f, 380f, 320f);
+        place(v[1], dx, dy, scale, 52f, 324f, 380f, 407f);
+        place(v[2], dx, dy, scale, 52f, 410f, 380f, 494f);
+        place(v[3], dx, dy, scale, 52f, 497f, 380f, 582f);
+
+        // Deliberately smaller and quieter than the four primary blocks.
+        place(maintenance, dx, dy, scale, 102f, 596f, 330f, 638f);
+        place(version, dx, dy, scale, 166f, 735f, 266f, 755f);
+    }
+
+    private void place(View v, float dx, float dy, float scale,
+                       float l, float t, float r, float b) {
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) v.getLayoutParams();
+        lp.width = Math.max(1, Math.round((r - l) * scale));
+        lp.height = Math.max(1, Math.round((b - t) * scale));
+        lp.leftMargin = Math.round(dx + l * scale);
+        lp.topMargin = Math.round(dy + t * scale);
+        v.setLayoutParams(lp);
+    }
+
+    private int dp(int v) {
+        return Math.round(v * getResources().getDisplayMetrics().density);
+    }
+
+    private void openAssistant(String target) {
+        Intent i = new Intent(this, AssistantActivityV2.class);
+        i.putExtra("darkroom_target", target);
+        startActivity(i);
+    }
+}
+'''
+home.write_text(home_source, encoding='utf-8')
+
+activity_source = r'''package it.darkroom.timer.maintenance;
+
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayDeque;
+
+/** Autonomous reference module. No Timer state, SONOFF state or Assistant state is read or written here. */
+public final class UseMaintenanceActivity extends Activity {
+    private static final int BG = Color.rgb(9, 8, 7);
+    private static final int PANEL = Color.rgb(24, 20, 17);
+    private static final int BRONZE = Color.rgb(181, 139, 82);
+    private static final int WARM = Color.rgb(232, 221, 203);
+    private static final int MUTED = Color.rgb(169, 154, 134);
+    private static final int RED = Color.rgb(103, 34, 30);
+
+    private static final String OPEMUS_URL = "https://drive.google.com/file/d/1UgqM5BZ0HQyKHDYZ-LHXlCFeq-HS_Mvg/view";
+    private static final String COLOR3_URL = "https://drive.google.com/file/d/1ITpUaCAcMZ_WF6GnTtwwG082nI_ULMn5/view";
+    private static final String JOBO_URL = "https://drive.google.com/file/d/1uteXQ0j4VDVM8mvboASGxeZOhqPS48dZ/view";
+    private static final String ACP200_URL = "https://drive.google.com/file/d/1-FuGPzvLvTpopfDIgmEv-0WrPCEhSSTr/view";
+    private static final String MINOLTA_REFERENCE_URL = "https://docs.google.com/document/d/1fQMuoXfO10yAUj8kWD_xeQ6lzG6CoQZ88R_QQX74YkE/edit";
+    private static final String ZONE_URL = "https://drive.google.com/file/d/1A_zEMVEGD9C8vVtLDEom_NfOKHRO0dnb/view";
+    private static final String PRINT_URL = "https://drive.google.com/file/d/1QJuScbe2I9nLx2NY7suCVXZWR_Culvzz/view";
+    private static final String COOKBOOK_URL = "https://drive.google.com/file/d/1LfXqGW4t9vamylwurIbPNqJoIsd_4UwR/view";
+
+    private final ArrayDeque<Runnable> backStack = new ArrayDeque<>();
+    private Runnable currentScreen;
+    private LinearLayout body;
+
+    private static final String[] Q_OPEMUS = {
+            "Quale obiettivo devo usare per 35 mm e 6×6?", "Come preparo l’ingranditore prima di stampare?", "Come inserisco correttamente il negativo?", "Come regolo dimensione dell’immagine e messa a fuoco?", "Quale diaframma conviene utilizzare?", "Come cambio obiettivo e configurazione passando da 35 mm a 6×6?", "Come uso la tabella β / scala d’ingrandimento presente sulla colonna?", "Come si correggono le linee convergenti?", "Come si puliscono e lubrificano le parti mobili?", "Come si regola la frizione della messa a fuoco?"
+    };
+    private static final String[] A_OPEMUS = {
+            "35 mm: obiettivo 50 mm. 6×6: obiettivo 80 mm. Il manuale indica il 50 mm per 24×36 e l’80 mm per negativi fino a 60×60 mm.",
+            "Controlla stabilità e pulizia, inserisci portanegativi e obiettivo corretti, poi apri il diaframma per inquadrare e mettere a fuoco. Prima di esporre, imposta il diaframma di lavoro.",
+            "Apri il portanegativi, regola le guide per 35 o 60 mm e inserisci la pellicola con emulsione verso il basso, quindi verso l’obiettivo. Fai scorrere la pellicola sollevando leggermente la parte superiore e toccandola solo ai bordi.",
+            "Apri tutto il diaframma. Regola la dimensione alzando o abbassando la testa sulla colonna e, insieme, rifinisci la nitidezza con la manopola di messa a fuoco.",
+            "Dopo la messa a fuoco, il manuale consiglia quando possibile f/5,6 o f/8 per buona uniformità d’illuminazione e resa. Se serve più tempo operativo puoi chiudere ulteriormente, verificando il nuovo tempo con un provino.",
+            "Per 6×6 usa l’80 mm. Per 35 mm usa il 50 mm e l’orientamento inverso dell’anello portaobiettivo, come indicato dalla figura J del manuale. Sostituisci anche la mascheratura/guida del portanegativi per il formato corretto.",
+            "Il testo italiano disponibile documenta i rapporti d’ingrandimento, ma non spiega operativamente la tabella β della colonna. Per non inventare una conversione, usala solo come riferimento ripetibile dopo aver verificato la dimensione reale proiettata.",
+            "Allenta il blocco A-3, inclina la testa finché le linee proiettate risultano circa parallele e serra di nuovo. Inclina coerentemente anche il piano della carta; metti a fuoco al centro e chiudi il diaframma per aumentare la profondità di fuoco.",
+            "Mantieni pulite colonna, cremagliera e aste di messa a fuoco. Il manuale ammette, se necessario, un panno leggermente impregnato di olio per macchina o vaselina. Ottiche e vetri: pennello morbido o panno fine e pulito.",
+            "Se la manopola è troppo dura o troppo libera, il manuale indica di regolare il precarico serrando o allentando le viti che trattengono la molla B-2. Il movimento a frizione deve restare continuo e fluido."
+    };
+
+    private static final String[] Q_COLOR3 = {
+            "A cosa servono Y, M e C?", "Come si usano Y e M per controllare il contrasto della carta multigrade?", "Come interpreto la scala 0–200 dei filtri Y/M/C?", "Posso usare contemporaneamente giallo e magenta e cosa succede?", "Qual è la lampada prevista dalla Color 3?", "A cosa serve lo schermo di densità D?", "Come si utilizza la Color 3 per stampare in B/N su carta multigrade?", "Perché cambiando filtrazione cambia anche il tempo di esposizione?", "Come si compensa il tempo quando modifico Y/M/C?", "Come si puliscono filtri, diffusore e parti ottiche?"
+    };
+    private static final String[] A_COLOR3 = {
+            "Sono filtri sottrattivi: Y agisce sulla componente blu, M sulla verde e C sulla rossa. La testa li inserisce in modo continuo nel fascio luminoso.",
+            "Per la carta multigrade si lavora con Y e M come filtrazioni di contrasto. Il manuale Color 3 però non fornisce una tabella grado-carta: qui quindi non assegniamo numeri di gradazione non documentati.",
+            "Ogni filtro ha scala Meopta 0–200, a passi di 2. È una scala propria della testa: il manuale la confronta solo indicativamente con altri sistemi, non con i gradi della carta multigrade.",
+            "Sì. Y e M possono essere inseriti insieme: la luce risultante cambia e cambia anche l’esposizione necessaria. Il manuale prevede l’uso combinato dei filtri e fornisce fattori di correzione del tempo.",
+            "La Color 3 è prevista con lampada alogena a riflettore 12 V / 100 W.",
+            "D attenua la luce senza cambiare le impostazioni dei filtri. La scala 0–60 copre circa due stop complessivi; il manuale usa D≈30 come riferimento pratico di circa uno stop.",
+            "Imposta la filtrazione Y/M desiderata e lascia C fuori salvo una necessità specifica. Il manuale non contiene una conversione in gradi multigrade, quindi il contrasto va verificato sulla carta con un provino.",
+            "I filtri assorbono quantità diverse di luce. Aumentando o modificando Y/M/C cambia la trasmissione totale e quindi il tempo necessario per ottenere la stessa densità di stampa.",
+            "Usa i fattori k riportati nel manuale: t₂ = t₁ × (kY₂×kM₂×kC₂)/(kY₁×kM₁×kC₁). È il metodo documentato per mantenere l’esposizione quando cambi filtrazione.",
+            "Proteggi la testa da polvere e umidità. Pulisci il vetro diffusore con panno morbido e tratta con delicatezza la camera di miscelazione. A lampada fredda e scollegata, evita di toccare bulbo e riflettore con le dita."
+    };
+
+    private static final String[] Q_JOBO = {
+            "Come devo posizionare e livellare correttamente la CPE2?", "Quanta acqua devo mettere nella vasca?", "Come porto chimica e macchina alla temperatura corretta?", "Quanto tempo prima devo accendere la CPE2?", "Come si monta correttamente il tank sulla macchina?", "Dove deve essere posizionato il supporto a rulli?", "Come si usa correttamente il Lift?", "Quali tank posso utilizzare sulla CPE2?", "Come si pulisce e si mantiene la CPE2?", "Cosa controllo se motore, riscaldamento o temperatura non funzionano correttamente?"
+    };
+    private static final String[] A_JOBO = {
+            "La macchina deve essere perfettamente in piano. Il manuale indica di controllare con una livella sul bordo anteriore, non sul drum, e di compensare eventuali dislivelli sotto l’apparecchio.",
+            "Per la CPE il manuale indica circa 7–8 litri nel bagno d’acqua, in funzione del sistema tank usato. Riempilo prima di alimentare la macchina.",
+            "Riempi il bagno, imposta il termostato e controlla la temperatura con un termometro nel bagno o nei prodotti. La chimica raggiunge l’equilibrio reale solo dopo il tempo di riscaldamento.",
+            "Per raggiungere con precisione la temperatura dei prodotti, il manuale indica circa 90 minuti. Non basta che il bagno sembri già caldo.",
+            "Con il motore fermo o in movimento, accoppia il magnete sul fondo del tank al magnete motore. Verifica che il drum sia sostenuto correttamente e ruoti senza impuntamenti.",
+            "Il supporto a rulli deve guidare il drum circa nell’ultimo terzo della sua lunghezza, così da mantenerlo stabile durante la rotazione.",
+            "Il manuale italiano disponibile nel Drive non descrive una procedura operativa del Lift. Per evitare istruzioni non verificate, questa FAQ non aggiunge passaggi che la fonte non contiene.",
+            "Il manuale tratta i sistemi tank 1500 e 2500/2800 e, sui modelli compatibili, 3000/Expert. La compatibilità effettiva dipende da macchina, tank e carico: non viene aggiunto qui un elenco oltre a quello documentato.",
+            "Svuota il bagno d’acqua dopo il lavoro. Il manuale indica lubrificazione occasionale dei rulli guida con vaselina e una pulizia periodica con Processor-Clean JOBO, circa ogni tre mesi.",
+            "Motore in una sola direzione: controlla la posizione dello star switch sul magnete motore. Riscaldamento assente: individua la causa e, a macchina fredda, verifica il reset della protezione termica. Per problemi di circolazione, controlla anche rotore/girante."
+    };
+
+    private static final String[] Q_ACP = {
+            "Come preparo e livello la ACP200 prima dell’uso?", "Quanto prodotto devo mettere nelle vasche?", "Come imposto la temperatura?", "Come si calibra la temperatura reale della macchina?", "Come scelgo tra 45, 120 e 210 secondi?", "Come si cambiano materialmente le velocità tramite gli ingranaggi?", "Come devo inserire la carta nella macchina?", "Quanto tempo devo attendere prima di iniziare a sviluppare?", "Come si svuota, lava e pulisce correttamente la ACP200?", "Cos’è la configurazione High Speed 30/90/150 s e come faccio a capire se la mia macchina la possiede?"
+    };
+    private static final String[] A_ACP = {
+            "Appoggia la macchina su un piano stabile e regolala con i piedini finché è perfettamente orizzontale. Controlla anche che scarichi e vasche siano correttamente chiusi prima di riempire.",
+            "Il manuale consolidato indica 2,5 litri di soluzione di lavoro per ciascuna vasca.",
+            "Imposta il termostato con il comando TEMP. La spia resta accesa durante il riscaldamento e si spegne quando il termostato raggiunge il punto impostato.",
+            "Quando la spia si spegne, misura la temperatura reale del bagno sviluppatore. Se non coincide con la scala, sfila con cautela la manopola e rimontala facendo corrispondere l’indice alla temperatura misurata.",
+            "Nella configurazione standard: rosso 45 s, verde 120 s, blu 210 s. La macchina esce di fabbrica sulla velocità 45 s.",
+            "Capovolgi la macchina secondo la procedura del manuale, rimuovi il coperchio inferiore, allenta il perno filettato e sposta sul relativo albero l’ingranaggio colorato della velocità scelta. Deve essere impegnato un solo rapporto alla volta.",
+            "Apri il coperchio e inserisci il foglio verticalmente finché i rulli lo prendono. Guardando la macchina frontalmente, il lato emulsione deve essere rivolto a sinistra. La fase finale di inserimento va fatta al buio.",
+            "Il manuale operativo indica circa 20 minuti perché le soluzioni arrivino alla temperatura di lavoro. Verifica comunque la temperatura reale prima del primo foglio.",
+            "A fine lavoro scollega la macchina e apri i tubi di scarico. Risciacqua accuratamente vasche e rack; per uso regolare il manuale raccomanda una pulizia approfondita settimanale. Evita abrasivi e solventi aggressivi.",
+            "Il kit High Speed porta i rapporti a rosso 30 s, verde 90 s, blu 150 s e modifica sia rack sviluppo sia bleach-fix con ingranaggi/posizioni specifiche. Per identificarlo, verifica la presenza dell’hardware High Speed descritto nelle figure 3–4; non basta l’etichetta esterna."
+    };
+
+    private static final String[] Q_MINOLTA = {
+            "Come imposto la sensibilità ISO/ASA della pellicola?", "Come uso correttamente il Viewfinder 10° per misurare una zona precisa della scena?", "Dove devo puntare il Viewfinder 10° e come interpreto la lettura rispetto al grigio medio?", "Come scelgo tempo e diaframma e come leggo il risultato?", "Come blocco una misurazione e la richiamo successivamente?", "Come memorizzo più misurazioni e ne calcolo la media?", "Come misuro la luce flash?", "Come confronto luce ambiente e luce flash?", "Come misuro il rapporto di illuminazione tra due zone della scena?", "Come calibro finemente l’esposimetro se le sue letture non coincidono con un riferimento?"
+    };
+    private static final String MINOLTA_PENDING = "Risposta non pubblicata: nel Drive è disponibile solo «Minolta Auto Meter IIIF - Manuale IT - Riferimento», e quel documento dichiara esplicitamente di non essere il manuale completo. Nessuna procedura viene aggiunta finché la fonte completa non è disponibile.";
+
+    private static final String[] Q_TESTSTRIP = {
+            "Come realizzo correttamente un provino?", "Da quale parte devo leggere il provino?", "Ho trovato prima i bianchi giusti: cosa faccio?", "Ho trovato prima i neri giusti: cosa faccio?", "Come riconosco quando il contrasto è corretto?", "Come scelgo la striscia da portare in stampa?", "Come modifico il contrasto senza perdere il tempo trovato?", "Cosa cambia tra provino in secondi e provino in f-stop?", "Metodo SCOPRIRE e COPRIRE: qual è la differenza?", "Quando devo rifare il provino?"
+    };
+    private static final String[] A_TESTSTRIP = {
+            "Metti a fuoco, scegli un diaframma di lavoro e usa una striscia che contenga insieme zone importanti chiare e scure. Esponi a gradini regolari, sviluppa sempre a fondo e valuta il provino asciutto o comunque nello stesso stato di confronto.",
+            "Leggilo dal CHIARO allo SCURO. Cerca dove arrivano prima i bianchi utili e dove arrivano i neri utili: l’ordine in cui li trovi ti dice se il contrasto va corretto.",
+            "AUMENTA il contrasto. Hai raggiunto il bianco utile prima del nero utile: serve più separazione tra le due estremità.",
+            "DIMINUISCI il contrasto. Hai raggiunto il nero utile prima del bianco utile: la gamma è troppo compressa verso gli estremi.",
+            "Quando bianchi e neri desiderati sono corretti nello stesso gradino. Regola guida: bianchi prima → aumenta contrasto; neri prima → diminuisci; insieme → contrasto giusto.",
+            "Scegli il gradino in cui il soggetto principale ha il tono giusto e, nello stesso gradino, bianchi e neri conservano il dettaglio che vuoi. Non scegliere solo il nero più profondo o il bianco più brillante.",
+            "Mantieni come riferimento il tempo del gradino scelto e cambia solo la filtrazione/gradazione. Poi verifica con un nuovo provino perché un cambio di contrasto può modificare anche la densità percepita.",
+            "In secondi aggiungi quantità lineari di tempo; in f-stop ogni passo è un rapporto costante di esposizione. Gli f-stop danno gradini percettivamente più uniformi, soprattutto quando il tempo base cambia molto.",
+            "SCOPRIRE: liberi progressivamente nuove porzioni, quindi alcune zone accumulano più esposizione. COPRIRE: parti esposti e copri progressivamente. Cambia il verso in cui si accumulano i tempi; scegli un metodo e leggilo sempre nello stesso verso.",
+            "Rifallo se cambi ingrandimento, diaframma, filtrazione/contrasto, carta, negativo o una condizione che altera realmente l’esposizione. Rifallo anche quando nessun gradino mette insieme bianchi e neri come desideri."
+    };
+
+    private static final String[] Q_SPLIT = {
+            "Cos’è lo Split Grade?", "A cosa serve l’esposizione morbida/gialla?", "A cosa serve l’esposizione dura/magenta?", "Perché giallo non significa semplicemente “luci” e magenta “ombre”?", "Come trovo i due tempi?", "In quale ordine faccio le due esposizioni?", "Come correggo una stampa Split Grade?", "Come integro Dodge e Burn?", "Quando conviene usarlo?", "Quando invece è inutile complicarsi con lo Split Grade?"
+    };
+    private static final String[] A_SPLIT = {
+            "È una stampa ottenuta sommando due esposizioni dello stesso foglio: una a contrasto morbido e una a contrasto duro. La stampa finale nasce dall’interazione delle due.",
+            "La filtrazione morbida abbassa il contrasto e aiuta a costruire la struttura dei toni chiari e medi, ma continua a esporre l’intera carta: non agisce solo sulle luci.",
+            "La filtrazione dura aumenta separazione e profondità nei toni scuri, ma continua a modificare anche il resto della stampa: non agisce solo sulle ombre.",
+            "Perché le due emulsioni della carta ricevono entrambe luce in entrambe le esposizioni. Cambiare il tempo giallo può cambiare anche i toni scuri; cambiare il magenta può spostare anche i toni chiari.",
+            "Trova prima un tempo morbido che dia una buona struttura generale, poi aggiungi il duro finché neri e separazione sono corretti. Rivedi entrambi se una correzione importante sposta l’equilibrio.",
+            "L’ordine fisico delle due esposizioni non cambia la somma della luce, ma per lavorare in modo ripetibile usa sempre lo stesso ordine. Un flusso pratico è morbido prima, duro dopo.",
+            "Correggi il canale che sta causando il problema, poi ristampa. Se tocchi molto un tempo, controlla anche l’altro: le due esposizioni non sono indipendenti.",
+            "Puoi mascherare o bruciare durante una sola esposizione oppure durante entrambe, a seconda di quale contrasto locale vuoi ottenere. Registra sempre canale, zona e tempo dell’intervento.",
+            "È utile quando una singola filtrazione non ti dà insieme la separazione desiderata nelle zone chiare e scure, o quando vuoi controllare in modo distinto il carattere di aree diverse.",
+            "Se una singola filtrazione produce già la stampa che vuoi, lo Split Grade aggiunge solo passaggi e possibilità d’errore. Usalo come strumento, non come obbligo."
+    };
+
+    private static final String[] Q_ZONE = {
+            "Cos’è il Sistema Zonale e a cosa serve?", "Cosa rappresentano le zone da 0 a X?", "Qual è la Zona V e perché è il riferimento dell’esposimetro?", "Come decido in quale zona collocare una parte della scena?", "Come espongo per mantenere dettaglio nelle ombre?", "Come valuto le alte luci rispetto alle ombre?", "Cosa significa previsualizzare la stampa prima dello scatto?", "Quando serve aumentare lo sviluppo del negativo?", "Quando serve ridurre lo sviluppo del negativo?", "Come collego Sistema Zonale, esposizione e stampa finale?"
+    };
+    private static final String[] A_ZONE = {
+            "È un metodo per collegare ciò che misuri nella scena con il tono che vuoi ottenere nella stampa. L’idea centrale è decidere prima il risultato, misurare i valori importanti e adattare esposizione e sviluppo al risultato previsto.",
+            "Le zone ordinano i toni dal nero estremo al bianco estremo in passi di esposizione. Il testo Drive usa esplicitamente la scala zonale e colloca la pelle chiara circa in Zona VI; non aggiungiamo qui soglie di dettaglio zona-per-zona non riportate nella fonte.",
+            "La Zona V è il riferimento del grigio medio. Il materiale Adams indica che la Zona VI è leggermente sopra il grigio medio e cita il cartoncino grigio 18% come valore-base di controllo: da qui si spostano intenzionalmente gli altri toni.",
+            "Misura la zona importante e chiediti come vuoi che appaia nella stampa. Se deve risultare più scura del grigio medio, la collochi sotto V; se deve risultare più chiara, sopra V. La scelta è parte della visualizzazione.",
+            "Scegli un’ombra in cui vuoi mantenere informazione e assegna a quella misura un tono sufficientemente basso ma non privo del dettaglio desiderato. L’esposizione viene così ancorata alle ombre importanti.",
+            "Dopo aver fissato le ombre, misura le alte luci importanti e guarda quanto è ampia l’escursione. Il testo Adams lega proprio questa escursione alla scelta dello sviluppo necessario per ottenere un negativo stampabile.",
+            "Significa immaginare prima dello scatto come dovranno diventare nella stampa i principali valori della scena. Poi misuri quei valori e programmi esposizione e sviluppo in funzione dell’immagine finale prefigurata.",
+            "Quando la scena ha poca escursione e vuoi un negativo con maggiore separazione tonale, puoi richiedere uno sviluppo più energico. La decisione va presa in funzione del processo di stampa previsto, non come regola automatica.",
+            "Quando l’escursione luminosa della scena è troppo ampia per la stampa desiderata, ridurre lo sviluppo aiuta a contenere l’opacità delle alte luci e a comprimere il contrasto del negativo.",
+            "Visualizza la stampa, misura i valori principali, scegli l’esposizione e poi adegua lo sviluppo per ottenere un negativo compatibile con quella stampa. Adams descrive il negativo come qualcosa da confezionare su misura per il processo di stampa."
+    };
+
+    private static final String[] Q_PRINT = {
+            "Come preparo correttamente ingranditore, negativo e carta prima di stampare?", "Come trovo il tempo base con un provino?", "Come scelgo il contrasto corretto?", "Come capisco se una stampa è troppo chiara o troppo scura?", "Come correggo una stampa troppo contrastata o troppo piatta?", "Come uso Dodge e Burn senza perdere il controllo della stampa?", "Quando devo rifare il provino?", "Come valuto correttamente una stampa sotto luce bianca?", "Come mantengo costanti i risultati tra una stampa e la successiva?", "Qual è il flusso corretto dal negativo alla stampa finale?"
+    };
+    private static final String[] A_PRINT = {
+            "Pulisci negativo e parti ottiche, inserisci il negativo correttamente, inquadra e metti a fuoco a diaframma aperto. Poi chiudi a un valore di lavoro intermedio e prepara carta e chimica prima di iniziare le esposizioni.",
+            "Fai un provino con più esposizioni sulla stessa immagine, sviluppalo sempre a fondo e identifica il gradino più vicino al risultato desiderato. Poi fai un secondo provino più fine attorno a quel tempo.",
+            "Cerca una stampa con neri profondi, bianchi puliti e una gamma di grigi leggibile. Se il risultato è piatto aumenta la gradazione; se è troppo duro riducila, verificando di nuovo il tempo.",
+            "Troppo chiara: la carta ha ricevuto poca esposizione, quindi aumenta il tempo. Troppo scura: riduci il tempo. Valuta però solo dopo sviluppo completo e in condizioni di osservazione coerenti.",
+            "Troppo contrastata: passa a una gradazione più morbida. Troppo piatta: passa a una più dura. Dopo il cambio fai un nuovo provino, perché contrasto e densità percepita si influenzano.",
+            "Dodging/mascheratura riduce localmente l’esposizione; burning/bruciatura ne aggiunge. Muovi continuamente la maschera per evitare bordi netti, prova gli interventi su un provino e annota zona e tempo per renderli ripetibili.",
+            "Quando cambi tempo in modo sostanziale, gradazione, diaframma, ingrandimento, carta o un intervento locale importante. Rifallo anche se nessun gradino del provino precedente è davvero convincente.",
+            "Guarda la stampa con una luce bianca costante, non sotto la sola luce di sicurezza. Confronta i bianchi con carta non esposta e considera che la stampa può scurirsi asciugando.",
+            "Annota almeno tempo, diaframma, altezza/ingrandimento, contrasto, carta, rivelatore e ogni Dodge/Burn. Mantieni costanti sviluppo e condizioni di valutazione: la ripetibilità nasce dalle note.",
+            "Prepara e metti a fuoco → provino per il tempo → regola il contrasto → ristampa di verifica → aggiungi eventuali Dodge/Burn → registra tutti i dati → stampa finale e valutazione sotto luce bianca."
+    };
+
+    @Override protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState); requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setStatusBarColor(Color.BLACK); getWindow().setNavigationBarColor(Color.BLACK); showRoot();
+    }
+    private void showRoot(){ backStack.clear(); currentScreen=this::renderRoot; currentScreen.run(); }
+    private void navigate(Runnable next){ if(currentScreen!=null) backStack.push(currentScreen); currentScreen=next; currentScreen.run(); }
+    @Override public void onBackPressed(){ if(!backStack.isEmpty()){ currentScreen=backStack.pop(); currentScreen.run(); } else finish(); }
+
+    private void renderRoot(){
+        begin("USO E MANUTENZIONE","Manuali, tecnica di camera oscura, manutenzione verificata e ricettario.");
+        body.addView(navCard("MANUALI","Apparecchi e FAQ ricavate dai manuali",()->navigate(this::renderManuals)));
+        body.addView(navCard("TECNICA","Provini, Split Grade, Sistema Zonale, stampa B/N",()->navigate(this::renderTechnique)));
+        body.addView(navCard("MANUTENZIONE","Solo procedure realmente verificate",()->navigate(this::renderMaintenance)));
+        body.addView(navCard("RICETTARIO","The Darkroom Cookbook su Google Drive",()->navigate(this::renderCookbook)));
+    }
+    private void renderManuals(){
+        begin("MANUALI","Tocca un apparecchio. Ogni pagina contiene 10 FAQ brevi e il collegamento alla fonte completa quando disponibile.");
+        body.addView(navCard("MEOPTA OPEMUS 6","Ingranditore",()->navigate(()->renderFaqPage("MEOPTA OPEMUS 6","Fonte: Meopta Opemus 6 Standard - Manuale IT",Q_OPEMUS,A_OPEMUS,OPEMUS_URL,"APRI MANUALE COMPLETO"))));
+        body.addView(navCard("MEOPTA COLOR 3","Testa colore",()->navigate(()->renderFaqPage("MEOPTA COLOR 3","Fonte: Meopta Color 3 - Manuale IT",Q_COLOR3,A_COLOR3,COLOR3_URL,"APRI MANUALE COMPLETO"))));
+        body.addView(navCard("JOBO CPE2","Processore a rotazione",()->navigate(()->renderFaqPage("JOBO CPE2","Fonte: JOBO CPE2 CPA2 CPP2 - Manuale IT",Q_JOBO,A_JOBO,JOBO_URL,"APRI MANUALE COMPLETO"))));
+        body.addView(navCard("THERMAPHOT ACP200","Processore carta",()->navigate(()->renderFaqPage("THERMAPHOT ACP200","Fonte: manuale consolidato completo IT",Q_ACP,A_ACP,ACP200_URL,"APRI MANUALE COMPLETO"))));
+        body.addView(navCard("MINOLTA AUTO METER IIIF","Viewfinder 10° · manuale completo non disponibile",()->navigate(this::renderMinolta)));
+    }
+    private void renderMinolta(){ String[] answers=new String[Q_MINOLTA.length]; for(int i=0;i<answers.length;i++) answers[i]=MINOLTA_PENDING; renderFaqPage("MINOLTA AUTO METER IIIF","Viewfinder 10° · fonte completa non disponibile nel Drive",Q_MINOLTA,answers,MINOLTA_REFERENCE_URL,"APRI RIFERIMENTO DRIVE"); notice("La cupoletta incidente non viene trattata. Le FAQ sono impostate sul Viewfinder 10°, ma le risposte tecniche restano sospese finché non è disponibile il manuale completo."); }
+    private void renderTechnique(){
+        begin("TECNICA","Consultazione rapida durante il lavoro in camera oscura.");
+        body.addView(navCard("PROVINI E CONTRASTO","Dal chiaro allo scuro",()->navigate(()->renderFaqPage("PROVINI E CONTRASTO","Principio guida approvato + pratica di camera oscura",Q_TESTSTRIP,A_TESTSTRIP,null,null))));
+        body.addView(navCard("SPLIT GRADE","Due esposizioni che interagiscono",()->navigate(()->renderFaqPage("SPLIT GRADE","Tecnica di stampa B/N",Q_SPLIT,A_SPLIT,null,null))));
+        body.addView(navCard("SISTEMA ZONALE","Esposizione, sviluppo, previsualizzazione",()->navigate(()->renderFaqPage("SISTEMA ZONALE","Fonte: Ansel Adams - Bianco e Nero",Q_ZONE,A_ZONE,ZONE_URL,"APRI FONTE SU DRIVE"))));
+        body.addView(navCard("STAMPA B/N","Dal negativo alla stampa finale",()->navigate(()->renderFaqPage("STAMPA B/N","Fonte: Stampa in Bianco e Nero - Camera Oscura",Q_PRINT,A_PRINT,PRINT_URL,"APRI FONTE SU DRIVE"))));
+    }
+    private void renderMaintenance(){
+        begin("MANUTENZIONE","Archivio volutamente minimo: vengono pubblicati solo interventi realmente verificati.");
+        LinearLayout card=card(); card.addView(title("OPEMUS 6",19)); card.addView(subtitle("Regolazione gioco messa a fuoco"));
+        card.addView(section("SINTOMO","Piccolo gioco/scattino quando si inverte il senso della manopola di messa a fuoco."));
+        card.addView(section("INTERVENTO PERSONALE REALMENTE ESEGUITO","• Pulizia delle due aste verticali cromate con panno.\n• Nel mio intervento è stato utilizzato Svitol.\n• Regolazione delle due grandi viti a taglio sulla piastra/frizione metallica vicino alla manopola.\n• Stringendo: manopola più dura. Allentando: più libera.\n• Cercare il punto in cui il gioco è minimo o quasi nullo, ma la messa a fuoco resta stabile e non scende da sola."));
+        card.addView(section("PRINCIPIO PRATICO","«Il più libera possibile, purché mantenga perfettamente la messa a fuoco»."));
+        card.addView(section("DISTINZIONE DAL MANUALE MEOPTA","Lo Svitol è parte dell’intervento personale, NON un’indicazione del manuale. Il manuale ufficiale parla invece, se necessario, di olio per macchina o vaselina sulle parti mobili e di regolazione del precarico della frizione.")); body.addView(card);
+    }
+    private void renderCookbook(){ begin("RICETTARIO","Nessun database aggiuntivo: il libro resta su Google Drive."); LinearLayout card=card(); card.addView(title("THE DARKROOM COOKBOOK",21)); card.addView(subtitle("Formule e preparazione della chimica fotografica")); card.addView(linkButton("APRI SU GOOGLE DRIVE",COOKBOOK_URL)); body.addView(card); }
+    private void renderFaqPage(String heading,String source,String[] questions,String[] answers,String url,String urlLabel){ if(questions.length!=10||answers.length!=10) throw new IllegalStateException("FAQ count must be 10 for "+heading); begin(heading,source); for(int i=0;i<questions.length;i++) body.addView(faqCard(questions[i],answers[i])); if(url!=null&&urlLabel!=null) body.addView(linkButton(urlLabel,url)); }
+
+    private void begin(String heading,String subheading){
+        ScrollView scroll=new ScrollView(this); scroll.setFillViewport(true); scroll.setBackgroundColor(BG); body=new LinearLayout(this); body.setOrientation(LinearLayout.VERTICAL); body.setPadding(dp(16),dp(10),dp(16),dp(30)); scroll.addView(body,new ScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+        TextView back=actionText(backStack.isEmpty()?"←  HOME":"←  INDIETRO"); back.setOnClickListener(v->onBackPressed()); body.addView(back,margin(-1,dp(42),0,0,0,dp(14)));
+        TextView h=title(heading,25); h.setTextColor(WARM); body.addView(h); if(subheading!=null&&!subheading.isEmpty()) body.addView(subtitle(subheading),margin(-1,-2,0,dp(4),0,dp(16))); setContentView(scroll);
+    }
+    private LinearLayout navCard(String heading,String detail,Runnable action){ LinearLayout c=card(); c.setClickable(true); c.setFocusable(true); TextView h=title("›  "+heading,18); h.setTextColor(WARM); c.addView(h); c.addView(subtitle(detail)); c.setOnClickListener(v->action.run()); return c; }
+    private LinearLayout faqCard(String question,String answerText){ LinearLayout c=card(); c.setPadding(dp(14),dp(8),dp(14),dp(8)); TextView q=text("›  "+question,16,WARM,true); q.setPadding(0,dp(9),0,dp(9)); TextView a=text(answerText,14,Color.rgb(218,207,190),false); a.setLineSpacing(0f,1.12f); a.setPadding(dp(2),dp(4),dp(2),dp(12)); a.setVisibility(View.GONE); q.setOnClickListener(v->{ boolean open=a.getVisibility()==View.VISIBLE; a.setVisibility(open?View.GONE:View.VISIBLE); q.setText((open?"›  ":"⌄  ")+question); }); c.addView(q); c.addView(a); return c; }
+    private LinearLayout card(){ LinearLayout c=new LinearLayout(this); c.setOrientation(LinearLayout.VERTICAL); c.setPadding(dp(15),dp(13),dp(15),dp(13)); GradientDrawable bg=new GradientDrawable(); bg.setColor(PANEL); bg.setCornerRadius(dp(12)); bg.setStroke(dp(1),Color.rgb(72,56,43)); c.setBackground(bg); c.setElevation(dp(1)); c.setLayoutParams(margin(-1,-2,0,0,0,dp(10))); return c; }
+    private TextView title(String value,int sp){ return text(value,sp,WARM,true); }
+    private TextView subtitle(String value){ TextView v=text(value,13,MUTED,false); v.setLineSpacing(0f,1.08f); return v; }
+    private TextView section(String label,String value){ TextView v=text(label+"\n"+value,14,Color.rgb(220,207,187),false); v.setLineSpacing(0f,1.15f); v.setPadding(0,dp(9),0,dp(5)); return v; }
+    private void notice(String value){ TextView v=text(value,13,Color.rgb(225,194,151),false); GradientDrawable bg=new GradientDrawable(); bg.setColor(Color.rgb(38,28,20)); bg.setStroke(dp(1),BRONZE); bg.setCornerRadius(dp(10)); v.setBackground(bg); v.setPadding(dp(12),dp(10),dp(12),dp(10)); body.addView(v,margin(-1,-2,0,dp(2),0,dp(10))); }
+    private TextView linkButton(String label,String url){ TextView v=actionText(label); v.setGravity(Gravity.CENTER); v.setTextColor(Color.rgb(237,219,187)); GradientDrawable bg=new GradientDrawable(); bg.setColor(RED); bg.setCornerRadius(dp(9)); bg.setStroke(dp(1),BRONZE); v.setBackground(bg); v.setOnClickListener(view->openUrl(url)); v.setLayoutParams(margin(-1,dp(48),0,dp(8),0,dp(12))); return v; }
+    private TextView actionText(String label){ TextView v=text(label,13,Color.rgb(217,195,164),true); v.setGravity(Gravity.CENTER_VERTICAL); v.setPadding(dp(12),0,dp(12),0); return v; }
+    private TextView text(String value,int sp,int color,boolean bold){ TextView v=new TextView(this); v.setText(value); v.setTextColor(color); v.setTextSize(sp); v.setTypeface(Typeface.create("sans-serif-condensed",bold?Typeface.BOLD:Typeface.NORMAL)); v.setIncludeFontPadding(false); return v; }
+    private void openUrl(String url){ try{ startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url))); }catch(ActivityNotFoundException e){ Toast.makeText(this,"Nessuna app disponibile per aprire il collegamento.",Toast.LENGTH_LONG).show(); } }
+    private int dp(int v){ return Math.round(v*getResources().getDisplayMetrics().density); }
+    private LinearLayout.LayoutParams margin(int w,int h,int l,int t,int r,int b){ LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(w,h); p.setMargins(dp(l),dp(t),dp(r),dp(b)); return p; }
+}
+'''
+activity = maintenance_dir / 'UseMaintenanceActivity.java'
+activity.write_text(activity_source, encoding='utf-8')
+
+ms = manifest.read_text(encoding='utf-8')
+activity_marker = 'android:name=".maintenance.UseMaintenanceActivity"'
+if activity_marker not in ms:
+    close = '</application>'
+    if close not in ms:
+        raise SystemExit('v0.1.9: manifest application closing tag missing')
+    entry = '''        <activity
+            android:name=".maintenance.UseMaintenanceActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />\n'''
+    ms = ms.replace(close, entry + '    ' + close, 1)
+    manifest.write_text(ms, encoding='utf-8')
+
+hs = home.read_text(encoding='utf-8')
+for marker in ['openAssistant("products")','openAssistant("film")','openAssistant("paper")','MainActivity.class','UseMaintenanceActivity.class','USO E MANUTENZIONE','getPackageInfo(getPackageName(), 0)','R.drawable.ic_wrench_bronze','place(maintenance, dx, dy, scale, 102f, 596f, 330f, 638f)']:
+    if marker not in hs:
+        raise SystemExit('v0.1.9: Home guard failed: ' + marker)
+
+js = activity.read_text(encoding='utf-8')
+for marker in ['MANUALI','TECNICA','MANUTENZIONE','RICETTARIO','Q_OPEMUS','Q_COLOR3','Q_JOBO','Q_ACP','Q_MINOLTA','Q_TESTSTRIP','Q_SPLIT','Q_ZONE','Q_PRINT','MINOLTA_PENDING','APRI MANUALE COMPLETO','APRI SU GOOGLE DRIVE','Svitol è parte dell’intervento personale, NON un’indicazione del manuale','Il manuale italiano disponibile nel Drive non descrive una procedura operativa del Lift','Nessuna procedura viene aggiunta finché la fonte completa non è disponibile']:
+    if marker not in js:
+        raise SystemExit('v0.1.9: maintenance source guard failed: ' + marker)
+if 'SearchView' in js or 'EditText' in js or 'AlertDialog' in js:
+    raise SystemExit('v0.1.9: forbidden search/modal UI detected')
+print('Darkroom v0.1.9 Uso e Manutenzione patch ready')
