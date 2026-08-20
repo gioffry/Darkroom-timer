@@ -1,0 +1,149 @@
+name: Build Darkroom Combined v0.1.2 Vintage Home
+
+on:
+  push:
+    branches:
+      - feature-darkroom-v012-vintage-home-r2
+    paths-ignore:
+      - 'combined/v012_latest_run.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: darkroom-v012-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-darkroom:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature-darkroom-v012-vintage-home-r2
+          fetch-depth: 0
+
+      - name: Prove canonical Darkroom genealogy
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_BASE=3246cda0c2356c7cac6da2e08cc2a2bbcd95b9d8
+          git fetch origin darkroom-main
+          git merge-base --is-ancestor "$EXPECTED_BASE" HEAD
+          MERGE_BASE=$(git merge-base "$EXPECTED_BASE" HEAD)
+          test "$MERGE_BASE" = "$EXPECTED_BASE"
+          grep -q 'Darkroom version: \*\*0.1.1\*\*' CURRENT_STATE.md
+          grep -q 'Canonical development branch: \*\*darkroom-main\*\*' CURRENT_STATE.md
+          grep -q 'All future Timer, chemistry, development, paper-bath, Home and UI changes start from \*\*`darkroom-main`\*\*' CURRENT_STATE.md
+          echo "BASE_HEAD=$EXPECTED_BASE" >> "$GITHUB_ENV"
+          echo "MERGE_BASE=$MERGE_BASE" >> "$GITHUB_ENV"
+
+      - name: Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK 34
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Gradle 8.13
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 -o "$RUNNER_TEMP/gradle.zip" https://services.gradle.org/distributions/gradle-8.13-bin.zip
+          unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/gradle-8.13/bin" >> "$GITHUB_PATH"
+
+      - name: Prepare stable signing
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_PASSWORD"
+          echo "::add-mask::$KEYSTORE_PASSWORD"
+          echo "::add-mask::$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
+
+      - name: Build Darkroom v0.1.2 from canonical v0.1.1
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/darkroom-signing.p12
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          bash combined/build_v012.sh
+          grep -q 'base_darkroom=0.1.1' validation-v012.txt
+          grep -q 'versionName=0.1.2' validation-v012.txt
+          grep -q 'products_function=PASS' validation-v012.txt
+          grep -q 'film_function=PASS' validation-v012.txt
+          grep -q 'paper_function=PASS' validation-v012.txt
+          grep -q 'timer_function=PASS' validation-v012.txt
+          grep -q 'timer_source_unchanged=PASS' validation-v012.txt
+          grep -q 'assistant_source_unchanged=PASS' validation-v012.txt
+          APK_SHA=$(cut -d' ' -f1 Darkroom-v0.1.2.sha256)
+          CERT_FP=$(grep -m1 'certificate SHA-256 digest:' certificate-v012.txt | sed 's/.*: *//')
+          echo "APK_SHA=$APK_SHA" >> "$GITHUB_ENV"
+          echo "CERT_FP=$CERT_FP" >> "$GITHUB_ENV"
+
+      - name: Upload Darkroom v0.1.2 APK
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: Darkroom-v0.1.2
+          path: |
+            Darkroom-v0.1.2.apk
+            Darkroom-v0.1.2.sha256
+            certificate-v012.txt
+            apk-badging-v012.txt
+            validation-v012.txt
+
+      - name: Record successful v0.1.2 build metadata
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          set -euo pipefail
+          cat > combined/v012_latest_run.txt <<EOF
+          run_id=$GITHUB_RUN_ID
+          base_branch=darkroom-main
+          base_head=$BASE_HEAD
+          new_branch=feature-darkroom-v012-vintage-home-r2
+          merge_base=$MERGE_BASE
+          functional_commit=$GITHUB_SHA
+          versionName=0.1.2
+          versionCode=3
+          timer_version=0.13.7
+          assistant_version=0.3.8
+          approved_vintage_home=PASS
+          products_function=PASS
+          film_function=PASS
+          paper_function=PASS
+          timer_function=PASS
+          timer_source_unchanged=PASS
+          assistant_source_unchanged=PASS
+          build=SUCCESS
+          signature=SUCCESS
+          certificate_continuity=PASS
+          certificate_SHA256=$CERT_FP
+          artifact=Darkroom-v0.1.2
+          artifact_id=$ARTIFACT_ID
+          apk_SHA256=$APK_SHA
+          EOF
+          git config user.name "Darkroom Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add combined/v012_latest_run.txt
+          git commit -m "Record Darkroom v0.1.2 successful build $GITHUB_RUN_ID [skip ci]"
+          git push origin HEAD:feature-darkroom-v012-vintage-home-r2
