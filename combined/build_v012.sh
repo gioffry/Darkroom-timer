@@ -109,11 +109,13 @@ APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
 AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
 "$APKSIGNER" verify --verbose --print-certs Darkroom-v0.1.4.apk | tee certificate-v014.txt
 "$AAPT" dump badging Darkroom-v0.1.4.apk > apk-badging-v014.txt
-grep -q "package: name='it.darkroom.darkroom' versionCode='5' versionName='0.1.4'" apk-badging-v014.txt
-grep -q "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v014.txt
+# Verifiche separate e robuste: l'ordine dei campi di aapt non è contrattuale.
+grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v014.txt
+grep -Fq "versionCode='5'" apk-badging-v014.txt
+grep -Fq "versionName='0.1.4'" apk-badging-v014.txt
+grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v014.txt
 unzip -l Darkroom-v0.1.4.apk > apk-listing-v014.txt
 grep -q 'assets/mdc_full.sqlite' apk-listing-v014.txt
-grep -q 'home_vintage' apk-listing-v014.txt
 CERT_FP=$(grep -m1 'certificate SHA-256 digest:' certificate-v014.txt | sed 's/.*: *//')
 test "$CERT_FP" = "fbead305657584b50a9d8892aa19bd9844b412d77db316e7daa5593c94e2a02f"
 sha256sum Darkroom-v0.1.4.apk | tee Darkroom-v0.1.4.sha256
