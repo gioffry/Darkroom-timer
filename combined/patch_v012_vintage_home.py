@@ -57,6 +57,7 @@ import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 
 import it.darkroom.timer.MainActivity;
+import it.darkroom.timer.R;
 import it.darkroom.assistant.AssistantActivityV2;
 
 /**
