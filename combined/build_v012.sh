@@ -36,10 +36,20 @@ grep -q 'android:versionCode="2"' combined/src/main/AndroidManifest.xml
 grep -q "versionName '0.1.1'" combined/build.gradle
 grep -q 'versionCode 2' combined/build.gradle
 
-# Genera la Home sicura usando il mockup HD caricato dall'utente.
+# Mantiene la Home sicura già verificata della 0.1.3 (routing/hotspot invariati).
 python3 combined/patch_v012_vintage_home.py
 
-# La patch storica produce 0.1.3; questa release HD viene promossa a 0.1.4 / code 5.
+# Sostituisce ESCLUSIVAMENTE l'asset raster con il mockup originale 864x1536
+# caricato dall'utente, ricomposto senza ricampionamenti aggiuntivi.
+HD_DIR=combined/v014_assets/home_hd
+test "$(find "$HD_DIR" -maxdepth 1 -type f -name '*.part' | wc -l)" -eq 8
+cat "$HD_DIR"/0{0..7}.part | tr -d '\r\n' | base64 --decode > combined/src/main/res/drawable-nodpi/home_vintage.webp
+HD_BYTES=$(stat -c%s combined/src/main/res/drawable-nodpi/home_vintage.webp)
+test "$HD_BYTES" -gt 80000
+test "$(head -c 4 combined/src/main/res/drawable-nodpi/home_vintage.webp)" = "RIFF"
+test "$(dd if=combined/src/main/res/drawable-nodpi/home_vintage.webp bs=1 skip=8 count=4 status=none)" = "WEBP"
+
+# Promuove l'app combinata a 0.1.4 / versionCode 5.
 sed -i 's/android:versionCode="4"/android:versionCode="5"/' combined/src/main/AndroidManifest.xml
 sed -i 's/android:versionName="0.1.3"/android:versionName="0.1.4"/' combined/src/main/AndroidManifest.xml
 sed -i "s/versionCode 4/versionCode 5/" combined/build.gradle
@@ -65,8 +75,6 @@ grep -q 'R.drawable.home_vintage' "$HOME"
 grep -q 'restoreSavedFilmDilution' "$ASSISTANT_MAIN"
 grep -q 'private static final String APP_VERSION = "0.13.7";' "$TIMER_MAIN"
 test -f combined/src/main/res/drawable-nodpi/home_vintage.webp
-# Asset precedente ~17 KB; il nuovo mockup HD deve restare sopra 100 KB.
-test "$(stat -c%s combined/src/main/res/drawable-nodpi/home_vintage.webp)" -gt 100000
 
 gradle :combined:assembleRelease --stacktrace
 cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.1.4.apk
@@ -91,7 +99,7 @@ sha256sum Darkroom-v0.1.4.apk | tee Darkroom-v0.1.4.sha256
   echo 'timer_version=0.13.7'
   echo 'assistant_version=0.3.8'
   echo 'vintage_home_hd=PASS'
-  echo 'home_asset_bytes='$(stat -c%s combined/src/main/res/drawable-nodpi/home_vintage.webp)
+  echo "home_asset_bytes=$HD_BYTES"
   echo 'safe_home_views=PASS'
   echo 'products_function=PASS'
   echo 'film_function=PASS'
