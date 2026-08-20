@@ -1,0 +1,5 @@
+base_branch=feature-v0121-assistant-ux-smart-catalog
+base_head=2f68fb5b79ae11f56286146605d63a10f69a0107
+versionName=0.12.2
+versionCode=59
+purpose=real-device repair of v0.12.1 Smart Search and chemistry UI

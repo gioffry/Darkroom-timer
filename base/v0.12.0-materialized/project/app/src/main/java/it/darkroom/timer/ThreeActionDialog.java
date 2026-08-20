@@ -1,0 +1,111 @@
+package it.darkroom.timer;
+
+import android.app.Activity;
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+public final class ThreeActionDialog {
+    private ThreeActionDialog() {}
+
+    public static void show(Activity activity, boolean darkroomMode,
+                            String title, String message,
+                            String primaryLabel, Runnable primaryAction,
+                            String secondaryLabel, Runnable secondaryAction,
+                            String cancelLabel) {
+        final int card = darkroomMode ? Color.BLACK : Color.rgb(18, 21, 23);
+        final int button = darkroomMode ? Color.rgb(18, 0, 0) : Color.rgb(31, 35, 38);
+        final int border = darkroomMode ? Color.rgb(105, 0, 0) : Color.rgb(57, 63, 68);
+        final int primaryText = darkroomMode ? Color.rgb(255, 0, 0) : Color.WHITE;
+        final int muted = darkroomMode ? Color.rgb(190, 0, 0) : Color.rgb(169, 176, 184);
+        final int red = darkroomMode ? Color.rgb(255, 0, 0) : Color.rgb(255, 92, 92);
+        final int blue = darkroomMode ? Color.rgb(255, 0, 0) : Color.rgb(63, 151, 255);
+
+        final Dialog dialog = new Dialog(activity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        LinearLayout panel = new LinearLayout(activity);
+        panel.setOrientation(LinearLayout.VERTICAL);
+        panel.setPadding(dp(activity, 20), dp(activity, 18), dp(activity, 20), dp(activity, 18));
+        panel.setBackground(roundRect(activity, card, 14, 1, border));
+
+        TextView heading = new TextView(activity);
+        heading.setText(title);
+        heading.setTextSize(19);
+        heading.setTextColor(primaryText);
+        heading.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        panel.addView(heading, margins(activity, -1, -2, 0, 0, 0, 12));
+
+        TextView body = new TextView(activity);
+        body.setText(message);
+        body.setTextSize(14);
+        body.setTextColor(muted);
+        body.setLineSpacing(0, 1.08f);
+        panel.addView(body, margins(activity, -1, -2, 0, 0, 0, 16));
+
+        Button primary = button(activity, primaryLabel, darkroomMode ? red : blue, Color.BLACK, border);
+        primary.setOnClickListener(v -> {
+            dialog.dismiss();
+            if (primaryAction != null) primaryAction.run();
+        });
+        panel.addView(primary, new LinearLayout.LayoutParams(-1, dp(activity, 52)));
+
+        Button secondary = button(activity, secondaryLabel, red, Color.BLACK, border);
+        secondary.setOnClickListener(v -> {
+            dialog.dismiss();
+            if (secondaryAction != null) secondaryAction.run();
+        });
+        panel.addView(secondary, margins(activity, -1, 50, 0, 8, 0, 0));
+
+        Button cancel = button(activity, cancelLabel, button, darkroomMode ? red : muted, border);
+        cancel.setOnClickListener(v -> dialog.dismiss());
+        panel.addView(cancel, margins(activity, -1, 48, 0, 8, 0, 0));
+
+        dialog.setContentView(panel);
+        Window window = dialog.getWindow();
+        if (window != null) window.setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.show();
+        if (window != null) {
+            window.setLayout((int)(activity.getResources().getDisplayMetrics().widthPixels * 0.92f),
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+    }
+
+    private static Button button(Activity activity, String label, int background, int foreground, int border) {
+        Button b = new Button(activity);
+        b.setText(label);
+        b.setTextSize(12);
+        b.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        b.setAllCaps(false);
+        b.setTextColor(foreground);
+        b.setPadding(0, 0, 0, 0);
+        b.setBackground(roundRect(activity, background, 9, background == border ? 0 : 1, border));
+        return b;
+    }
+
+    private static GradientDrawable roundRect(Activity activity, int color, int radiusDp, int strokeDp, int strokeColor) {
+        GradientDrawable g = new GradientDrawable();
+        g.setColor(color);
+        g.setCornerRadius(dp(activity, radiusDp));
+        if (strokeDp > 0) g.setStroke(dp(activity, strokeDp), strokeColor);
+        return g;
+    }
+
+    private static LinearLayout.LayoutParams margins(Activity activity, int width, int heightDp,
+                                                      int left, int top, int right, int bottom) {
+        int height = heightDp < 0 ? heightDp : dp(activity, heightDp);
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(width, height);
+        p.setMargins(dp(activity, left), dp(activity, top), dp(activity, right), dp(activity, bottom));
+        return p;
+    }
+
+    private static int dp(Activity activity, float value) {
+        return Math.round(value * activity.getResources().getDisplayMetrics().density);
+    }
+}

@@ -1,0 +1,12 @@
+run_id=32238512571
+functional_commit=f4cebe505e100521d5ecb222a28d1e2f3c1956d0
+versionName=0.13.3
+versionCode=64
+preferred_strip_pending=PASS
+non_ora_keeps_pending=PASS
+persistent_choose_button=PASS
+next_test_replaces_pending=PASS
+timing_math_unchanged=PASS
+sonoff_service_unchanged=PASS
+apk_built=NO
+source_check=PASS

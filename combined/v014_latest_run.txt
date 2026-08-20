@@ -1,0 +1,8 @@
+run_id=32366762080
+artifact_id=9405613329
+artifact=Darkroom-v0.1.4
+branch=feature-darkroom-v014-hd-home
+commit=cb59c07417aeaf8d7c5d198847d58bfa0806a880
+versionName=0.1.4
+versionCode=5
+build=SUCCESS
