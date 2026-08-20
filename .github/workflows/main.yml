@@ -1,9 +1,9 @@
-name: Build Darkroom v0.1.6 Cambio Ingrandimento
+name: Build Darkroom v0.1.7 Enlargement Polish
 
 on:
   push:
     branches:
-      - feature-darkroom-v016-enlargement
+      - feature-darkroom-v017-enlargement-polish
   workflow_dispatch:
 
 permissions:
@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feature-darkroom-v016-enlargement
+          ref: feature-darkroom-v017-enlargement-polish
           fetch-depth: 0
       - uses: actions/setup-java@v5
         with:
@@ -42,7 +42,7 @@ jobs:
         run: |
           test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_PASSWORD"
           printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
-      - name: Build and validate v0.1.6
+      - name: Build and validate v0.1.7
         env:
           ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/darkroom-signing.p12
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -50,16 +50,16 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           cat combined/v015_assets/home_bottom_parts/00.part combined/v015_assets/home_bottom_parts/01.part combined/v015_assets/home_bottom_parts/02.part combined/v015_assets/home_bottom_parts/03.part > combined/v015_assets/home_bottom.jpg
-          bash combined/build_v016.sh
+          bash combined/build_v017.sh
           cat validation-v015.txt
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Darkroom-v0.1.6
+          name: Darkroom-v0.1.7
           if-no-files-found: error
           path: |
-            Darkroom-v0.1.6.apk
-            Darkroom-v0.1.6.sha256
+            Darkroom-v0.1.7.apk
+            Darkroom-v0.1.7.sha256
             certificate-v015.txt
             apk-badging-v015.txt
             validation-v015.txt
@@ -74,4 +74,4 @@ jobs:
           JOB_STATUS: ${{ job.status }}
         run: |
           if [ "$JOB_STATUS" = success ]; then STATE=success; else STATE=failure; fi
-          curl --silent --show-error -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/statuses/$SHA" -d "{\"state\":\"$STATE\",\"context\":\"darkroom-v016-enlargement-build\",\"target_url\":\"$RUN_URL\"}" >/dev/null
+          curl --silent --show-error -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/statuses/$SHA" -d "{\"state\":\"$STATE\",\"context\":\"darkroom-v017-polish-build\",\"target_url\":\"$RUN_URL\"}" >/dev/null
