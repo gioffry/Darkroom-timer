@@ -1,0 +1,201 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Porta nel worktree le basi ufficiali esatte senza modificare alcun branch storico.
+git checkout origin/feature-v0137-flat-bottom-nav -- \
+  base/v0.12.0-materialized \
+  experiments/v0121 experiments/v0122 experiments/v0123 \
+  experiments/v0130 experiments/v0131 experiments/v0132 experiments/v0133 \
+  experiments/v0134 experiments/v0135 experiments/v0136 experiments/v0137
+git checkout origin/feature-darkroom-assistant-v038-edit-persistence -- assistant
+
+# -----------------------------------------------------------------------------
+# TIMER: ricostruzione esatta v0.13.7
+# -----------------------------------------------------------------------------
+rm -rf work && mkdir -p work
+cp -a base/v0.12.0-materialized/project work/project
+cp base/v0.12.0-materialized/build_darkroom.py work/build_darkroom.py
+cp base/v0.12.0-materialized/v064_icon.py work/v064_icon.py
+python3 experiments/v0121/apply_v0121_assistant_ux_smart_catalog.py work
+python3 experiments/v0122/apply_v0122_real_device_repair.py work
+python3 experiments/v0123/apply_v0123_live_web_repair.py work
+python3 experiments/v0123/apply_v0123_no_manual_cleanup.py work
+python3 experiments/v0130/apply_v0130_timer_only_reset.py work
+python3 experiments/v0131/apply_v0131_fstop_subtractive_teststrip.py work
+python3 experiments/v0132/apply_v0132_consolidated_timer_fixes.py work
+python3 experiments/v0133/apply_v0133_preferred_strip_pending.py work
+python3 experiments/v0134/apply_v0134_preferred_strip_button_fix.py work
+python3 experiments/v0135/apply_v0135_provino_contrast_note.py work
+python3 experiments/v0136/apply_v0136_bottom_nav_provino_first.py work
+python3 experiments/v0137/apply_v0137_flat_bottom_nav.py work
+
+grep -q 'android:versionName="0.13.7"' work/project/app/src/main/AndroidManifest.xml
+grep -q 'android:versionCode="68"' work/project/app/src/main/AndroidManifest.xml
+grep -q 'private static final String APP_VERSION = "0.13.7";' work/project/app/src/main/java/it/darkroom/timer/MainActivity.java
+
+# -----------------------------------------------------------------------------
+# ASSISTANT: v0.3.8 + database offline
+# -----------------------------------------------------------------------------
+python3 assistant/build_mdc_sqlite_asset_v032.py
+python3 assistant/patch_v018_visible_results.py
+python3 assistant/patch_v019_search_enrichment.py
+python3 assistant/patch_v020_source_brain.py
+python3 assistant/patch_v021_index_fallback.py
+python3 assistant/patch_v022_strict_entities.py
+python3 assistant/patch_v030_offline_mdc.py
+python3 assistant/patch_v031_bundled_db.py
+python3 assistant/patch_v032_pure_offline.py
+python3 assistant/patch_v033_startup_safe.py
+python3 assistant/patch_v034_db_schema_match.py
+
+python3 - <<'PY'
+from pathlib import Path
+p=Path('assistant/patch_v035_format_stop_fix.py')
+s=p.read_text()
+start=s.index('# Nel flusso pellicola aggiungi FORMATO')
+end=s.index('# Listener formato:', start)
+block=r'''# Nel flusso pellicola aggiungi FORMATO prima del campo ISO.
+needle = '        isoField = edit("", InputType.TYPE_CLASS_NUMBER);'
+repl = ''' + "'''" + '''        formatSpinner = spinner(new String[]{"Seleziona prima la pellicola"});
+page.addView(fieldBlock("FORMATO", formatSpinner));
+
+isoField = edit("", InputType.TYPE_CLASS_NUMBER);''' + "'''" + r'''
+if needle not in s:
+    raise SystemExit('film ISO insertion marker missing')
+s = s.replace(needle, repl, 1)
+
+'''
+s=s[:start]+block+s[end:]
+p.write_text(s)
+PY
+python3 assistant/patch_v035_format_stop_fix.py
+python3 assistant/patch_v036_inline_results.py
+python3 assistant/patch_v037_time_search_capacity.py
+python3 assistant/patch_v038_edit_persistence_simplify.py
+test -f assistant/src/main/assets/mdc_full.sqlite
+
+# -----------------------------------------------------------------------------
+# COMBINAZIONE + fix memoria ultima diluizione film
+# -----------------------------------------------------------------------------
+sed -i 's/adst_assistant_java/dst_assistant_java/g' combined/prepare_combined.py
+python3 - <<'PY'
+from pathlib import Path
+p=Path('combined/prepare_combined.py')
+s=p.read_text(encoding='utf-8')
+
+# Routing Assistant: conserva ogni inizializzazione e sostituisce soltanto showHome().
+start=s.index('# onCreate: apre direttamente la sezione richiesta dalla Home unica.')
+end=s.index('# Back = Home unica.', start)
+block=r'''# onCreate: conserva tutte le inizializzazioni della v0.3.8 e sostituisce
+# soltanto la showHome finale con il routing dalla Home combinata.
+on_start = s.index('    @Override\\n    protected void onCreate(Bundle savedInstanceState) {')
+on_end = s.index('\\n    @Override', on_start + 20)
+on_seg = s[on_start:on_end]
+old_home = '        showHome();'
+if old_home not in on_seg:
+    raise SystemExit('Assistant onCreate showHome marker missing')
+route = ''' + "'''" + '''        String target = getIntent().getStringExtra("darkroom_target");
+        if ("products".equals(target)) showProducts();
+        else if ("film".equals(target)) showFilm();
+        else if ("paper".equals(target)) showPaper();
+        else finish();''' + "'''" + r'''
+on_seg = on_seg.replace(old_home, route, 1)
+s = s[:on_start] + on_seg + s[on_end:]
+
+'''
+s=s[:start]+block+s[end:]
+
+# Home nel Timer v0.13.7: la freccia esistente diventa casetta.
+old_timer='''ts = ts.replace('compactButton("← HOME")', 'compactButton("⌂")')
+ts = ts.replace('margin(lp(dp(94), dp(38)), 0, 0, 0, 4)',
+                'margin(lp(dp(52), dp(38)), 0, 0, 0, 4)')'''
+new_timer='''if 'homeButton.setText("←");' in ts:
+    ts = ts.replace('homeButton.setText("←");', 'homeButton.setText("⌂");', 1)
+elif 'compactButton("← HOME")' in ts:
+    ts = ts.replace('compactButton("← HOME")', 'compactButton("⌂")', 1)
+else:
+    raise SystemExit('Timer HOME control not found')'''
+if old_timer not in s:
+    raise SystemExit('prepare_combined Timer marker missing')
+s=s.replace(old_timer,new_timer,1)
+s=s.replace("assert 'compactButton(\"⌂\")' in ts", "assert '⌂' in ts")
+
+# Ripristino robusto dell'ultima diluizione: attende che l'adapter venga ricostruito
+# dopo il ripristino del rivelatore, invece di tentare una sola volta.
+old='''        if (developerSpinner != null) developerSpinner.post(() ->
+                selectSpinnerText(dilutionSpinner, prefs.getString("last_film_dil", "")));
+    }
+
+    private void restorePaperUiState() {'''
+new='''        restoreSavedFilmDilution(0);
+    }
+
+    private void restoreSavedFilmDilution(int attempt) {
+        String wanted = prefs.getString("last_film_dil", "");
+        if (wanted.isEmpty() || dilutionSpinner == null) return;
+        selectSpinnerText(dilutionSpinner, wanted);
+        if (wanted.equals(spinnerText(dilutionSpinner))) return;
+        if (attempt < 12) {
+            dilutionSpinner.postDelayed(() -> restoreSavedFilmDilution(attempt + 1), 120L);
+        }
+    }
+
+    private void restorePaperUiState() {'''
+if old not in s:
+    raise SystemExit('film dilution restore marker missing')
+s=s.replace(old,new,1)
+p.write_text(s,encoding='utf-8')
+PY
+
+python3 combined/prepare_combined.py
+
+# Timer 0.13.7 è standalone: sposta il launcher dalla MainActivity alla Home combinata.
+python3 - <<'PY'
+from pathlib import Path
+import re
+p=Path('combined/src/main/AndroidManifest.xml')
+s=p.read_text(encoding='utf-8')
+pat=r'''        <activity\s+android:name="\.MainActivity"\s+android:screenOrientation="portrait"\s+android:exported="true">\s+<intent-filter>\s+<action android:name="android.intent.action.MAIN" />\s+<category android:name="android.intent.category.LAUNCHER" />\s+</intent-filter>\s+</activity>'''
+repl='''        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity
+            android:name=".home.HomeActivity"
+            android:screenOrientation="portrait"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>'''
+s,n=re.subn(pat,repl,s,count=1,flags=re.S)
+if n != 1:
+    raise SystemExit('MainActivity launcher block not found')
+s=re.sub(r'android:versionCode="[^"]+"','android:versionCode="2"',s,count=1)
+s=re.sub(r'android:versionName="[^"]+"','android:versionName="0.1.1"',s,count=1)
+p.write_text(s,encoding='utf-8')
+PY
+
+# Contratto della v0.1.1.
+grep -q 'PRODOTTI CHIMICI' combined/src/main/java/it/darkroom/timer/home/HomeActivity.java
+grep -q 'SVILUPPO PELLICOLA' combined/src/main/java/it/darkroom/timer/home/HomeActivity.java
+grep -q 'BAGNI STAMPA' combined/src/main/java/it/darkroom/timer/home/HomeActivity.java
+grep -q 'TIMER STAMPA' combined/src/main/java/it/darkroom/timer/home/HomeActivity.java
+grep -q 'private static final String APP_VERSION = "0.13.7";' combined/src/main/java/it/darkroom/timer/MainActivity.java
+grep -q 'restoreSavedFilmDilution' combined/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+grep -q 'last_film_dil' combined/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
+grep -q 'android:name=".home.HomeActivity"' combined/src/main/AndroidManifest.xml
+
+# Build e verifica.
+gradle :combined:assembleRelease --stacktrace
+cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.1.1.apk
+APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
+AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
+"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.1.1.apk
+BADGING=$("$AAPT" dump badging Darkroom-v0.1.1.apk)
+echo "$BADGING" | grep -q "package: name='it.darkroom.darkroom' versionCode='2' versionName='0.1.1'"
+echo "$BADGING" | grep -q "launchable-activity: name='it.darkroom.timer.home.HomeActivity'"
+unzip -l Darkroom-v0.1.1.apk | grep -q 'assets/mdc_full.sqlite'
+sha256sum Darkroom-v0.1.1.apk | tee Darkroom-v0.1.1.sha256
