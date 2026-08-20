@@ -28,8 +28,11 @@ helper = r'''    ExposureRecipe sourceRecipeForResize(int base){
                 r.filterType=ft;r.filterValue=fv;
             }else{
                 int m=parseFilterNumber(originEntry.magenta),y=parseFilterNumber(originEntry.yellow);
-                if(m>0){r.filterType=ExposureRecipe.FILTER_MAGENTA;r.filterValue=ExposureRecipe.snap5(m);}
-                else if(y>0){r.filterType=ExposureRecipe.FILTER_YELLOW;r.filterValue=ExposureRecipe.snap5(y);}
+                // Old manual cards can contain both Y and M. ExposureRecipe can
+                // represent one base contrast filter only, so never guess when both
+                // are non-zero: preserve the card values in LOG and leave base filter NONE.
+                if(m>0&&y<=0){r.filterType=ExposureRecipe.FILTER_MAGENTA;r.filterValue=ExposureRecipe.snap5(m);}
+                else if(y>0&&m<=0){r.filterType=ExposureRecipe.FILTER_YELLOW;r.filterValue=ExposureRecipe.snap5(y);}
             }
             int dq=parseDensityQuarterSteps(originEntry.density);
             if(dq>=0)r.densityQuarterSteps=dq;
@@ -66,7 +69,7 @@ s = s.replace(old_active, new_active, 1)
 p.write_text(s, encoding='utf-8')
 
 out = p.read_text(encoding='utf-8')
-for guard in ['sourceRecipeForResize(oldBase)', 'parseFilterNumber(originEntry.magenta)', 'parseDensityQuarterSteps(originEntry.density)']:
+for guard in ['sourceRecipeForResize(oldBase)', 'parseFilterNumber(originEntry.magenta)', 'parseDensityQuarterSteps(originEntry.density)', 'if(m>0&&y<=0)']:
     if guard not in out:
         raise SystemExit('v0.2.0 legacy recipe guard failed: ' + guard)
 print('Darkroom v0.2.0 legacy recipe compatibility patch ready')
