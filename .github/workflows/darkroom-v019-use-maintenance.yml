@@ -88,14 +88,14 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p build-output/v019
-          rm -f build-output/v019/BUILD_FAILED.txt
           cp Darkroom-v0.1.9.apk build-output/v019/Darkroom-v0.1.9.apk
           cp Darkroom-v0.1.9.sha256 build-output/v019/Darkroom-v0.1.9.sha256
           cp validation-v015.txt build-output/v019/validation-v0.1.9.txt
           cp apk-badging-v015.txt build-output/v019/apk-badging-v0.1.9.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- build-output/v019/Darkroom-v0.1.9.apk build-output/v019/Darkroom-v0.1.9.sha256 build-output/v019/validation-v0.1.9.txt build-output/v019/apk-badging-v0.1.9.txt build-output/v019/BUILD_FAILED.txt
+          git rm -f --ignore-unmatch build-output/v019/BUILD_FAILED.txt
+          git add -- build-output/v019/Darkroom-v0.1.9.apk build-output/v019/Darkroom-v0.1.9.sha256 build-output/v019/validation-v0.1.9.txt build-output/v019/apk-badging-v0.1.9.txt
           git commit -m "Publish Darkroom v0.1.9 APK [skip ci]"
           git push origin HEAD:feature-darkroom-v019-use-maintenance
 
