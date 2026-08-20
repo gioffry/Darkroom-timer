@@ -36,22 +36,18 @@ grep -q 'android:versionCode="2"' combined/src/main/AndroidManifest.xml
 grep -q "versionName '0.1.1'" combined/build.gradle
 grep -q 'versionCode 2' combined/build.gradle
 
-# Il vecchio asset 0.1.3 serve soltanto alla patch che genera la Home sicura.
-# Normalizza il Base64 legacy; subito dopo viene comunque sostituito dal mockup HD 864x1536.
+# Riusa ESATTAMENTE il codice Home sicuro della 0.1.3, ma salta il vecchio
+# asset raster legacy: nella 0.1.4 viene sostituito subito dopo dal mockup HD.
 python3 - <<'PY'
 from pathlib import Path
-parts = sorted(Path('combined/v012_assets/home_mockup').glob('*.part'))
-if len(parts) != 2:
-    raise SystemExit('asset legacy Home: attese 2 parti')
-encoded = ''.join(''.join(p.read_text(encoding='utf-8').split()) for p in parts)
-encoded += '=' * (-len(encoded) % 4)
-cut = len(''.join(parts[0].read_text(encoding='utf-8').split()))
-parts[0].write_text(encoded[:cut], encoding='utf-8')
-parts[1].write_text(encoded[cut:], encoding='utf-8')
+src = Path('combined/patch_v012_vintage_home.py').read_text(encoding='utf-8')
+start = src.index("parts = sorted(assets.glob('*.part'))")
+end = src.index("home_source = r'''", start)
+replacement = """image_bytes = b'RIFF0000WEBP'\ndrawable = combined / 'src/main/res/drawable-nodpi/home_vintage.webp'\ndrawable.parent.mkdir(parents=True, exist_ok=True)\ndrawable.write_bytes(image_bytes)\n\n"""
+src = src[:start] + replacement + src[end:]
+Path('/tmp/patch_v013_home_code_only.py').write_text(src, encoding='utf-8')
 PY
-
-# Mantiene la Home sicura già verificata della 0.1.3 (routing/hotspot invariati).
-python3 combined/patch_v012_vintage_home.py
+python3 /tmp/patch_v013_home_code_only.py
 
 # Sostituisce ESCLUSIVAMENTE l'asset raster con il mockup originale 864x1536
 # caricato dall'utente, ricomposto senza ricampionamenti aggiuntivi.
