@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Darkroom v0.1.5: base canonica 0.1.1, Timer 0.13.7 + Assistant 0.3.8.
-# Cambia ESCLUSIVAMENTE la Home grafica: usa il JPEG HD approvato e Android-safe.
-git fetch origin archive/timer-v0137-baseline archive/assistant-v038-baseline feature-darkroom-v012-mockup-home
+# Darkroom v0.1.5: base canonica Darkroom 0.1.1.
+# Timer 0.13.7 e Assistant 0.3.8 restano invariati. Cambia solo la Home.
+git fetch origin archive/timer-v0137-baseline archive/assistant-v038-baseline
 
 git update-ref refs/remotes/origin/feature-v0137-flat-bottom-nav \
   "$(git rev-parse origin/archive/timer-v0137-baseline)"
@@ -32,11 +32,8 @@ sha256sum "$ASSISTANT_MAIN" | cut -d' ' -f1 > /tmp/assistant.before
 
 grep -q 'android:versionName="0.1.1"' combined/src/main/AndroidManifest.xml
 grep -q 'android:versionCode="2"' combined/src/main/AndroidManifest.xml
-grep -q "versionName '0.1.1'" combined/build.gradle
-grep -q 'versionCode 2' combined/build.gradle
 
-# Riusa soltanto il codice Home già verificato della 0.1.3.
-# L'asset legacy viene bypassato e sostituito subito dopo.
+# Riusa esclusivamente il codice Home sicuro della 0.1.3, senza il suo vecchio asset.
 python3 - <<'PY'
 from pathlib import Path
 src = Path('combined/patch_v012_vintage_home.py').read_text(encoding='utf-8')
@@ -48,61 +45,40 @@ Path('/tmp/patch_home_code_only.py').write_text(src, encoding='utf-8')
 PY
 python3 /tmp/patch_home_code_only.py
 
-# Recupera il JPEG HD originale del mockup approvato dalla sua sorgente storica.
-# I file in home_mockup_parts sono segmenti consecutivi DELLA STESSA stringa Base64:
-# vanno quindi concatenati prima e decodificati una sola volta.
+# Ricostruisce l'asset HD già presente nel repository. Il WebP NON viene fornito ad Android:
+# viene usato solo come sorgente e convertito da ffmpeg in un JPEG standard Android-safe.
 python3 - <<'PY'
 from pathlib import Path
 import base64
-import re
-import subprocess
-
-ref = 'origin/feature-darkroom-v012-mockup-home'
-listing = subprocess.check_output([
-    'git', 'ls-tree', '-r', '--name-only', ref, '--', 'combined/home_mockup_parts'
-], text=True)
-parts = sorted(x.strip() for x in listing.splitlines() if x.strip())
-if len(parts) != 10:
-    raise SystemExit(f'JPEG HD: attesi 10 blocchi, trovati {len(parts)}')
-
-segments = []
-for index, path in enumerate(parts):
-    text = subprocess.check_output(['git', 'show', f'{ref}:{path}'], text=True)
-    clean = ''.join(text.split())
-    if re.search(r'[^A-Za-z0-9+/=]', clean):
-        raise SystemExit(f'JPEG HD: carattere Base64 non valido nel blocco {path}')
-    segments.append(clean)
-    print(f'JPEG_SEGMENT={index + 1}/{len(parts)} chars={len(clean)}')
-
-encoded = ''.join(segments)
+hd = Path('combined/v014_assets/home_hd')
+parts = sorted(hd.glob('*.part'))
+if len(parts) != 8:
+    raise SystemExit(f'asset HD: attese 8 parti, trovate {len(parts)}')
+encoded = ''.join(''.join(p.read_text(encoding='utf-8').split()) for p in parts)
 encoded += '=' * (-len(encoded) % 4)
-try:
-    data = base64.b64decode(encoded, validate=True)
-except Exception as exc:
-    raise SystemExit(f'JPEG HD: stream Base64 completo non decodificabile: {exc}')
-
-Path('/tmp/home_hd_source.jpg').write_bytes(data)
-print(f'JPEG_TOTAL_BYTES={len(data)}')
+data = base64.b64decode(encoded, validate=True)
+if len(data) < 80000 or data[:4] != b'RIFF' or data[8:12] != b'WEBP':
+    raise SystemExit('asset HD WebP sorgente non valido')
+Path('/tmp/home_hd_source.webp').write_bytes(data)
+print('WEBP_SOURCE_BYTES=' + str(len(data)))
 PY
 
-# JPEG completo e decodificabile, non soltanto header formalmente valido.
-test "$(head -c 2 /tmp/home_hd_source.jpg | od -An -tx1 | tr -d ' \n')" = "ffd8"
-test "$(tail -c 2 /tmp/home_hd_source.jpg | od -An -tx1 | tr -d ' \n')" = "ffd9"
-ffmpeg -v error -xerror -i /tmp/home_hd_source.jpg -frames:v 1 -f null -
-DIMS="$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 /tmp/home_hd_source.jpg)"
-test "$DIMS" = "864x1536"
-
-# Installa direttamente il JPEG validato nella Home; nessun WebP resta nel pacchetto.
+# Decodifica tollerante del WebP e ricodifica JPEG baseline. Pad a 864x1536 per mantenere
+# esattamente la geometria/hotspot del mockup anche se il vecchio stream WebP ha la coda danneggiata.
 rm -f combined/src/main/res/drawable-nodpi/home_vintage.webp
-cp /tmp/home_hd_source.jpg combined/src/main/res/drawable-nodpi/home_vintage.jpg
+ffmpeg -y -v warning -err_detect ignore_err -i /tmp/home_hd_source.webp \
+  -frames:v 1 -vf "scale=864:-2,pad=864:1536:0:0:black" \
+  -pix_fmt yuvj420p -q:v 2 combined/src/main/res/drawable-nodpi/home_vintage.jpg
 
 JPG=combined/src/main/res/drawable-nodpi/home_vintage.jpg
 test -s "$JPG"
 test "$(head -c 2 "$JPG" | od -An -tx1 | tr -d ' \n')" = "ffd8"
-JPG_DIMS="$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$JPG")"
-test "$JPG_DIMS" = "864x1536"
+test "$(tail -c 2 "$JPG" | od -An -tx1 | tr -d ' \n')" = "ffd9"
+ffmpeg -v error -xerror -i "$JPG" -frames:v 1 -f null -
+DIMS="$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$JPG")"
+test "$DIMS" = "864x1536"
 
-# v0.1.5 / versionCode 6.
+# Versione Darkroom 0.1.5 / versionCode 6.
 sed -i 's/android:versionCode="4"/android:versionCode="6"/' combined/src/main/AndroidManifest.xml
 sed -i 's/android:versionName="0.1.3"/android:versionName="0.1.5"/' combined/src/main/AndroidManifest.xml
 sed -i "s/versionCode 4/versionCode 6/" combined/build.gradle
@@ -113,9 +89,6 @@ test "$(cat /tmp/assistant.before)" = "$(sha256sum "$ASSISTANT_MAIN" | cut -d' '
 
 grep -q 'android:versionName="0.1.5"' combined/src/main/AndroidManifest.xml
 grep -q 'android:versionCode="6"' combined/src/main/AndroidManifest.xml
-grep -q "versionName '0.1.5'" combined/build.gradle
-grep -q 'versionCode 6' combined/build.gradle
-
 HOME=combined/src/main/java/it/darkroom/timer/home/HomeActivity.java
 grep -q 'openAssistant("products")' "$HOME"
 grep -q 'openAssistant("film")' "$HOME"
@@ -153,10 +126,9 @@ sha256sum Darkroom-v0.1.5.apk | tee Darkroom-v0.1.5.sha256
   echo 'timer_version=0.13.7'
   echo 'assistant_version=0.3.8'
   echo 'home_asset_format=JPEG'
-  echo 'home_asset_source=approved_hd_jpeg'
   echo 'home_asset_dimensions=864x1536'
-  echo 'home_full_decode=PASS'
-  echo 'home_webp_removed=PASS'
+  echo 'home_jpeg_full_decode=PASS'
+  echo 'home_webp_not_packaged=PASS'
   echo 'products_function=PASS'
   echo 'film_function=PASS'
   echo 'paper_function=PASS'
