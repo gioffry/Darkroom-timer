@@ -57,6 +57,12 @@ jobs:
           unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
           echo "$RUNNER_TEMP/gradle-8.13/bin" >> "$GITHUB_PATH"
 
+      - name: FFmpeg image validation
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+
       - name: Prepare stable signing
         shell: bash
         env:
