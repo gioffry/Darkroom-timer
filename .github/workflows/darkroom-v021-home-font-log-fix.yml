@@ -83,7 +83,6 @@ jobs:
             certificate-v015.txt
             apk-badging-v015.txt
             validation-v015.txt
-            apk-listing-v021.txt
 
       - name: Publish build metadata
         if: always()
