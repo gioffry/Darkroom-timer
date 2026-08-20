@@ -77,6 +77,16 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('combined/build_v012.sh')
+          s = p.read_text(encoding='utf-8')
+          needle = "base64 --decode /tmp/home_hd.clean.b64 > /tmp/home_hd_source.webp"
+          pad = "python3 -c \"from pathlib import Path; p=Path('/tmp/home_hd.clean.b64'); s=p.read_text(); p.write_text(s + '=' * (-len(s) % 4))\""
+          if needle not in s:
+              raise SystemExit('decode marker non trovato')
+          p.write_text(s.replace(needle, pad + '\n' + needle, 1), encoding='utf-8')
+          PY
           bash combined/build_v012.sh
           cat validation-v015.txt
 
