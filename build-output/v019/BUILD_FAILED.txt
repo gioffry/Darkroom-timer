@@ -1,4 +1,0 @@
-Darkroom v0.1.9 BUILD FAILED
-commit=47c36e48c98915c1695ab67db49acfc3eae4727c
---- tail build-v019.log ---
-v0.1.9 build wrapper: marker missing in v0.1.8: python3 combined/patch_v018_enlargement_fixes_r2.py\n

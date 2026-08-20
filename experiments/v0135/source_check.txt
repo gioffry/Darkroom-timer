@@ -1,0 +1,9 @@
+run_id=32265422079
+versionName=0.13.5
+versionCode=66
+provino_contrast_note=PASS
+exact_requested_text=PASS
+timing_math_unchanged=PASS
+sonoff_service_unchanged=PASS
+apk_built=NO
+source_check=PASS

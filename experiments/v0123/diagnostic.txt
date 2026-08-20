@@ -1,0 +1,93 @@
+run_id=32220269611
+commit=9c0179f4aa1bcab148ea0d3be28258050a78eb51
+status=PASS
+--- diag-v0121.txt ---
+v0.12.1 OK build VERSION_NAME
+v0.12.1 OK build VERSION_CODE
+v0.12.1 OK Gradle version
+v0.12.1 OK manifest version
+v0.12.1 OK Timer footer version
+v0.12.1 source it/darkroom/timer/assistant/recipes/MyRecipesActivity.java
+v0.12.1 source it/darkroom/timer/assistant/equipment/OwnedTankPickerActivity.java
+v0.12.1 source it/darkroom/timer/assistant/equipment/MyEquipmentActivity.java
+v0.12.1 source it/darkroom/timer/assistant/search/SmartSearchActivity.java
+v0.12.1 source it/darkroom/timer/assistant/search/SmartSearchEngine.java
+v0.12.1 source it/darkroom/timer/assistant/search/SmartSearchBinder.java
+v0.12.1 source it/darkroom/timer/assistant/search/SmartCatalog.java
+v0.12.1 source it/darkroom/timer/assistant/ui/AssistantUi.java
+v0.12.1 source it/darkroom/timer/assistant/log/DevelopmentLogActivity.java
+v0.12.1 source it/darkroom/timer/assistant/paper/PaperChemistryActivity.java
+v0.12.1 source it/darkroom/timer/assistant/system/DataManagementActivity.java
+v0.12.1 source it/darkroom/timer/assistant/system/CatalogManager.java
+v0.12.1 source it/darkroom/timer/assistant/chemistry/inventory/MyChemistryActivity.java
+v0.12.1 OK bundled catalog v2
+v0.12.1 OK backup catalog version
+v0.12.1 OK backup app version
+v0.12.1 OK backup versionCode
+v0.12.1 OK manifest Smart Search activities
+v0.12.1 OK New Development request codes
+v0.12.1 OK Smart Search pellicola
+v0.12.1 OK Smart Search rivelatore
+v0.12.1 OK canonical film selection
+v0.12.1 OK canonical dilution lookup
+v0.12.1 OK canonical calculate inputs
+v0.12.1 OK calculate canonical developer
+v0.12.1 OK modern owned-tank picker
+v0.12.1 OK tank best failure inline
+v0.12.1 OK tank best success inline
+v0.12.1 OK New Development picker results
+v0.12.1 OK TankPlanner UNKNOWN compatibility semantics
+v0.12.1 TRANSFORM OK — Timer protected; Assistant UX/Smart Catalog applied
+v0.12.1 OK builder preflight normalized to versionCode 58 / versionName 0.12.1
+--- diag-v0122.txt ---
+v0.12.2 OK Gradle version
+v0.12.2 OK manifest version
+v0.12.2 OK Timer footer version
+v0.12.2 OK backup app version
+v0.12.2 OK backup versionCode
+v0.12.2 OK SmartSearch Item human-readable toString
+v0.12.2 OK AutoComplete explicit result-to-name conversion
+v0.12.2 OK multifunction category label
+v0.12.2 OK paper chemistry stock calculation
+v0.12.2 OK paper chemistry SmartSearchEngine import
+v0.12.2 OK restore documented paper chemistry defaults
+v0.12.2 OK paper chemistry manual fallback
+v0.12.2 OK working manual paper chemistry entry
+v0.12.2 OK Prepare Chemistry comment
+v0.12.2 OK Prepare Chemistry 9/9 label
+v0.12.2 TRANSFORM OK — real-device Smart Search and chemistry repairs applied
+--- diag-v0123.txt ---
+v0.12.3 OK Gradle version
+v0.12.3 OK manifest version
+v0.12.3 OK Timer footer version
+v0.12.3 OK backup app version
+v0.12.3 OK backup versionCode
+v0.12.3 source it/darkroom/timer/assistant/search/WebSearchParser.java
+v0.12.3 source it/darkroom/timer/assistant/search/WebProductResolver.java
+v0.12.3 OK Smart Catalog ISO propagation
+v0.12.3 OK disable manual creation globally
+v0.12.3 OK live Internet fallback
+v0.12.3 OK web-found confirmation and correction
+v0.12.3 TRANSFORM OK — ISO propagation + automatic live web discovery + correction-after-import
+--- diag-cleanup.txt ---
+v0.12.3 OK manual product creation removed completely
+--- diag-parser.txt ---
+PASS Bellini Hydrofen -> official Bellini source -> 1+15, 1+31
+--- diag-verify.txt ---
+PASS version 0.12.3 / 60
+PASS Timer footer version only
+PASS backup metadata
+PASS selected film propagates nominal/exposed ISO
+PASS unknown product invokes automatic live web lookup
+PASS manual creation disabled and removed
+PASS correction offered only after web discovery
+PASS original discovered record preserved before correction
+PASS real Internet search engines configured
+PASS resolver follows retrieved web sources
+PASS documented dilution extraction
+PASS web source provenance stored
+PASS web data explicitly marked
+PASS database schema unchanged
+PASS STAMPA -> PROVINO remains removed
+PASS package unchanged
+v0.12.3 RELEASE GUARDS PASS

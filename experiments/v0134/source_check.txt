@@ -1,0 +1,10 @@
+run_id=32239060999
+versionName=0.13.4
+versionCode=65
+manual_button_forced_path=PASS
+stale_testChooserOpen_bypass=PASS
+pending_state_preserved=PASS
+timing_math_unchanged=PASS
+sonoff_service_unchanged=PASS
+apk_built=NO
+source_check=PASS
