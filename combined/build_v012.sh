@@ -13,6 +13,9 @@ git update-ref refs/remotes/origin/feature-darkroom-assistant-v038-edit-persiste
 test "$(git rev-parse origin/archive/timer-v0137-baseline)" = "bd7291e4d0e875f4664fbe034be4b901059c1e4f"
 test "$(git rev-parse origin/archive/assistant-v038-baseline)" = "7ff0e0324376c3465777b08e3949cc284e4a8487"
 
+# Applica la correzione di newline già presente nella base canonica prima di riusare build_v011.sh.
+python3 combined/fix_build_v011_newlines.py
+
 # Riusa esattamente la preparazione verificata della v0.1.1, fermandosi prima del build.
 python3 - <<'PY'
 from pathlib import Path
