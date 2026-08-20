@@ -1,19 +1,16 @@
-name: Build Darkroom Combined v0.1.3 Vintage Home Safe
+name: Build Darkroom Combined v0.1.4 HD Home
 
 on:
   push:
     branches:
-      - feature-darkroom-v012-vintage-home-r2
-  pull_request:
-    branches:
-      - darkroom-main
+      - feature-darkroom-v014-hd-home
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: darkroom-v013-${{ github.ref }}
+  group: darkroom-v014-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -23,7 +20,7 @@ jobs:
       - name: Checkout exact feature branch
         uses: actions/checkout@v4
         with:
-          ref: feature-darkroom-v012-vintage-home-r2
+          ref: feature-darkroom-v014-hd-home
           fetch-depth: 0
 
       - name: Prove canonical Darkroom genealogy
@@ -73,7 +70,7 @@ jobs:
           echo "::add-mask::$KEY_PASSWORD"
           printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
 
-      - name: Build and validate Darkroom v0.1.3
+      - name: Build and validate Darkroom v0.1.4
         shell: bash
         env:
           ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/darkroom-signing.p12
@@ -83,17 +80,17 @@ jobs:
         run: |
           set -euo pipefail
           bash combined/build_v012.sh
-          cat validation-v013.txt
+          cat validation-v014.txt
 
-      - name: Upload Darkroom v0.1.3 APK
+      - name: Upload Darkroom v0.1.4 APK
         uses: actions/upload-artifact@v4
         with:
-          name: Darkroom-v0.1.3
+          name: Darkroom-v0.1.4
           if-no-files-found: error
           path: |
-            Darkroom-v0.1.3.apk
-            Darkroom-v0.1.3.sha256
-            certificate-v013.txt
-            apk-badging-v013.txt
-            apk-listing-v013.txt
-            validation-v013.txt
+            Darkroom-v0.1.4.apk
+            Darkroom-v0.1.4.sha256
+            certificate-v014.txt
+            apk-badging-v014.txt
+            apk-listing-v014.txt
+            validation-v014.txt
