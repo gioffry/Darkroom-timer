@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# Darkroom v0.1.7 build trigger
 python3 - <<'PY'
 from pathlib import Path
 s=Path('combined/build_v016.sh').read_text(encoding='utf-8')
