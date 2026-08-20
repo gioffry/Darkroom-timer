@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feature-darkroom-combined-v011-timer0137-dilution
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -90,7 +93,6 @@ jobs:
           p=Path('combined/prepare_combined.py')
           s=p.read_text(encoding='utf-8')
 
-          # Routing Assistant: conserva tutte le inizializzazioni v0.3.8 e cambia solo la showHome finale.
           start=s.index('# onCreate: apre direttamente la sezione richiesta dalla Home unica.')
           end=s.index('# Back = Home unica.', start)
           block=r'''# onCreate: conserva tutte le inizializzazioni della v0.3.8 e sostituisce
@@ -112,7 +114,6 @@ jobs:
           '''
           s=s[:start]+block+s[end:]
 
-          # Timer v0.13.7: la freccia esistente diventa casetta e finish() torna alla nuova Home.
           old_timer='''ts = ts.replace('compactButton("← HOME")', 'compactButton("⌂")')
           ts = ts.replace('margin(lp(dp(94), dp(38)), 0, 0, 0, 4)',
                           'margin(lp(dp(52), dp(38)), 0, 0, 0, 4)')'''
@@ -127,8 +128,6 @@ jobs:
           s=s.replace(old_timer,new_timer,1)
           s=s.replace("assert 'compactButton(\"⌂\")' in ts", "assert '⌂' in ts")
 
-          # Memoria diluizione: non un singolo post fragile, ma retry finché l'adapter
-          # viene ricostruito dopo il ripristino del rivelatore.
           old='''        if (developerSpinner != null) developerSpinner.post(() ->
                           selectSpinnerText(dilutionSpinner, prefs.getString("last_film_dil", "")));
               }
@@ -151,12 +150,10 @@ jobs:
           if old not in s:
               raise SystemExit('film dilution restore marker missing')
           s=s.replace(old,new,1)
-
           p.write_text(s,encoding='utf-8')
           PY
           python3 combined/prepare_combined.py
 
-          # Il Timer 0.13.7 è standalone: sposta il launcher sulla Home combinata.
           python3 - <<'PY'
           from pathlib import Path
           import re
