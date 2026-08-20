@@ -1,14 +1,15 @@
-# HD home rebuild trigger
 name: Build Darkroom Combined v0.1.4 HD Home
 
 on:
   push:
     branches:
       - feature-darkroom-v014-hd-home
+    paths-ignore:
+      - 'combined/v014_latest_run.txt'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: darkroom-v014-${{ github.ref }}
@@ -84,6 +85,7 @@ jobs:
           cat validation-v014.txt
 
       - name: Upload Darkroom v0.1.4 APK
+        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: Darkroom-v0.1.4
@@ -95,3 +97,26 @@ jobs:
             apk-badging-v014.txt
             apk-listing-v014.txt
             validation-v014.txt
+
+      - name: Record successful v0.1.4 build
+        if: success() && github.event_name == 'push'
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          set -euo pipefail
+          cat > combined/v014_latest_run.txt <<EOF
+          run_id=$GITHUB_RUN_ID
+          artifact_id=$ARTIFACT_ID
+          artifact=Darkroom-v0.1.4
+          branch=feature-darkroom-v014-hd-home
+          commit=$GITHUB_SHA
+          versionName=0.1.4
+          versionCode=5
+          build=SUCCESS
+          EOF
+          git config user.name "Darkroom Builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- combined/v014_latest_run.txt
+          git commit -m "Record Darkroom v0.1.4 build $GITHUB_RUN_ID [skip ci]"
+          git push origin HEAD:feature-darkroom-v014-hd-home
