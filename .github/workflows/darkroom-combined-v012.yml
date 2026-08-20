@@ -102,19 +102,22 @@ jobs:
           echo "CERT_FP=$CERT_FP" >> "$GITHUB_ENV"
 
       - name: Upload Darkroom v0.1.2 APK
+        if: always()
         id: upload
         uses: actions/upload-artifact@v4
         with:
           name: Darkroom-v0.1.2
+          if-no-files-found: error
           path: |
             Darkroom-v0.1.2.apk
             Darkroom-v0.1.2.sha256
             certificate-v012.txt
             apk-badging-v012.txt
+            apk-listing-v012.txt
             validation-v012.txt
 
       - name: Record successful v0.1.2 build metadata
-        if: github.event_name == 'push'
+        if: success() && github.event_name == 'push'
         shell: bash
         env:
           ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
