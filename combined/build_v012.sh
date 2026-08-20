@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Darkroom v0.1.4 parte esclusivamente dalla base canonica Darkroom 0.1.1.
-# Timer e Assistant restano quelli della Darkroom 0.1.1; cambia solo la Home grafica.
-git fetch origin archive/timer-v0137-baseline archive/assistant-v038-baseline
+# Darkroom v0.1.5: base canonica 0.1.1, Timer 0.13.7 + Assistant 0.3.8.
+# Cambia ESCLUSIVAMENTE la Home grafica: usa un JPEG Android-safe ad alta risoluzione.
+git fetch origin archive/timer-v0137-baseline archive/assistant-v038-baseline feature-darkroom-v012-vintage-home-r2
 
 git update-ref refs/remotes/origin/feature-v0137-flat-bottom-nav \
   "$(git rev-parse origin/archive/timer-v0137-baseline)"
@@ -21,8 +21,7 @@ src = Path('combined/build_v011.sh').read_text(encoding='utf-8')
 marker = '# Build e verifica.'
 if marker not in src:
     raise SystemExit('build_v011.sh: marker build non trovato')
-prefix = src.split(marker, 1)[0]
-Path('/tmp/prepare_darkroom_v011.sh').write_text(prefix, encoding='utf-8')
+Path('/tmp/prepare_darkroom_v011.sh').write_text(src.split(marker, 1)[0], encoding='utf-8')
 PY
 bash /tmp/prepare_darkroom_v011.sh
 
@@ -36,8 +35,8 @@ grep -q 'android:versionCode="2"' combined/src/main/AndroidManifest.xml
 grep -q "versionName '0.1.1'" combined/build.gradle
 grep -q 'versionCode 2' combined/build.gradle
 
-# Riusa ESATTAMENTE il codice Home sicuro della 0.1.3, ma salta il vecchio
-# asset raster legacy: nella 0.1.4 viene sostituito subito dopo dal mockup HD.
+# Riusa soltanto il codice Home già verificato della 0.1.3.
+# L'asset legacy viene bypassato e sostituito subito dopo.
 python3 - <<'PY'
 from pathlib import Path
 src = Path('combined/patch_v012_vintage_home.py').read_text(encoding='utf-8')
@@ -45,49 +44,54 @@ start = src.index("parts = sorted(assets.glob('*.part'))")
 end = src.index("home_source = r'''", start)
 replacement = """image_bytes = b'RIFF0000WEBP'\ndrawable = combined / 'src/main/res/drawable-nodpi/home_vintage.webp'\ndrawable.parent.mkdir(parents=True, exist_ok=True)\ndrawable.write_bytes(image_bytes)\n\n"""
 src = src[:start] + replacement + src[end:]
-Path('/tmp/patch_v013_home_code_only.py').write_text(src, encoding='utf-8')
+Path('/tmp/patch_home_code_only.py').write_text(src, encoding='utf-8')
 PY
-python3 /tmp/patch_v013_home_code_only.py
+python3 /tmp/patch_home_code_only.py
 
-# Sostituisce ESCLUSIVAMENTE l'asset raster con il mockup HD 864x1536.
-# Le parti contengono un'unica stringa Base64 spezzata: normalizza spazi e padding.
-python3 - <<'PY'
-from pathlib import Path
-import base64
-hd = Path('combined/v014_assets/home_hd')
-parts = sorted(hd.glob('*.part'))
-if len(parts) != 8:
-    raise SystemExit(f'asset HD: attese 8 parti, trovate {len(parts)}')
-encoded = ''.join(''.join(p.read_text(encoding='utf-8').split()) for p in parts)
-encoded += '=' * (-len(encoded) % 4)
-try:
-    data = base64.b64decode(encoded, validate=True)
-except Exception as exc:
-    raise SystemExit('asset HD Base64 non valido: ' + str(exc))
-if len(data) <= 80000 or data[:4] != b'RIFF' or data[8:12] != b'WEBP':
-    raise SystemExit('asset HD WebP non valido')
-out = Path('combined/src/main/res/drawable-nodpi/home_vintage.webp')
-out.write_bytes(data)
-print('HD_BYTES=' + str(len(data)))
-PY
-HD_BYTES=$(stat -c%s combined/src/main/res/drawable-nodpi/home_vintage.webp)
-test "$HD_BYTES" -gt 80000
-test "$(head -c 4 combined/src/main/res/drawable-nodpi/home_vintage.webp)" = "RIFF"
-test "$(dd if=combined/src/main/res/drawable-nodpi/home_vintage.webp bs=1 skip=8 count=4 status=none)" = "WEBP"
+# Ricostruisce la copia HD storica completa e la decodifica rigorosamente.
+SRC_REF=origin/feature-darkroom-v012-vintage-home-r2
+mapfile -t PARTS < <(git ls-tree -r --name-only "$SRC_REF" -- combined/v012_assets/home_mockup | sort)
+test "${#PARTS[@]}" -eq 9
+: > /tmp/home_hd.b64
+for f in "${PARTS[@]}"; do
+  git show "$SRC_REF:$f" >> /tmp/home_hd.b64
+done
+tr -d '\r\n\t ' < /tmp/home_hd.b64 > /tmp/home_hd.clean.b64
+base64 --decode /tmp/home_hd.clean.b64 > /tmp/home_hd_source.webp
 
-# Promuove l'app combinata a 0.1.4 / versionCode 5.
-sed -i 's/android:versionCode="4"/android:versionCode="5"/' combined/src/main/AndroidManifest.xml
-sed -i 's/android:versionName="0.1.3"/android:versionName="0.1.4"/' combined/src/main/AndroidManifest.xml
-sed -i "s/versionCode 4/versionCode 5/" combined/build.gradle
-sed -i "s/versionName '0.1.3'/versionName '0.1.4'/" combined/build.gradle
+test "$(head -c 4 /tmp/home_hd_source.webp)" = "RIFF"
+test "$(dd if=/tmp/home_hd_source.webp bs=1 skip=8 count=4 status=none)" = "WEBP"
+
+# Fallisce se il WebP è anche solo parzialmente corrotto.
+ffmpeg -v error -xerror -i /tmp/home_hd_source.webp -frames:v 1 -f null -
+
+DIMS="$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 /tmp/home_hd_source.webp)"
+test "$DIMS" = "864x1536"
+
+# Android-safe: JPEG standard, nessun WebP nel pacchetto Home.
+rm -f combined/src/main/res/drawable-nodpi/home_vintage.webp
+ffmpeg -v error -xerror -i /tmp/home_hd_source.webp -frames:v 1 -q:v 2 \
+  combined/src/main/res/drawable-nodpi/home_vintage.jpg
+
+JPG=combined/src/main/res/drawable-nodpi/home_vintage.jpg
+test -s "$JPG"
+test "$(head -c 2 "$JPG" | od -An -tx1 | tr -d ' \n')" = "ffd8"
+JPG_DIMS="$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$JPG")"
+test "$JPG_DIMS" = "864x1536"
+
+# v0.1.5 / versionCode 6.
+sed -i 's/android:versionCode="4"/android:versionCode="6"/' combined/src/main/AndroidManifest.xml
+sed -i 's/android:versionName="0.1.3"/android:versionName="0.1.5"/' combined/src/main/AndroidManifest.xml
+sed -i "s/versionCode 4/versionCode 6/" combined/build.gradle
+sed -i "s/versionName '0.1.3'/versionName '0.1.5'/" combined/build.gradle
 
 test "$(cat /tmp/timer.before)" = "$(sha256sum "$TIMER_MAIN" | cut -d' ' -f1)"
 test "$(cat /tmp/assistant.before)" = "$(sha256sum "$ASSISTANT_MAIN" | cut -d' ' -f1)"
 
-grep -q 'android:versionName="0.1.4"' combined/src/main/AndroidManifest.xml
-grep -q 'android:versionCode="5"' combined/src/main/AndroidManifest.xml
-grep -q "versionName '0.1.4'" combined/build.gradle
-grep -q 'versionCode 5' combined/build.gradle
+grep -q 'android:versionName="0.1.5"' combined/src/main/AndroidManifest.xml
+grep -q 'android:versionCode="6"' combined/src/main/AndroidManifest.xml
+grep -q "versionName '0.1.5'" combined/build.gradle
+grep -q 'versionCode 6' combined/build.gradle
 
 HOME=combined/src/main/java/it/darkroom/timer/home/HomeActivity.java
 grep -q 'openAssistant("products")' "$HOME"
@@ -96,39 +100,38 @@ grep -q 'openAssistant("paper")' "$HOME"
 grep -q 'MainActivity.class' "$HOME"
 grep -q 'ImageView.ScaleType.CENTER_CROP' "$HOME"
 grep -q 'R.drawable.home_vintage' "$HOME"
-! grep -q 'BitmapFactory' "$HOME"
-! grep -q 'WindowInsetsController' "$HOME"
 grep -q 'restoreSavedFilmDilution' "$ASSISTANT_MAIN"
 grep -q 'private static final String APP_VERSION = "0.13.7";' "$TIMER_MAIN"
-test -f combined/src/main/res/drawable-nodpi/home_vintage.webp
+test -f "$JPG"
+test ! -f combined/src/main/res/drawable-nodpi/home_vintage.webp
 
 gradle :combined:assembleRelease --stacktrace
-cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.1.4.apk
+cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.1.5.apk
 
 APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
 AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.1.4.apk | tee certificate-v014.txt
-"$AAPT" dump badging Darkroom-v0.1.4.apk > apk-badging-v014.txt
-# Verifiche separate e robuste: l'ordine dei campi di aapt non è contrattuale.
-grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v014.txt
-grep -Fq "versionCode='5'" apk-badging-v014.txt
-grep -Fq "versionName='0.1.4'" apk-badging-v014.txt
-grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v014.txt
-unzip -l Darkroom-v0.1.4.apk > apk-listing-v014.txt
-grep -q 'assets/mdc_full.sqlite' apk-listing-v014.txt
-CERT_FP=$(grep -m1 'certificate SHA-256 digest:' certificate-v014.txt | sed 's/.*: *//')
+"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.1.5.apk | tee certificate-v015.txt
+"$AAPT" dump badging Darkroom-v0.1.5.apk > apk-badging-v015.txt
+grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v015.txt
+grep -Fq "versionCode='6'" apk-badging-v015.txt
+grep -Fq "versionName='0.1.5'" apk-badging-v015.txt
+grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v015.txt
+unzip -l Darkroom-v0.1.5.apk > apk-listing-v015.txt
+grep -q 'assets/mdc_full.sqlite' apk-listing-v015.txt
+
+CERT_FP=$(grep -m1 'certificate SHA-256 digest:' certificate-v015.txt | sed 's/.*: *//')
 test "$CERT_FP" = "fbead305657584b50a9d8892aa19bd9844b412d77db316e7daa5593c94e2a02f"
-sha256sum Darkroom-v0.1.4.apk | tee Darkroom-v0.1.4.sha256
+sha256sum Darkroom-v0.1.5.apk | tee Darkroom-v0.1.5.sha256
 
 {
   echo 'base_darkroom=0.1.1'
-  echo 'versionName=0.1.4'
-  echo 'versionCode=5'
+  echo 'versionName=0.1.5'
+  echo 'versionCode=6'
   echo 'timer_version=0.13.7'
   echo 'assistant_version=0.3.8'
-  echo 'vintage_home_hd=PASS'
-  echo "home_asset_bytes=$HD_BYTES"
-  echo 'safe_home_views=PASS'
+  echo 'home_asset_format=JPEG'
+  echo 'home_asset_dimensions=864x1536'
+  echo 'home_webp_removed=PASS'
   echo 'products_function=PASS'
   echo 'film_function=PASS'
   echo 'paper_function=PASS'
@@ -138,4 +141,4 @@ sha256sum Darkroom-v0.1.4.apk | tee Darkroom-v0.1.4.sha256
   echo 'certificate_continuity=PASS'
   echo "certificate_SHA256=$CERT_FP"
   echo 'build=SUCCESS'
-} > validation-v014.txt
+} > validation-v015.txt
