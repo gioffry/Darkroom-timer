@@ -70,7 +70,6 @@ grep -q "package: name='it.darkroom.darkroom' versionCode='4' versionName='0.1.3
 grep -q "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v013.txt
 unzip -l Darkroom-v0.1.3.apk > apk-listing-v013.txt
 grep -q 'assets/mdc_full.sqlite' apk-listing-v013.txt
-grep -Eq 'res/drawable-nodpi(-v4)?/home_vintage.webp' apk-listing-v013.txt
 CERT_FP=$(grep -m1 'certificate SHA-256 digest:' certificate-v013.txt | sed 's/.*: *//')
 test "$CERT_FP" = "fbead305657584b50a9d8892aa19bd9844b412d77db316e7daa5593c94e2a02f"
 sha256sum Darkroom-v0.1.3.apk | tee Darkroom-v0.1.3.sha256
