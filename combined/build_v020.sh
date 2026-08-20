@@ -3,6 +3,33 @@ set -euo pipefail
 
 # Darkroom v0.2.0: visual coherence + completed enlargement/log flow.
 # Base source: verified Darkroom v0.1.9; runtime Timer/SONOFF timing logic unchanged.
+
+# Restore the complete approved CAMERA OSCURA artwork from its historical
+# source branch. The current branch inherited an incomplete two-part copy.
+git fetch --no-tags origin feature-darkroom-v012-vintage-home-r2
+git checkout FETCH_HEAD -- combined/v012_assets/home_mockup
+python3 - <<'PY'
+from pathlib import Path
+import base64
+assets = Path('combined/v012_assets/home_mockup')
+parts = sorted(assets.glob('*.part'))
+if len(parts) != 9:
+    raise SystemExit(f'v0.2.0: expected 9 historical Home asset parts, found {len(parts)}')
+encoded = ''.join(''.join(p.read_text(encoding='utf-8').split()) for p in parts)
+payload = encoded + '=' * (-len(encoded) % 4)
+raw = base64.b64decode(payload, validate=True)
+if len(raw) < 50000 or raw[:4] != b'RIFF' or raw[8:12] != b'WEBP':
+    raise SystemExit('v0.2.0: historical approved Home asset is not a valid WebP')
+# patch_v020_visual_coherence intentionally consumes exactly two parts;
+# repartition the verified historical payload without changing a byte.
+for p in parts:
+    p.unlink()
+cut = (len(encoded) + 1) // 2
+(assets / '00.part').write_text(encoded[:cut], encoding='utf-8')
+(assets / '01.part').write_text(encoded[cut:], encoding='utf-8')
+print('Approved CAMERA OSCURA Home asset restored:', len(raw), 'bytes')
+PY
+
 python3 - <<'PY'
 from pathlib import Path
 s = Path('combined/build_v018.sh').read_text(encoding='utf-8')
