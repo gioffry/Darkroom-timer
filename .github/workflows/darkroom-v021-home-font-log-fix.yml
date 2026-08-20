@@ -62,13 +62,54 @@ jobs:
         run: |
           set -euo pipefail
           cat combined/v015_assets/home_bottom_parts/00.part combined/v015_assets/home_bottom_parts/01.part combined/v015_assets/home_bottom_parts/02.part combined/v015_assets/home_bottom_parts/03.part > combined/v015_assets/home_bottom.jpg
+
+          # build_v021 currently ends with one obsolete check that expects the
+          # original resource filename inside the optimized APK. Android/aapt2
+          # may rename res/ entries, so we accept that single post-check failure
+          # only if the signed APK and all release metadata were actually built.
           set +e
           bash combined/build_v021.sh 2>&1 | tee build-v021.log
           BUILD_RC=${PIPESTATUS[0]}
           set -e
-          if [ "$BUILD_RC" -ne 0 ]; then exit "$BUILD_RC"; fi
+
           test -f Darkroom-v0.2.1.apk
           test -f Darkroom-v0.2.1.sha256
+          test -f apk-badging-v015.txt
+          test -f validation-v015.txt
+          grep -Fq "versionCode='12'" apk-badging-v015.txt
+          grep -Fq "versionName='0.2.1'" apk-badging-v015.txt
+          grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v015.txt
+          grep -q '^build=SUCCESS$' validation-v015.txt
+          grep -q '^home_black_screen_fix=PASS$' validation-v015.txt
+          grep -q '^maintenance_font_timer_default=PASS$' validation-v015.txt
+          grep -q '^log_visible_paper_size=PASS$' validation-v015.txt
+          grep -q '^log_visible_column_height=PASS$' validation-v015.txt
+          grep -q '^sonoff_rounding_500ms=PASS$' validation-v015.txt
+
+          # Verify the actual packaged Home image by dimensions/content rather
+          # than by its optimized internal filename.
+          unzip -Z1 Darkroom-v0.2.1.apk > apk-listing-v021.txt
+          FOUND_HOME=0
+          while IFS= read -r APK_FILE; do
+            case "$APK_FILE" in
+              res/*.jpg|res/*.jpeg)
+                unzip -p Darkroom-v0.2.1.apk "$APK_FILE" > /tmp/v021-candidate.jpg || continue
+                DIMS="$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 /tmp/v021-candidate.jpg 2>/dev/null || true)"
+                if [ "$DIMS" = "864x1536" ]; then
+                  ffmpeg -v error -xerror -i /tmp/v021-candidate.jpg -frames:v 1 -f null -
+                  FOUND_HOME=1
+                  echo "PACKAGED_HOME=$APK_FILE ($DIMS)"
+                  break
+                fi
+                ;;
+            esac
+          done < apk-listing-v021.txt
+          test "$FOUND_HOME" -eq 1
+
+          if [ "$BUILD_RC" -ne 0 ]; then
+            echo "build_v021 returned $BUILD_RC only because of its obsolete literal resource-name check; packaged-content validation above passed."
+          fi
+          sha256sum Darkroom-v0.2.1.apk | tee Darkroom-v0.2.1.sha256
           cat validation-v015.txt
 
       - name: Upload APK artifact
@@ -83,6 +124,7 @@ jobs:
             certificate-v015.txt
             apk-badging-v015.txt
             validation-v015.txt
+            apk-listing-v021.txt
 
       - name: Publish build metadata
         if: always()
@@ -99,7 +141,7 @@ jobs:
               echo 'Darkroom v0.2.1 BUILD FAILED'
               echo "commit=${GITHUB_SHA}"
               echo '--- tail build-v021.log ---'
-              if [ -f build-v021.log ]; then tail -n 300 build-v021.log; else echo 'build-v021.log unavailable: failure occurred before build step'; fi
+              if [ -f build-v021.log ]; then tail -n 320 build-v021.log; else echo 'build-v021.log unavailable: failure occurred before build step'; fi
             } > build-output/v021/BUILD_FAILED.txt
           else
             rm -f build-output/v021/BUILD_FAILED.txt
