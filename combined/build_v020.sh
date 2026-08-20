@@ -28,6 +28,7 @@ needle = 'python3 combined/patch_v018_enlargement_fixes_r2.py\\\\n'
 replacement = (needle
                + 'python3 combined/patch_v019_use_maintenance.py\\\\n'
                + 'python3 combined/patch_v020_enlargement_log_flow.py\\\\n'
+               + 'python3 combined/patch_v020_enlargement_legacy_recipe.py\\\\n'
                + 'python3 combined/patch_v020_visual_coherence.py\\\\n')
 if s.count(needle) != 1:
     raise SystemExit('v0.2.0 build wrapper: patch insertion point ambiguous')
@@ -57,6 +58,7 @@ for extra in [
     'visual_coherence_assistant=PASS',
     'visual_coherence_maintenance=PASS',
     'legacy_log_enlargement_backfill=PASS',
+    'legacy_recipe_filter_preservation=PASS',
     'per_log_entry_enlargement=PASS',
     'resize_action_inside_print_card=PASS',
     'resize_inline_result=PASS',
@@ -81,6 +83,7 @@ grep -q 'FORMATO ORIGINALE DELLA STAMPA' combined/src/main/java/it/darkroom/time
 grep -q 'SALVA E CONTINUA' combined/src/main/java/it/darkroom/timer/EnlargementActivity.java
 grep -q 'COMPENSAZIONE' combined/src/main/java/it/darkroom/timer/EnlargementActivity.java
 grep -q 'LogStore.save(this,d)' combined/src/main/java/it/darkroom/timer/EnlargementActivity.java
+grep -q 'sourceRecipeForResize(oldBase)' combined/src/main/java/it/darkroom/timer/EnlargementActivity.java
 ! grep -q 'confirmDerived(' combined/src/main/java/it/darkroom/timer/EnlargementActivity.java
 ! grep -q 'new Dialog(' combined/src/main/java/it/darkroom/timer/EnlargementActivity.java
 ! grep -q 'Button resizeEntry = compactButton("RIDIMENSIONA STAMPA")' combined/src/main/java/it/darkroom/timer/MainActivity.java
