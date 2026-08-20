@@ -6,6 +6,9 @@ on:
       - feature-darkroom-v012-vintage-home-r2
     paths-ignore:
       - 'combined/v012_latest_run.txt'
+  pull_request:
+    branches:
+      - darkroom-main
   workflow_dispatch:
 
 permissions:
@@ -111,6 +114,7 @@ jobs:
             validation-v012.txt
 
       - name: Record successful v0.1.2 build metadata
+        if: github.event_name == 'push'
         shell: bash
         env:
           ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
