@@ -1,0 +1,1 @@
+trigger Darkroom v0.2.7 safelight hotfix
