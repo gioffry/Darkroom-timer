@@ -1,5 +1,0 @@
-combined/src/main/res/drawable-nodpi/ic_launcher.png
-combined/src/main/res/drawable/ic_wrench_bronze.xml
-combined/src/main/res/raw/catalog_v2.json
-combined/src/main/res/values/strings.xml
-combined/src/main/res/values/styles.xml
