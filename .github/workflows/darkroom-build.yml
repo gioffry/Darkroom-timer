@@ -1,0 +1,106 @@
+name: Darkroom Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'feature-darkroom-v*'
+    paths-ignore:
+      - 'build-output/**'
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK 34
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Gradle 8.13
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 -o "$RUNNER_TEMP/gradle.zip" https://services.gradle.org/distributions/gradle-8.13-bin.zip
+          unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/gradle-8.13/bin" >> "$GITHUB_PATH"
+
+      - name: FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Prepare stable signing
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
+
+      - name: Detect current build wrapper
+        id: detect
+        run: |
+          set -euo pipefail
+          SCRIPT="$(find combined -maxdepth 1 -type f -name 'build_v[0-9][0-9][0-9].sh' | sort -V | tail -n 1)"
+          test -n "$SCRIPT"
+          echo "script=$SCRIPT" >> "$GITHUB_OUTPUT"
+          echo "Using $SCRIPT"
+
+      - name: Build current Darkroom release
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/darkroom-signing.p12
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -d combined/v015_assets/home_bottom_parts ]; then
+            cat combined/v015_assets/home_bottom_parts/*.part > combined/v015_assets/home_bottom.jpg
+          fi
+          bash "${{ steps.detect.outputs.script }}" 2>&1 | tee darkroom-build.log
+          APK="$(ls -1 Darkroom-v*.apk | sort -V | tail -n 1)"
+          test -f "$APK"
+          echo "APK=$APK" >> "$GITHUB_ENV"
+          echo "ARTIFACT_NAME=${APK%.apk}" >> "$GITHUB_ENV"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          if-no-files-found: error
+          path: |
+            ${{ env.APK }}
+            Darkroom-v*.sha256
+            certificate-*.txt
+            apk-badging-*.txt
+            validation-*.txt
+            apk-listing-*.txt
+
+      - name: Record generic build metadata
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p build-output/current
+          printf '%s\n' "$GITHUB_RUN_ID" > build-output/current/run-id.txt
+          printf '%s\n' "${{ job.status }}" > build-output/current/status.txt
+          printf '%s\n' "${{ steps.detect.outputs.script }}" > build-output/current/build-script.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- build-output/current
+          git commit -m "Record current Darkroom build metadata [skip ci]" || exit 0
+          git push origin HEAD:${GITHUB_REF_NAME}
