@@ -1,0 +1,6 @@
+Darkroom v0.2.9 BUILD FAILED
+commit=a2b67e223a23b7ddd7bdb5ea8680394d6c6128dc
+--- tail build-v029.log ---
+From https://github.com/gioffry/Darkroom-timer
+ * branch            feature-darkroom-v012-vintage-home-r2 -> FETCH_HEAD
+v0.2.9 build wrapper missing base marker: python3 combined/patch_v018_enlargement_fixes_r2.py\n
