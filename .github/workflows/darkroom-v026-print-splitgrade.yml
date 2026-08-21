@@ -96,7 +96,6 @@ jobs:
           if [ -f Darkroom-v0.2.6.sha256 ]; then cp Darkroom-v0.2.6.sha256 build-output/v026/Darkroom-v0.2.6.sha256; fi
           if [ -f apk-badging-v015.txt ]; then cp apk-badging-v015.txt build-output/v026/apk-badging-v0.2.6.txt; fi
           if [ -f validation-v015.txt ]; then cp validation-v015.txt build-output/v026/validation-v0.2.6.txt; fi
-          if [ "$JOB_STATUS" = "failure" ]; then true; fi
           if [ "${{ job.status }}" != "success" ]; then
             {
               echo 'Darkroom v0.2.6 BUILD FAILED'
