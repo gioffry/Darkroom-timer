@@ -1,43 +1,49 @@
 # DARKROOM — CANONICAL CURRENT STATE
 
-**This file is the authoritative development pointer.**
+**This file is the authoritative development pointer for ChatGPT, Codex and manual work.**
 
 ## Current app
 - App: **Darkroom**
-- Darkroom version: **0.1.1**
+- Current stable version: **0.2.8**
+- versionCode: **19**
 - Android applicationId: **it.darkroom.darkroom**
-- Canonical development branch: **darkroom-main**
-- Baseline source commit: **20309a225573503f93088496d977a828630db209**
-- Last verified build run: **32331452671** — SUCCESS
-- Verified artifact: **Darkroom-v0.1.1**
-- Artifact id: **9393187604**
-- Artifact digest: **sha256:3a555085acc06f71c8eb2235f66492fc8ecdece1ebd7ddc789989c999336344e**
+- Timer internal version: **0.13.11**
+- Assistant version: **0.3.8**
+- Canonical branch: **main**
+- Compatibility alias: **darkroom-main**
+- Frozen release branch: **archive/darkroom-v028-release**
+- Verified release source commit: **84d2755c351b67859578e701b9bc58ea8310bd6c**
+- Last verified build run: **32471989336** — SUCCESS
+- Verified artifact: **Darkroom-v0.2.8**
+- Artifact id: **9442925987**
+- Artifact digest: **sha256:2ee3c34077989d4e57efe4914b8cfc02aa36d0229b64d8678a8b05b124fdf3b5**
 
-## Components frozen inside Darkroom 0.1.1
-### Timer
-- Version: **0.13.7**
-- Original branch: `feature-v0137-flat-bottom-nav`
-- Exact source commit: `bd7291e4d0e875f4664fbe034be4b901059c1e4f`
-- Immutable safety branch: **`archive/timer-v0137-baseline`**
+## Current stable scope
+Darkroom 0.2.8 includes the validated Timer/SONOFF flow, Split Grade provino + print integration, revision-safe return to provino, voice guidance, safelight transition fix, enlargement/resize flow, Log, Uso e Manutenzione and the native graphical refresh/Home.
 
-### Assistant
-- Version/base: **0.3.8**, plus Darkroom 0.1.1 persistence fix for the last film dilution
-- Original branch: `feature-darkroom-assistant-v038-edit-persistence`
-- Exact source commit: `7ff0e0324376c3465777b08e3949cc284e4a8487`
-- Immutable safety branch: **`archive/assistant-v038-baseline`**
+## Immutable safety branches
+These are rollback/build references and must never be rewritten or deleted:
+- `archive/timer-v0137-baseline`
+- `archive/assistant-v038-baseline`
+- `archive/darkroom-v011-baseline`
+- `archive/darkroom-v028-release`
+- `archive/main-pre-v028-cleanup`
+- `archive/darkroom-main-pre-v028-cleanup`
 
-### Darkroom 0.1.1 baseline
-- Exact source commit: `20309a225573503f93088496d977a828630db209`
-- Immutable safety branch: **`archive/darkroom-v011-baseline`**
+## Development rule
+1. **Start every new change from `main`.**
+2. `darkroom-main` is only a compatibility alias and should point to the same canonical commit as `main`.
+3. Never start new work from historical `feature-*` branches.
+4. Never overwrite a completed release branch. Create a new feature branch/version for each new release.
+5. Build APKs only with GitHub Actions.
+6. Preserve SONOFF operational rounding to 0.5 s.
+7. Before a new release, verify branch, versionName, versionCode, successful run and artifact.
 
-## Non-negotiable development rule
-All future Timer, chemistry, development, paper-bath, Home and UI changes start from **`darkroom-main`**.
+## Historical branches
+Historical `feature-*` branches are retained only as audit/history. They are not valid development bases unless this file explicitly says otherwise.
 
-Do **not** start future work from `main`, from a historical Timer branch, or from a historical Assistant branch.
-
-The three `archive/*-baseline` branches are rollback/build dependencies and **must never be deleted or rewritten**.
-
-Historical feature branches may remain for audit/history. Closing an old technical PR does not delete its branch.
+## Codex rule
+Codex must treat **`main` + this file + `AGENTS.md`** as the source of truth. If another prompt or old document names an older branch/version as canonical, this file wins unless the user explicitly requests a historical rollback.
 
 ## Build strategy
-Darkroom 0.1.1 is reconstructed from the exact frozen Timer 0.13.7 and Assistant 0.3.8 baselines, then applies the Darkroom integration layer. Future releases should preserve these references until the relevant component is intentionally advanced inside `darkroom-main`.
+The repository still contains historical build wrappers/patches because the current APK is reconstructed through that chain. Do not casually delete build dependencies. Cleanup should target obsolete workflow/trigger noise, not files required by `combined/build_v028.sh` or its transitive dependencies.
