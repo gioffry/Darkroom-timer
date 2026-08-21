@@ -1,6 +1,6 @@
 base_darkroom=0.1.1
 versionName=0.2.9
-versionCode=19
+versionCode=20
 timer_version=0.13.11
 assistant_version=0.3.8
 products_function=PASS
