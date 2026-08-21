@@ -1,0 +1,60 @@
+12:import android.speech.tts.TextToSpeech;
+13:import android.speech.tts.UtteranceProgressListener;
+100:    private volatile TextToSpeech tts;
+101:    private volatile boolean ttsReady = false;
+124:        tts = new TextToSpeech(getApplicationContext(), status -> {
+125:            if (status == TextToSpeech.SUCCESS && tts != null) {
+126:                int r = tts.setLanguage(Locale.ITALIAN);
+127:                tts.setSpeechRate(0.95f);
+128:                ttsReady = r != TextToSpeech.LANG_MISSING_DATA && r != TextToSpeech.LANG_NOT_SUPPORTED;
+129:                tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+188:                    ? "STAMPA richiesta " + seconds(widthMs) + " • " + timingMethod + " · " + TimingMath.stepLabel(timingMethod)
+189:                    : (TimingMath.isFStop(timingMethod) ? "PROVINO F-STOP · ¼ stop • strisce " + TimingMath.seriesLabel(testTargetsMs) + " • pausa " + seconds(pauseMs) : "PROVINO richiesto " + count + " × " + seconds(widthMs) + " • pausa " + seconds(pauseMs)));
+200:                    TechnicalLog.add(this,techSessionId,"SPLIT PROVINO • BASE MORBIDA TUTTA STRISCIA • "+pf+" • "+seconds(testPreExposureMs));
+209:                    ? "Imposto Inching a " + seconds(widthMs)
+210:                    : (TimingMath.isFStop(timingMethod) ? "Preparo provino: " + count + " strisce • ¼ stop" : "Preparo provino: " + count + " × " + seconds(widthMs)));
+288:            TechnicalLog.add(this, techSessionId, "SETTAGGIO Inching richiesto • " + seconds(currentPulseWidthMs));
+293:                msg = "SPLIT GRADE ARMATO — GIALLO " + printSequence.split.softYellow + " · " + seconds(printSequence.split.softMs) + dodgeStatusSuffix(PrintCorrection.PHASE_SOFT) + " — premi il pulsante fisico";
+295:                msg = "SPLIT GRADE · BASE MORBIDA ARMATA — " + testPreExposureFilterValue + "Y / 0M · " + seconds(testPreExposureMs) + " — premi il pulsante fisico";
+301:            if (mode == MODE_PRINT && printSequence != null && printSequence.hasSplit()) scheduleVoiceInstruction(splitPhasePrompt(PrintCorrection.PHASE_SOFT));
+360:                            : (!testPreExposureDone ? "ESPOSIZIONE MORBIDA SU TUTTA LA STRISCIA — " + seconds(testPreExposureMs)
+361:                            : (TimingMath.isFStop(timingMethod) ? "PROVINO DURO " + current + "/" + count + " — fascia finale " + seconds(TimingMath.physicalTargetAt(testTargetsMs, current - 1, testStripMethod)) + " · impulso " + seconds(currentPulseWidthMs) : "PROVINO " + current + "/" + count + " — esposizione " + seconds(widthMs)));
+382:                                        + " • " + secondsLong(observed) + " < attesi " + seconds(currentPulseWidthMs));
+387:                                    + " • richiesti " + seconds(currentPulseWidthMs));
+391:                            + " su " + seconds(currentPulseWidthMs) + ")");
+421:                + ". Azzera il magenta. Mantieni il cyan a zero. Tempo morbido: " + seconds(testPreExposureMs) + ".";
+426:                + ". Mantieni il cyan a zero. Premi il pulsante fisico per iniziare il provino duro.";
+439:                TechnicalLog.add(this, techSessionId, "SPLIT PROVINO • base morbida completata • attesa cambio filtro • prossimo impulso duro " + seconds(currentPulseWidthMs));
+506:        String msg = "PAUSA — " + completed + "/" + count + " completate • prossima " + next + "/" + count + " tra " + seconds(pauseMs);
+520:                    TechnicalLog.add(this, techSessionId, "COMANDO pulse=on aggiornato • esposizione " + (completed + 1) + "/" + count + " • impulso " + seconds(currentPulseWidthMs) + " • fascia finale " + seconds(TimingMath.physicalTargetAt(testTargetsMs, completed, testStripMethod)));
+535:                String exposing = TimingMath.isFStop(timingMethod) ? "PROVINO " + current + "/" + count + " — fascia finale " + seconds(TimingMath.physicalTargetAt(testTargetsMs, current - 1, testStripMethod)) + " · impulso " + seconds(currentPulseWidthMs) : "PROVINO " + current + "/" + count + " — esposizione " + seconds(widthMs);
+641:            String msg = "SPLIT GRADE — MAGENTA " + printSequence.split.hardMagenta + " — " + seconds(currentPulseWidthMs)
+643:            TechnicalLog.add(this, techSessionId, "SPLIT fase magenta preparata • M " + printSequence.split.hardMagenta + " • " + seconds(currentPulseWidthMs));
+647:            scheduleVoiceInstruction(splitPhasePrompt(PrintCorrection.PHASE_HARD));
+667:            String amount = burn.usesFStop() ? TimingMath.stopLabel(burn.quarterStops) : seconds(currentPulseWidthMs);
+711:    private String splitPhasePrompt(String phase) {
+726:        return "BRUCIATURA " + (burnIndex + 1) + "/" + burns.size() + " — " + burn.safeLabel() + " · " + seconds(currentPulseWidthMs);
+733:                    ? "SPLIT GRADE · MORBIDA · Y " + printSequence.split.softYellow + " · " + seconds(currentPulseWidthMs)
+734:                    : "SPLIT GRADE · DURA · M " + printSequence.split.hardMagenta + " · " + seconds(currentPulseWidthMs);
+736:        return printSequence != null && !printSequence.isEmpty() ? "ESPOSIZIONE BASE IN CORSO — " + seconds(widthMs) : "ESPOSIZIONE IN CORSO — " + seconds(widthMs);
+751:                String amount = dodge.usesFStop() ? TimingMath.dodgeStopLabel(dodge.quarterStops) : seconds(dodgeMs);
+755:                speakOnce("Togli la maschera: " + dodge.safeLabel());
+772:    private void speakOnce(String words) {
+773:        if (!voiceGuideEnabled() || words == null || words.trim().isEmpty() || !ttsReady || tts == null) return;
+774:        try { tts.speak(words, TextToSpeech.QUEUE_FLUSH, null, "darkroom-once-" + System.nanoTime()); } catch (Exception ignored) {}
+783:        voiceRepeatTask = cueIo.schedule(() -> speakRepeatingVoice(gen), 250L, TimeUnit.MILLISECONDS);
+786:    private void speakRepeatingVoice(final long gen) {
+788:                || voiceRepeatWords.isEmpty() || !ttsReady || tts == null) return;
+790:            if (tts.isSpeaking()) {
+791:                voiceRepeatTask = cueIo.schedule(() -> speakRepeatingVoice(gen), 250L, TimeUnit.MILLISECONDS);
+794:            tts.speak(voiceRepeatWords, TextToSpeech.QUEUE_ADD, null,
+810:        voiceRepeatTask = cueIo.schedule(() -> speakRepeatingVoice(gen), 8_000L, TimeUnit.MILLISECONDS);
+825:        try { if (tts != null) tts.stop(); } catch (Exception ignored) {}
+1032:                TechnicalLog.add(this, techSessionId, "COMANDO Inching pulse=ON • richiesti " + seconds(wanted) + " • tentativo " + attempt + "/3");
+1038:                        TechnicalLog.add(this, techSessionId, "INCHING CONFERMATO • " + seconds(wanted));
+1048:        throw new Exception("Inching non confermato a " + seconds(wanted) + ": " + readable(last));
+1228:                : (mode == MODE_TEST ? "Darkroom Timer — Provino " + count + " × " + seconds(widthMs) : "Darkroom Timer — " + seconds(widthMs));
+1272:    private static String seconds(int ms) {
+1273:        return String.format(Locale.ITALY, "%.1f s", ms / 1000.0);
+1277:        return String.format(Locale.ITALY, "%.3f s", ms / 1000.0);
+1290:        if (tts != null) { try { tts.stop(); tts.shutdown(); } catch (Exception ignored) {} tts = null; }
