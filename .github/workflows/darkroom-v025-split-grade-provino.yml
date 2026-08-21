@@ -64,7 +64,7 @@ jobs:
           set -euo pipefail
           cat combined/v015_assets/home_bottom_parts/00.part combined/v015_assets/home_bottom_parts/01.part combined/v015_assets/home_bottom_parts/02.part combined/v015_assets/home_bottom_parts/03.part > combined/v015_assets/home_bottom.jpg
           set +e
-          bash combined/build_v025.sh 2>&1 | tee build-v025.log
+          bash combined/build_v025_final.sh 2>&1 | tee build-v025.log
           BUILD_RC=${PIPESTATUS[0]}
           set -e
           if [ "$BUILD_RC" -ne 0 ]; then exit "$BUILD_RC"; fi
