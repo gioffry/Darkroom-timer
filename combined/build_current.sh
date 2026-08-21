@@ -1,21 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Canonical Darkroom build wrapper.
-# It deliberately maps the historical branch names expected by build_v011.sh
-# to immutable archive branches, so future builds do not depend on mutable
-# feature branches remaining untouched.
+# Canonical Darkroom build entry point.
+# Do not hard-code an old release: always execute the highest numbered
+# combined/build_vNNN.sh present on the current branch.
 
-git fetch origin archive/timer-v0137-baseline archive/assistant-v038-baseline
+SCRIPT="$(find combined -maxdepth 1 -type f -name 'build_v[0-9][0-9][0-9].sh' | sort -V | tail -n 1)"
+if [ -z "$SCRIPT" ]; then
+  echo "No Darkroom build_vNNN.sh wrapper found" >&2
+  exit 1
+fi
 
-git update-ref refs/remotes/origin/feature-v0137-flat-bottom-nav \
-  "$(git rev-parse origin/archive/timer-v0137-baseline)"
+# Some historical wrappers expect the compatibility Home fragment to exist.
+if [ -d combined/v015_assets/home_bottom_parts ]; then
+  cat combined/v015_assets/home_bottom_parts/*.part > combined/v015_assets/home_bottom.jpg
+fi
 
-git update-ref refs/remotes/origin/feature-darkroom-assistant-v038-edit-persistence \
-  "$(git rev-parse origin/archive/assistant-v038-baseline)"
-
-# Guard the exact frozen dependency commits before building.
-test "$(git rev-parse origin/archive/timer-v0137-baseline)" = "bd7291e4d0e875f4664fbe034be4b901059c1e4f"
-test "$(git rev-parse origin/archive/assistant-v038-baseline)" = "7ff0e0324376c3465777b08e3949cc284e4a8487"
-
-bash combined/build_v011.sh
+echo "Canonical build wrapper: $SCRIPT"
+bash "$SCRIPT"
