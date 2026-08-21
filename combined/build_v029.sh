@@ -23,7 +23,8 @@ for marker in [
         raise SystemExit('v0.2.9 source build marker missing: '+marker)
 
 # Keep the proven v0.2.8 recipe and only advance package version / artifact name.
-s=s.replace('v0.2.8','v0.2.9')
+# Replacing the numeric version also updates occurrences embedded in v0.2.8.
+s=s.replace('0.2.8','0.2.9')
 s=s.replace('versionCode="19"','versionCode="20"')
 s=s.replace('versionCode 19','versionCode 20')
 s=s.replace("versionCode='19'","versionCode='20'")
