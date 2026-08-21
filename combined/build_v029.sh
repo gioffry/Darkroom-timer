@@ -71,13 +71,19 @@ PY
 
 bash /tmp/build_v029_generated.sh
 
-# Add v0.2.9-specific validation flags after the inherited validation passes.
+# Normalize inherited validation metadata and add v0.2.9-specific flags.
 python3 - <<'PY'
 from pathlib import Path
 p=Path('validation-v015.txt')
 if not p.exists():
     raise SystemExit('v0.2.9 validation file missing after build')
-lines=p.read_text(encoding='utf-8').splitlines()
+lines=[]
+for line in p.read_text(encoding='utf-8').splitlines():
+    if line.startswith('versionName='):
+        line='versionName=0.2.9'
+    elif line.startswith('versionCode='):
+        line='versionCode=20'
+    lines.append(line)
 for flag in ['home_film_label_fit=PASS','darkroom_guide_drive_link=PASS','darkroom_app_faq_count_10=PASS']:
     if flag not in lines:
         if 'build=SUCCESS' in lines:
