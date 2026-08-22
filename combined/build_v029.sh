@@ -22,6 +22,7 @@ s=Path('combined/build_v028.sh').read_text(encoding='utf-8')
 s=s.replace('Darkroom v0.2.8','Darkroom v0.2.9')
 s=s.replace('Darkroom-v0.2.8','Darkroom-v0.2.9')
 s=s.replace('versionName="0.2.8"','versionName="0.2.9"')
+s=s.replace("versionName '0.2.8'","versionName '0.2.9'")
 s=s.replace("versionName='0.2.8'","versionName='0.2.9'")
 s=s.replace('versionName=0.2.8','versionName=0.2.9')
 s=s.replace('versionCode="19"','versionCode="20"')
@@ -30,7 +31,7 @@ s=s.replace('versionCode 19','versionCode 20')
 s=s.replace('versionCode=19','versionCode=20')
 Path('/tmp/build_v029_generated.sh').write_text(s,encoding='utf-8')
 PY
-bash -x /tmp/build_v029_generated.sh
+bash /tmp/build_v029_generated.sh
 
 python3 combined/validate_v029_catalog.py
 
