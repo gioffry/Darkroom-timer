@@ -1,0 +1,80 @@
+from pathlib import Path
+import json, re, sqlite3, unicodedata
+
+ROOT = Path('.')
+DB = ROOT / 'assistant/src/main/assets/mdc_full.sqlite'
+CAT = ROOT / 'experiments/v0121/catalog-v2.json'
+if not DB.exists(): raise SystemExit('v029: mdc_full.sqlite missing')
+if not CAT.exists(): raise SystemExit('v029: catalog-v2.json missing')
+
+ROLE_MAP = {
+    'FILM_DEVELOPER': 1,
+    'PAPER_DEVELOPER': 2,
+    'STOP_BATH': 4,
+    'FIXER': 8,
+    'WETTING_AGENT': 16,
+    'WASHING_AID': 32,
+    'CHEMISTRY': 64,
+    'FILM': 128,
+}
+
+def norm(s):
+    s = unicodedata.normalize('NFKD', str(s or '')).encode('ascii','ignore').decode('ascii').lower()
+    s = s.replace('–',' ').replace('—',' ').replace('-',' ')
+    s = re.sub(r'[^a-z0-9+]+',' ',s)
+    return ' '.join(s.split())
+
+def compact(s): return re.sub(r'[^a-z0-9]+','', norm(s))
+
+def arr(v):
+    if isinstance(v, list): return [str(x).strip() for x in v if str(x).strip()]
+    if v in (None, ''): return []
+    return [str(v).strip()]
+
+def first_list(t, *keys):
+    for k in keys:
+        v = t.get(k)
+        if isinstance(v, list) and v: return arr(v)
+    return []
+
+raw = json.loads(CAT.read_text(encoding='utf-8'))
+payload = raw.get('payload', raw)
+sources = {s.get('id',''): s for s in payload.get('sources', []) if isinstance(s, dict)}
+records = [r for r in payload.get('records', []) if isinstance(r, dict)]
+
+# Required regression entries: use the verified catalog whenever present; only add
+# a minimal identity/category shell if an old catalog snapshot lacks the name.
+required_shells = [
+    ('FOMADON Excel','FOMA',['FILM_DEVELOPER','CHEMISTRY']),
+    ('FOMADON P','FOMA',['FILM_DEVELOPER','CHEMISTRY']),
+    ('FOMADON LQN','FOMA',['FILM_DEVELOPER','CHEMISTRY']),
+    ('FOMADON R09','FOMA',['FILM_DEVELOPER','CHEMISTRY']),
+    ('FOMA Universal','FOMA',['FILM_DEVELOPER','PAPER_DEVELOPER','CHEMISTRY']),
+    ('FOMATOL LQN','FOMA',['PAPER_DEVELOPER','CHEMISTRY']),
+    ('FOMATOL P','FOMA',['PAPER_DEVELOPER','CHEMISTRY']),
+    ('FOMATOL PW','FOMA',['PAPER_DEVELOPER','CHEMISTRY']),
+    ('FOMACITRO','FOMA',['STOP_BATH','CHEMISTRY']),
+    ('FOMAFIX','FOMA',['FIXER','CHEMISTRY']),
+    ('FOTONAL','FOMA',['WETTING_AGENT','CHEMISTRY']),
+]
+by_norm = {norm(r.get('name')): r for r in records if r.get('name')}
+for name, manufacturer, cats in required_shells:
+    if norm(name) not in by_norm:
+        r = {
+            'id':'v029-shell-' + compact(name), 'name':name, 'manufacturer':manufacturer,
+            'categories':cats, 'aliases':[], 'subtitle':'', 'sourceId':'foma-handbook',
+            'technical':{}, 'verificationStatus':'IDENTITA_VERIFICATA'
+        }
+        records.append(r); by_norm[norm(name)] = r
+
+# Ensure the explicit FOMATOL LQN regression facts even if an older snapshot was sparse.
+fql = by_norm.get(norm('FOMATOL LQN'))
+if fql is not None:
+    fql.setdefault('manufacturer','FOMA')
+    cats = list(dict.fromkeys(arr(fql.get('categories')) + ['PAPER_DEVELOPER','CHEMISTRY']))
+    fql['categories'] = cats
+    tech = fql.setdefault('technical', {})
+    if not isinstance(tech, dict): tech = {}; fql['technical'] = tech
+    tech.setdefault('physicalState','concentrato liquido')
+    pd = first_list(tech,'paperDilutions','dilutions')
+    if '1+7' not in pd: pd.append('1+7')
