@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MDC_FIRST_MANUFACTURER_FILL_ONLY",
+  "checkedAt": "2026-08-22",
+  "records": [
+    {
+      "matchNames": ["Ars-Imago FE"],
+      "manufacturer": "ars-imago",
+      "productName": "ARS-IMAGO FE ECO Film Developer",
+      "physicalState": "liquid concentrate",
+      "preparation": "Prepare with running water. The manufacturer documents 1+1 for a reusable working solution and 1+3 for a one-shot working solution.",
+      "dilutions": ["1+1", "1+3"],
+      "reuseMode": "reusable_at_1+1_one_shot_at_1+3",
+      "reuseInstructions": "At 1+1 the working solution can develop up to 15 films; increase development time by 15% every 3 films. At 1+3 discard after use.",
+      "capacityText": "At 1+1, one litre working solution develops up to 15 films.",
+      "shelfLifeOpened": "Use concentrate within 4 months in a completely full container or 2 months in a partially full container.",
+      "sourceTitle": "ARS-IMAGO FE ECO Film Developer Datasheet",
+      "sourceUrl": "https://www.ars-imago.com/web/content/88086?download=true&unique=31f79c1c35acb1b91abe4f9560c80ec057ce90e9",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Ilfotec RT Rapid"],
+      "manufacturer": "HARMAN technology / ILFORD",
+      "productName": "ILFORD ILFOTEC RT RAPID",
+      "physicalState": "two-part liquid concentrate kit",
+      "preparation": "Standard replenisher is 1 part A + 1 part B + 2 parts water; modified replenisher 1+1+5 is also documented. Add ILFOTEC RT RAPID Starter to turn replenisher into working-strength developer.",
+      "dilutions": ["1+1+2", "1+1+5"],
+      "reuseMode": "replenished_machine_system",
+      "reuseInstructions": "Designed for replenished roller-transport and short-leader processors; use process control and replenishment. It is not recommended for spiral tanks, dishes, dip-and-dunk, rotary tubes or continuous long-leader processing.",
+      "capacityText": "The 2x5 litre kit makes 20 litres of 1+1+2 working-strength solution and provides replenishment for about 1100 135-36 films; at 1+1+5 it makes 35 litres and replenishment for about 1925 135-36 films.",
+      "shelfLifeUnopened": "Full unopened concentrate stored at 5-20 C: 2 years.",
+      "shelfLifeOpened": "Once opened, use concentrate completely within 3 months; keep bottles tightly sealed until use.",
+      "shelfLifeWorking": "Replenished developer: general replacement guide 6-12 months in the process tank. Unreplenished working strength: up to 6 months full tightly capped, 2 months under floating lid, 1 month half-full tightly capped.",
+      "sourceTitle": "ILFORD ILFOTEC RT RAPID Technical Information",
+      "sourceUrl": "https://www.ilfordphoto.com/wp/wp-content/uploads/2024/03/ILFOTEC-RT-RAPID-070324.pdf",
+      "sourceDate": "2024-02"
+    },
+    {
+      "matchNames": ["Rollei RLS Low Speed"],
+      "manufacturer": "Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS",
+      "productName": "Rollei RLS Low Speed",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute 1+4; the current manufacturer example uses 52 ml RLS + 208 ml water for 260 ml working solution at 24 C.",
+      "dilutions": ["1+4"],
+      "capacityText": "500 ml RLS concentrate is sufficient for approximately 19 films.",
+      "sourceTitle": "Rollei RLS Low Speed",
+      "sourceUrl": "https://www.rolleianalog.com/products/rollei-rls/?lang=en",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Rollei RLC Low Contrast"],
+      "manufacturer": "Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS",
+      "productName": "Rollei RLC Low Contrast",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute 1+4; the current manufacturer example uses 52 ml RLC + 208 ml distilled water for 260 ml working solution.",
+      "dilutions": ["1+4"],
+      "capacityText": "500 ml RLC concentrate is sufficient for approximately 8 films.",
+      "sourceTitle": "Rollei RLC Low Contrast",
+      "sourceUrl": "https://www.rolleianalog.com/products/rollei-rlc/?lang=en",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Silberra RDN-LQ"],
+      "manufacturer": "Silberra",
+      "productName": "Silberra RDN-LQ",
+      "dilutions": ["1+25"],
+      "sourceTitle": "Silberra PAN100 / ULTIMA100 official development table",
+      "sourceUrl": "https://silberra.com/films/silberra-pan100",
+      "sourceDate": "current"
+    }
+  ]
+}
