@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MDC_FIRST_MANUFACTURER_FILL_ONLY",
+  "checkedAt": "2026-08-22",
+  "records": [
+    {
+      "matchNames": ["D-76"],
+      "manufacturer": "Kodak Alaris",
+      "productName": "KODAK PROFESSIONAL Developer D-76",
+      "physicalState": "powder",
+      "preparation": "Mix the full packaged powder quantity according to the instructions supplied with the product; Kodak does not recommend mixing less than the package volume.",
+      "dilutions": ["stock", "1+1"],
+      "capacityText": "Kodak's B&W chemistry matrix lists useful tank capacity as 16 per US gallon / 4 per litre for D-76.",
+      "shelfLifeStock": "Full-strength stock in a full closed container: 6 months without use.",
+      "shelfLifeWorking": "Kodak matrix lists approximately 24 hours in an open tray and 1 month in a tank for full-strength solution; diluted 1+1 reuse is not recommended by the matrix.",
+      "sourceTitle": "Chemicals for KODAK PROFESSIONAL Black-and-White Films, E103CF",
+      "sourceUrl": "https://www.kodakprofessional.com/sites/default/files/wysiwyg/pro/chemistry/E103CF_0.pdf",
+      "sourceDate": "2018-12"
+    },
+    {
+      "matchNames": ["Ilfotec DD"],
+      "manufacturer": "HARMAN technology / ILFORD",
+      "productName": "ILFORD ILFOTEC DD",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute ILFOTEC DD Developer 1+4 and use with ILFOTEC DD Starter according to the replenished processor instructions.",
+      "dilutions": ["1+4"],
+      "reuseMode": "replenished_system",
+      "reuseInstructions": "Designed for dip-and-dunk replenished processors and used with ILFOTEC DD Starter; the chemistry is replenished and is formulated for long tank life and resistance to contamination.",
+      "sourceTitle": "ILFORD Introduction to Film Developers / ILFOTEC DD",
+      "sourceUrl": "https://www.ilfordphoto.com/beginners-guide-film-developers/",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Ars-Imago FD"],
+      "manufacturer": "ars-imago",
+      "productName": "ARS-IMAGO FD Film Developer",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute the liquid concentrate immediately before use. Standard working dilution is 1+39; the manufacturer sheet allows approximately 1+19 to 1+59 depending on the film and desired result.",
+      "dilutions": ["1+19", "1+39", "1+59"],
+      "reuseMode": "one_shot",
+      "reuseInstructions": "The diluted working solution must not be reused and is discarded after development.",
+      "capacityText": "Up to 40 films per 300 ml of concentrate. For high dilutions use at least 6 ml concentrate per 135 or 120 film.",
+      "shelfLifeOpened": "Use concentrate within 6 months after opening; minimize air in the bottle or use inert gas.",
+      "sourceTitle": "ARS-IMAGO FD Film Developer Datasheet",
+      "sourceUrl": "https://www.ars-imago.com/web/content/88464?download=true&unique=c764ab5b1ca759c7fc6b9ca6aaa6fc5f269e543d",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["510-Pyro"],
+      "manufacturer": "Zone Imaging Ltd",
+      "productName": "Zone Imaging 510 Pyro",
+      "physicalState": "liquid concentrate",
+      "preparation": "Prepare a one-shot working solution from the concentrate; the standard dilution is 1+100, with higher dilutions up to about 1+500 possible for economy and longer development times.",
+      "dilutions": ["1+100", "1+200", "1+500"],
+      "reuseMode": "one_shot",
+      "reuseInstructions": "Designed as a one-shot film developer; discard working solution after use.",
+      "capacityText": "A 100 ml bottle develops approximately 30-100 rolls of 35 mm film, depending on dilution and working volume.",
+      "shelfLifeOpened": "Opened concentrate: more than 6 years according to Zone Imaging.",
+      "sourceTitle": "Zone Imaging 510 Pyro Film Developer",
+      "sourceUrl": "https://www.zone-imaging.co.uk/shop/p/510pyro",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Ars-Imago Monobath"],
+      "manufacturer": "ars-imago",
+      "productName": "ARS-IMAGO ME Monobath Eco",
+      "physicalState": "one-part liquid concentrate",
+      "preparation": "For the 135 ml format, mix 135 ml concentrate with 165 ml water to make 300 ml ready-to-use solution; the 500 ml package can be mixed with 500 ml water to make one litre.",
+      "reuseMode": "limited_reuse",
+      "reuseInstructions": "Working solution can be reused for a limited period/capacity according to package size and storage conditions.",
+      "capacityText": "135 ml package makes 300 ml working solution for at least 2 rolls; when stored accurately the same working solution may process up to 3-4 rolls. The 500 ml package makes 1 litre and the current product page states up to 8 rolls within two weeks.",
+      "shelfLifeUnopened": "Unopened concentrate: 8-12 months.",
+      "shelfLifeOpened": "Opened concentrate: use within 1 month; life may be extended to 8-12 months if air is successfully removed and the concentrate is stored properly.",
+      "shelfLifeWorking": "135 ml working solution: use within 5 days; the current 500 ml product formulation states reuse within two weeks.",
+      "sourceTitle": "ARS-IMAGO ME Monobath Eco Datasheet",
+      "sourceUrl": "https://www.ars-imago.com/web/content/160431?download=true&unique=9abfc8222e3b17b5b132eced019f1af5fbb92389",
+      "sourceDate": "2022-07"
+    }
+  ]
+}
