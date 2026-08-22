@@ -1,6 +1,6 @@
 developer,manufacturer,missing_fields,mdc_combinations,mdc_films
 123-Pyro,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
-510-Pyro,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",189,95
+510-Pyro,Zone Imaging Ltd,"shelf_life_unopened,shelf_life_stock,shelf_life_working",189,95
 777,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",12,12
 A&B Lith,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 ABC Pyro,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
@@ -24,9 +24,9 @@ Arista Premium,,"manufacturer,physical_state,preparation,reuse_mode,capacity_tex
 Arista® 76 Powder,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,3
 Arista® Premium Liquid,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Arista® Premium Powder,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",4,2
-Ars-Imago FD,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",78,33
+Ars-Imago FD,ars-imago,"shelf_life_unopened,shelf_life_stock,shelf_life_working",78,33
 Ars-Imago FE,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",74,29
-Ars-Imago Monobath,ars-imago,"shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",3,3
+Ars-Imago Monobath,ars-imago,shelf_life_stock,3,3
 Atomal 49,ADOX Fotowerke GmbH,"shelf_life_opened,shelf_life_working",132,64
 AVR-3,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",17,9
 Bellini B&W Ecofilm,Bellini Foto S.r.l.,"reuse_mode,capacity_text,shelf_life_stock",4,4
@@ -64,7 +64,7 @@ D-19,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_li
 D-23,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",115,60
 D-25,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 D-72,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",6,6
-D-76,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",862,239
+D-76,Kodak Alaris,"reuse_mode,shelf_life_unopened,shelf_life_opened",862,239
 D-76D,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",7,7
 D-8,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 D-9,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
@@ -124,7 +124,7 @@ ID-62,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_l
 ID-68,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",6,5
 Ilford Multigrade,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,5
 Ilfosol 3,HARMAN technology / ILFORD,"preparation,shelf_life_unopened,shelf_life_stock",308,116
-Ilfotec DD,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",145,42
+Ilfotec DD,HARMAN technology / ILFORD,"capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",145,42
 Ilfotec DD-X,HARMAN technology / ILFORD,"preparation,shelf_life_unopened,shelf_life_stock,shelf_life_working",339,109
 Ilfotec HC,HARMAN technology / ILFORD,"preparation,shelf_life_working",198,80
 Ilfotec LC29,HARMAN technology / ILFORD,"preparation,shelf_life_unopened,shelf_life_stock,shelf_life_working",249,81
