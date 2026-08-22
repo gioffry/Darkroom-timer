@@ -1,0 +1,4 @@
+Darkroom v0.3.1 BUILD FAILED
+commit=a2df2116260a2035f61911b7cf89b1c8c7e0b086
+--- tail build-v031.log ---
+v0.3.0 artifact validation marker ambiguous
