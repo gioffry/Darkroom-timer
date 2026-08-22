@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MDC_FIRST_MANUFACTURER_FILL_ONLY",
+  "checkedAt": "2026-08-22",
+  "scope": "MACODIRECT_CURRENT_LISTINGS_ONLY",
+  "records": [
+    {
+      "matchNames": ["Ilford Multigrade"],
+      "manufacturer": "HARMAN technology / ILFORD",
+      "productName": "ILFORD MULTIGRADE Developer",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute concentrate 1+9 for standard use or 1+14 for greater control/economy. For 1 litre at 1+9 use 100 ml concentrate plus 900 ml water.",
+      "reuseMode": "reusable_until_capacity_or_keeping_limit",
+      "reuseInstructions": "ILFORD states MULTIGRADE has good keeping properties and can typically be reused; discard when capacity or keeping-life limit is reached.",
+      "capacityText": "One 1 litre bottle at 1+9 processes about 1000 RC 8x10 inch prints or 500 FB 8x10 inch prints.",
+      "shelfLifeUnopened": "Full unopened concentrate stored at 5-20 C: 2 years.",
+      "shelfLifeOpened": "Opened concentrate: use within 6 months; keep tightly sealed.",
+      "shelfLifeWorking": "Working-strength solution: no more than one working day in an open dish; up to about 24 hours in a tightly capped bottle.",
+      "sourceTitle": "ILFORD Black & White Paper Developers / MULTIGRADE Developer",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1828/product/736/",
+      "sourceDate": "ILFORD technical information"
+    },
+    {
+      "matchNames": ["PQ Universal"],
+      "manufacturer": "HARMAN technology / ILFORD",
+      "productName": "ILFORD PQ UNIVERSAL",
+      "physicalState": "liquid concentrate",
+      "preparation": "For paper, dilute concentrate 1+9. For supported technical/sheet films ILFORD also documents 1+9 or 1+19 depending on application.",
+      "reuseMode": "reusable_until_capacity_or_keeping_limit",
+      "reuseInstructions": "ILFORD states PQ UNIVERSAL has good keeping properties and can typically be reused; discard when capacity or keeping-life limit is reached.",
+      "capacityText": "One 1 litre bottle at 1+9 processes about 700 RC 8x10 inch prints, 450 FB 8x10 inch prints, or 100 8x10 inch sheet films.",
+      "shelfLifeUnopened": "Full unopened concentrate stored at 5-20 C: 2 years.",
+      "shelfLifeOpened": "Opened concentrate: use within 6 months; keep tightly sealed.",
+      "shelfLifeWorking": "Working-strength solution: no more than one working day in an open dish; up to about 24 hours in a tightly capped bottle.",
+      "sourceTitle": "ILFORD Black & White Paper Developers / PQ UNIVERSAL",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1828/product/736/",
+      "sourceDate": "ILFORD technical information"
+    },
+    {
+      "matchNames": ["PMK"],
+      "manufacturer": "BERGGER",
+      "productName": "BERGGER PMK",
+      "physicalState": "two-part liquid concentrate",
+      "preparation": "Standard working dilution is 1+2+100: add Part A and Part B to water immediately before processing.",
+      "reuseMode": "one_shot_fresh_working_solution",
+      "reuseInstructions": "BERGGER documentation states the mixed working solution should be used straight away; the separate component solutions are kept unmixed for storage.",
+      "capacityText": "At 1+2+100 the kit makes about 25 litres of working solution. About 1 litre working solution processes two 135-36 films, two 120 films, eight 4x5 sheets or two 8x10 sheets.",
+      "shelfLifeUnopened": "Separate Part A and Part B solutions have very long shelf life when not mixed.",
+      "shelfLifeWorking": "Mixed working solution should be used immediately after preparation.",
+      "sourceTitle": "BERGGER PMK product information and PMK processing guidance",
+      "sourceUrl": "https://bergger.com/en/film-developer/pmk-liquide-250-ml-a-500-ml-b.html",
+      "sourceDate": "current manufacturer information"
+    },
+    {
+      "matchNames": ["Spur Dokuspeed SL-N"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR Dokuspeed SL-N",
+      "physicalState": "two-component liquid concentrate",
+      "preparation": "Prepare the working solution from Parts A and B plus distilled water. For example, for 250 ml use 10 ml Part A + 5 ml Part B and fill to 250 ml; exact A/B quantities vary by film and format according to the SPUR chart.",
+      "reuseMode": "limited_reuse_by_working_volume",
+      "reuseInstructions": "250-300 ml working solution develops one 135 film. 500-600 ml develops two 135 films or two 120 films, together or sequentially; no time extension is required for the second film if processed within working-solution life.",
+      "capacityText": "250-300 ml working solution: one 135 film. 500-600 ml: two 135 films or two 120 films.",
+      "shelfLifeUnopened": "Part A: 3-4 years unopened; Part B: effectively indefinite.",
+      "shelfLifeWorking": "Working solution: about one week in a bottle filled completely to exclude oxygen.",
+      "sourceTitle": "SPUR Dokuspeed SL-N Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-Sheet-SPUR-Dokuspeed-SL-N.pdf",
+      "sourceDate": "current manufacturer data sheet"
+    },
+    {
+      "matchNames": ["Bellini DF2 Duo Step"],
+      "manufacturer": "Bellini Foto S.r.l.",
+      "productName": "Bellini DUO STEP Developer",
+      "physicalState": "two-part liquid developer system",
+      "preparation": "Bellini documents a two-part A/B system. For replenishment, reconstitute 1 litre from 500 ml seasoned tank solution + 250 ml fresh concentrate + 250 ml water for each bath; recommended dilution is 1+1.",
+      "reuseMode": "replenished_seasoned_tank_system",
+      "reuseInstructions": "The manufacturer provides a replenishment procedure for seasoned tank solution rather than requiring immediate disposal after each film.",
+      "sourceTitle": "Bellini DUO STEP Developer Replenisher Technical Data Sheet",
+      "sourceUrl": "https://www.bellinifoto.it/wp-content/uploads/2020/08/DFDUOSTEP-REP.pdf",
+      "sourceDate": "Bellini technical data sheet"
+    }
+  ]
+}
