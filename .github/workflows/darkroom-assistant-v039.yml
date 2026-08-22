@@ -4,10 +4,15 @@ on:
   push:
     branches:
       - feature-darkroom-assistant-v039-unified-chemical-tech-it
+    paths-ignore:
+      - assistant/V039_BUILD_STATUS.md
   pull_request:
     branches:
       - main
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build-assistant:
@@ -162,14 +167,12 @@ jobs:
           d=Path('assistant/src/main/java/it/darkroom/assistant/DevTimeEngine.java').read_text()
           tech=Path('assistant/src/main/java/it/darkroom/assistant/ChemicalTechnicalStore.java').read_text()
 
-          # v0.3.8: modifiche utente ancora prioritarie.
           start=a.index('    private Product findProduct(String name) {')
           end=a.index('    private FilmStock findFilm', start)
           m=a[start:end]
           assert m.index('loadSavedProduct(wanted)') < m.index('canonicalDeveloperName(wanted)')
           assert 'if (saved != null) return saved;' in m
 
-          # v0.3.9: una sola card per MDC + scheda tecnica del rivelatore.
           assert 'RIVELATORE · RICETTA + SCHEDA TECNICA' in a
           assert 'COMBINAZIONE DI SVILUPPO' in a
           assert 'SCHEDA TECNICA DEL RIVELATORE' in a
@@ -177,7 +180,6 @@ jobs:
           assert 'appendTechnicalText(msg, tech)' in a
           assert 'Nessun dato tecnico viene inventato' in a
 
-          # Guardrail: il motore tempi NON consulta mai il database tecnico.
           assert 'MdcOfflineStore.lookup' in d
           assert 'ChemicalTechnicalStore' not in d
           assert 'tempi, ISO, temperatura o diluizione' in tech
@@ -232,3 +234,28 @@ jobs:
         with:
           name: DarkroomAssistant-v0.3.9
           path: DarkroomAssistant-v0.3.9.apk
+
+      - name: Registra esito build sul branch
+        if: always() && github.event_name == 'push'
+        shell: bash
+        env:
+          BUILD_STATUS: ${{ job.status }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -u
+          cat > assistant/V039_BUILD_STATUS.md <<EOF
+          # Darkroom Assistant v0.3.9 build status
+
+          status: ${BUILD_STATUS}
+          run_id: ${RUN_ID}
+          run_attempt: ${RUN_ATTEMPT}
+          source_sha: ${SOURCE_SHA}
+          artifact_expected: DarkroomAssistant-v0.3.9
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assistant/V039_BUILD_STATUS.md
+          git commit -m "ci: record v0.3.9 build ${RUN_ID} ${BUILD_STATUS}" || true
+          git push origin HEAD:feature-darkroom-assistant-v039-unified-chemical-tech-it
