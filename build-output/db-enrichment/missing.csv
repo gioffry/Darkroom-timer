@@ -25,7 +25,7 @@ Arista® 76 Powder,,"manufacturer,physical_state,preparation,reuse_mode,capacity
 Arista® Premium Liquid,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Arista® Premium Powder,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",4,2
 Ars-Imago FD,ars-imago,"shelf_life_unopened,shelf_life_stock,shelf_life_working",78,33
-Ars-Imago FE,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",74,29
+Ars-Imago FE,ars-imago,"shelf_life_unopened,shelf_life_stock,shelf_life_working",74,29
 Ars-Imago Monobath,ars-imago,shelf_life_stock,3,3
 Atomal 49,ADOX Fotowerke GmbH,"shelf_life_opened,shelf_life_working",132,64
 AVR-3,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",17,9
@@ -128,7 +128,7 @@ Ilfotec DD,HARMAN technology / ILFORD,"capacity_text,shelf_life_unopened,shelf_l
 Ilfotec DD-X,HARMAN technology / ILFORD,"preparation,shelf_life_unopened,shelf_life_stock,shelf_life_working",339,109
 Ilfotec HC,HARMAN technology / ILFORD,"preparation,shelf_life_working",198,80
 Ilfotec LC29,HARMAN technology / ILFORD,"preparation,shelf_life_unopened,shelf_life_stock,shelf_life_working",249,81
-Ilfotec RT Rapid,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,3
+Ilfotec RT Rapid,HARMAN technology / ILFORD,shelf_life_stock,5,3
 JOBO Alpha,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Kalogen,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",15,14
 LegacyPro® L-110,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",4,3
@@ -174,8 +174,8 @@ Rodinal,ADOX Fotowerke,"preparation,shelf_life_unopened,shelf_life_opened,shelf_
 Rollei ATP DC,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Rollei D74,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",79,35
 Rollei RHS DC,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",8,7
-Rollei RLC Low Contrast,Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS,"reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",9,7
-Rollei RLS Low Speed,Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS,"reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",48,34
+Rollei RLC Low Contrast,Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",9,7
+Rollei RLS Low Speed,Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",48,34
 Rollei RPX-D,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",13,8
 Rollei RSL Superlith,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Rollei Supergrain,Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS,"preparation,reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",45,33
@@ -187,7 +187,7 @@ Silberra Ascorol,Silberra,shelf_life_stock,56,51
 Silberra Micro-F,Silberra,"shelf_life_opened,shelf_life_stock",2,2
 Silberra Microl,Silberra,"shelf_life_opened,shelf_life_stock",5,5
 Silberra Pyro-HD,Silberra,"capacity_text,shelf_life_opened,shelf_life_stock",6,4
-Silberra RDN-LQ,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",14,10
+Silberra RDN-LQ,Silberra,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",14,10
 Silberra S-76,Silberra,"shelf_life_opened,shelf_life_stock",10,6
 Silvermax,ADOX Fotowerke GmbH,"physical_state,preparation,shelf_life_stock",38,22
 SP-76EC,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",22,12
