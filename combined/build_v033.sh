@@ -27,9 +27,13 @@ cp assistant/src/main/assets/mdc_full.sqlite combined/src/main/assets/mdc_full.s
 python3 combined/patch_v033_enriched_profiles.py
 
 # Advance only the outer app package version. Internal Timer remains 0.13.11.
+# Android Gradle Plugin takes versionName/versionCode from defaultConfig, so update both
+# Gradle and manifest. Keep SQLite helper schema at 3 because the enriched asset itself is
+# user_version=3; the new DB filename alone forces a fresh bundled copy on upgrade.
 python3 - <<'PY'
 from pathlib import Path
 import re
+
 p=Path('combined/src/main/AndroidManifest.xml')
 s=p.read_text(encoding='utf-8')
 s,n1=re.subn(r'android:versionCode="[^"]+"','android:versionCode="24"',s,count=1)
@@ -37,6 +41,24 @@ s,n2=re.subn(r'android:versionName="[^"]+"','android:versionName="0.3.3"',s,coun
 if n1 != 1 or n2 != 1:
     raise SystemExit('v0.3.3 manifest version update failed')
 p.write_text(s,encoding='utf-8')
+
+g=Path('combined/build.gradle')
+gs=g.read_text(encoding='utf-8')
+gs,n3=re.subn(r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 24', gs, count=1)
+gs,n4=re.subn(r'(?m)^\s*versionName\s+[\'\"][^\'\"]+[\'\"]\s*$', "        versionName '0.3.3'", gs, count=1)
+if n3 != 1 or n4 != 1:
+    raise SystemExit('v0.3.3 Gradle version update failed')
+g.write_text(gs,encoding='utf-8')
+
+m=Path('combined/src/main/java/it/darkroom/assistant/MdcOfflineStore.java')
+ms=m.read_text(encoding='utf-8')
+if 'private static final int DB_VERSION = 4;' in ms:
+    ms=ms.replace('private static final int DB_VERSION = 4;', 'private static final int DB_VERSION = 3;', 1)
+if 'private static final int DB_VERSION = 3;' not in ms:
+    raise SystemExit('v0.3.3 SQLite helper version marker missing')
+if 'mdc_offline_darkroom_v033.sqlite' not in ms:
+    raise SystemExit('v0.3.3 fresh database filename missing')
+m.write_text(ms,encoding='utf-8')
 PY
 
 # Rebuild after the DB/UI bridge patch.
@@ -96,7 +118,7 @@ grep -Fq 'applyDeveloperProfile' "$ASSIST"
 grep -Fq 'if ((role & ROLE_FILM_DEV) != 0) return 0;' "$ASSIST"
 grep -Fq 'REUSE_FRESH_RECOMMENDED = 3' "$ASSIST"
 grep -Fq 'mdc_offline_darkroom_v033.sqlite' "$MDC"
-grep -Fq 'private static final int DB_VERSION = 4;' "$MDC"
+grep -Fq 'private static final int DB_VERSION = 3;' "$MDC"
 # Preserve prior functional areas.
 grep -q 'private static final String APP_VERSION = "0.13.11";' "$MAIN"
 grep -Fq 'NIKON L35AF' "$MAINT"
