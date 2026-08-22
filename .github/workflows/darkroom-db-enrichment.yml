@@ -3,7 +3,7 @@ name: Audit Darkroom Enriched Developer Database
 on:
   push:
     branches:
-      - feature-darkroom-db-enrichment-mdc-first
+      - feature-v0121-manufacturer-enrichment
     paths-ignore:
       - 'build-output/db-enrichment/**'
   workflow_dispatch:
@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feature-darkroom-db-enrichment-mdc-first
+          ref: feature-v0121-manufacturer-enrichment
           fetch-depth: 0
 
       - name: Build MDC base database
@@ -33,6 +33,7 @@ jobs:
           python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch3.json
           python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch4.json
           python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch5.json
+          python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch6.json
 
       - name: Audit enriched database
         run: |
@@ -70,6 +71,7 @@ jobs:
             assistant/db/producer_enrichment_batch3.json
             assistant/db/producer_enrichment_batch4.json
             assistant/db/producer_enrichment_batch5.json
+            assistant/db/producer_enrichment_batch6.json
 
       - name: Publish audit metadata
         if: always()
@@ -85,4 +87,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- build-output/db-enrichment
           git commit -m "Record developer database audit [skip ci]" || exit 0
-          git push origin HEAD:feature-darkroom-db-enrichment-mdc-first
+          git push origin HEAD:feature-v0121-manufacturer-enrichment
