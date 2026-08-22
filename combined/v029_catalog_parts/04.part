@@ -59,14 +59,18 @@
     private static int score(String q,String qc,String name,String aliases){
         if(q==null||q.length()<3)return 0; String n=norm(name), nc=compact(name);
         int best=scoreOne(q,qc,n,nc);
-        if(aliases!=null)for(String a:aliases.split("\\|")){String an=norm(a);best=Math.max(best,scoreOne(q,qc,an,compact(a)));}
+        if(aliases!=null&&!aliases.trim().isEmpty())for(String a:aliases.split("\\|")){
+            String an=norm(a); if(an.isEmpty())continue;
+            best=Math.max(best,scoreOne(q,qc,an,compact(a)));
+        }
         return best;
     }
     private static int scoreOne(String q,String qc,String n,String nc){
+        if(n==null||n.isEmpty()||nc==null||nc.isEmpty())return 0;
         if(n.equals(q)||nc.equals(qc))return 1000;
         if(n.startsWith(q)||nc.startsWith(qc))return 950;
         if(q.startsWith(n)||qc.startsWith(nc)||q.endsWith(" "+n)||qc.endsWith(nc))return 930;
-        for(String t:n.split(" "))if(t.startsWith(q))return 910;
+        for(String t:n.split(" "))if(!t.isEmpty()&&t.startsWith(q))return 910;
         if(n.contains(q)||(!qc.isEmpty()&&nc.contains(qc)))return 850;
         String[] qt=q.split(" "); boolean all=true; for(String t:qt)if(!n.contains(t)){all=false;break;} if(all)return 760;
         return 0;
