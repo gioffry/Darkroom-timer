@@ -63,7 +63,7 @@ jobs:
           set -euo pipefail
           cat combined/v015_assets/home_bottom_parts/00.part combined/v015_assets/home_bottom_parts/01.part combined/v015_assets/home_bottom_parts/02.part combined/v015_assets/home_bottom_parts/03.part > combined/v015_assets/home_bottom.jpg
           set +e
-          bash combined/build_v035.sh 2>&1 | tee build-v035.log
+          bash combined/build_v035_r2.sh 2>&1 | tee build-v035.log
           BUILD_RC=${PIPESTATUS[0]}
           set -e
           if [ "$BUILD_RC" -ne 0 ]; then exit "$BUILD_RC"; fi
@@ -85,6 +85,7 @@ jobs:
             apk-listing-v035.txt
             validation-v035.txt
             validation-v035-technical-db.txt
+            validation-v035-preparations.txt
             validation-v035-bundled-db.txt
             developer-db-audit.txt
             developer-db-missing.csv
