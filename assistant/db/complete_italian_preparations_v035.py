@@ -76,14 +76,16 @@ P={
 for dn,text in P.items():
     cur.execute('UPDATE developer_profiles SET preparation_it=?,translation_status=? WHERE developer_norm=?',(text,'v035_strict_it_complete_prep',dn))
 
-# v0.3.5 core override products were already populated by the previous pass.
 raw_count=cur.execute("SELECT COUNT(*) FROM developer_profiles WHERE COALESCE(preparation,'')<>''").fetchone()[0]
 it_count=cur.execute("SELECT COUNT(*) FROM developer_profiles WHERE COALESCE(preparation_it,'')<>''").fetchone()[0]
 if raw_count!=79 or it_count!=79:
     missing=cur.execute("SELECT developer_norm,developer_name FROM developer_profiles WHERE COALESCE(preparation,'')<>'' AND COALESCE(preparation_it,'')='' ORDER BY developer_name").fetchall()
     raise SystemExit(f'Italian preparation coverage mismatch raw={raw_count} it={it_count} missing={missing}')
 
-bad=re.compile(r'\b(the|and|with|when|should|stored|working solution|original package|minimum|defines|processing|explicitly|before|protected|darkness|oxidation|later use|replace|guaranteed|direct sun|air access|unopened|opened concentrate|prepared|manufacturer states|depending on|once opened|use once|discard|per litre|per liter|rolls|sheets|developer|full tightly|half full)\b',re.I)
+# English prose guard. "Developer" is deliberately allowed here because it is
+# part of official product names such as ILFOTEC DD Developer and T-MAX RS
+# Developer and Replenisher; the surrounding sentence is already Italian.
+bad=re.compile(r'\b(the|and|with|when|should|stored|working solution|original package|minimum|defines|processing|explicitly|before|protected|darkness|oxidation|later use|replace|guaranteed|direct sun|air access|unopened|opened concentrate|prepared|manufacturer states|depending on|once opened|use once|discard|per litre|per liter|rolls|sheets|full tightly|half full)\b',re.I)
 for dn,v in cur.execute("SELECT developer_norm,preparation_it FROM developer_profiles WHERE COALESCE(preparation_it,'')<>''"):
     if bad.search(v) or '\\n' in v:
         raise SystemExit(f'Bad Italian preparation {dn}: {v}')
