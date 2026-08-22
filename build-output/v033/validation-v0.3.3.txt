@@ -1,0 +1,14 @@
+release=Darkroom-v0.3.3
+versionName=0.3.3
+versionCode=24
+base_version=0.3.2
+database_hierarchy=MDC_FIRST_MANUFACTURER_FILL_ONLY
+macodirect_role=COMMERCE_FILTER_ONLY
+technical_sources=MANUFACTURERS_ONLY
+rollei_supergrain=COMPLETE
+user_facing_technical_notes=ITALIAN
+mdc_combinations=14504
+mdc_priority_regression=PASS
+camera_manuals_preserved=PASS
+timer_split_sonoff_preserved=PASS
+personal_data_migration=NO_DESTRUCTIVE_RESET
