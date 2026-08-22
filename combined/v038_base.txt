@@ -1,0 +1,5 @@
+Darkroom v0.3.8 base verification
+base_version=0.3.7
+base_versionCode=28
+base_source_sha=7f4482665e0178e2260bf5327c89ba778c4cb6c8
+base_apk_sha256=79427ad99c1d3279800ff774ca6246aa5e4ee0bbc506b5460b23970353c94cc0
