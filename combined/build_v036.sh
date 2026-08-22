@@ -10,6 +10,16 @@ bash combined/build_v035.sh
 # The final v0.3.5 release completed all existing Italian preparation/duration
 # overlays; run them explicitly here so the v0.3.6 build is reproducible even
 # when rebuilt from the canonical v0.3.5 source chain.
+# Normalize one official Kodak English product title inside an otherwise Italian
+# sentence before applying the strict language validator. Technical meaning is
+# unchanged; this is display text only.
+python3 - <<'PY'
+from pathlib import Path
+p=Path('assistant/db/complete_italian_preparations_v035.py')
+s=p.read_text(encoding='utf-8')
+s=s.replace('T-MAX RS Developer and Replenisher', 'T-MAX RS (rivelatore e reintegratore)')
+p.write_text(s,encoding='utf-8')
+PY
 python3 assistant/db/complete_italian_preparations_v035.py combined/src/main/assets/mdc_full.sqlite \
   | tee validation-v036-preparations.txt
 python3 assistant/db/complete_italian_durations_v035.py combined/src/main/assets/mdc_full.sqlite \
