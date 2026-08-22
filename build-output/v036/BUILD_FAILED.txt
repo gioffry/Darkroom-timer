@@ -1,5 +1,5 @@
 Darkroom v0.3.6 BUILD FAILED
-commit=c6c8099859b23f41550925ca3d414ee068e3010c
+commit=f3df3664279b3c3a5689a13d50e67e6b0d65faeb
 --- tail build-v036.log ---
 From https://github.com/gioffry/Darkroom-timer
  * branch            feature-darkroom-v012-vintage-home-r2 -> FETCH_HEAD
@@ -170,18 +170,18 @@ v0.13.7 OK nav indicator setter
 v0.13.7 OK draw active line
 v0.13.7 TRANSFORM OK — flat mockup-style bottom nav; PROVINO default preserved; timing untouched
 progress 20/234 developers, raw_rows=683, failed=0
-progress 40/234 developers, raw_rows=1382, failed=0
-progress 60/234 developers, raw_rows=1681, failed=0
+progress 40/234 developers, raw_rows=1465, failed=0
+progress 60/234 developers, raw_rows=1664, failed=0
 progress 80/234 developers, raw_rows=2958, failed=0
-progress 100/234 developers, raw_rows=4429, failed=0
+progress 100/234 developers, raw_rows=4412, failed=0
 progress 120/234 developers, raw_rows=4881, failed=0
-progress 140/234 developers, raw_rows=7618, failed=0
+progress 140/234 developers, raw_rows=7658, failed=0
 progress 160/234 developers, raw_rows=8712, failed=0
 progress 180/234 developers, raw_rows=10477, failed=0
-progress 200/234 developers, raw_rows=10899, failed=0
+progress 200/234 developers, raw_rows=10847, failed=0
 progress 220/234 developers, raw_rows=11879, failed=0
 progress 234/234 developers, raw_rows=14527, failed=0
-BUILT SQLITE V032: canonical_index=364 films=347 developers=232 rows=14504 failed=0 rodinal=1 ferrania_p30=1 noisy_films=0 quick_check=ok size=3960832
+BUILT SQLITE V032: canonical_index=364 films=347 developers=232 rows=14504 failed=0 rodinal=1 ferrania_p30=1 noisy_films=0 quick_check=ok size=3969024
 v0.1.8 visible-results patch applied
 v0.1.9 search enrichment patch applied
 v0.2.0 source-brain patch applied
@@ -204,14 +204,14 @@ v029 unified chemical metadata fixed
 Combined Darkroom sources prepared
 Darkroom v0.1.3 HOME SAFE OK — mockup approvato + 4 funzioni reali preservate
 WEBP_SOURCE_BYTES=112623
-[swscaler @ 0x55d0b9659600] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x55d0b9742b80] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x55d0b96571c0] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x55b1dbc3a600] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x55b1dbd23b80] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x55b1dbc381c0] deprecated pixel format used, make sure you did set range correctly
     Last message repeated 2 times
-[swscaler @ 0x55d0b9742b40] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x55b1dbd23b40] deprecated pixel format used, make sure you did set range correctly
     Last message repeated 2 times
-[image2 @ 0x55d0b95b8a80] The specified filename 'combined/src/main/res/drawable-nodpi/home_vintage.jpg' does not contain an image sequence pattern or a pattern is invalid.
-[image2 @ 0x55d0b95b8a80] Use a pattern such as %03d for an image sequence or use the -update option (with -frames:v 1 if needed) to write a single image.
+[image2 @ 0x55b1dbb99a80] The specified filename 'combined/src/main/res/drawable-nodpi/home_vintage.jpg' does not contain an image sequence pattern or a pattern is invalid.
+[image2 @ 0x55b1dbb99a80] Use a pattern such as %03d for an image sequence or use the -update option (with -frames:v 1 if needed) to write a single image.
 v016 enlargement patch applied
 v017 polish applied
 settings scroll fix applied
@@ -220,14 +220,14 @@ Darkroom v0.1.9 Uso e Manutenzione patch ready
 Darkroom v0.2.0 enlargement/log flow patch ready
 Darkroom v0.2.0 legacy recipe compatibility patch ready
 Darkroom v0.2.0 visual coherence patch ready
-[swscaler @ 0x55d6aad04600] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x55d6aadedb80] deprecated pixel format used, make sure you did set range correctly
-[swscaler @ 0x55d6aad021c0] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x560f4eb71600] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x560f4ec5ab80] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x560f4eb6f1c0] deprecated pixel format used, make sure you did set range correctly
     Last message repeated 2 times
-[swscaler @ 0x55d6aadedb40] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x560f4ec5ab40] deprecated pixel format used, make sure you did set range correctly
     Last message repeated 2 times
-[image2 @ 0x55d6aac63a80] The specified filename 'combined/src/main/res/drawable-nodpi/home_vintage.jpg' does not contain an image sequence pattern or a pattern is invalid.
-[image2 @ 0x55d6aac63a80] Use a pattern such as %03d for an image sequence or use the -update option (with -frames:v 1 if needed) to write a single image.
+[image2 @ 0x560f4ead0a80] The specified filename 'combined/src/main/res/drawable-nodpi/home_vintage.jpg' does not contain an image sequence pattern or a pattern is invalid.
+[image2 @ 0x560f4ead0a80] Use a pattern such as %03d for an image sequence or use the -update option (with -frames:v 1 if needed) to write a single image.
 Darkroom v0.2.1 Home/font/LOG fix patch ready
 v0.2.4 temporary native-button Home applied
 v0.2.5 OK Timer footer version
@@ -341,8 +341,8 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :combined:mergeReleaseNativeDebugMetadata NO-SOURCE
 > Task :combined:javaPreCompileRelease
 > Task :combined:checkReleaseDuplicateClasses
-> Task :combined:checkReleaseAarMetadata
 > Task :combined:generateReleaseResValues
+> Task :combined:checkReleaseAarMetadata
 > Task :combined:mapReleaseSourceSetPaths
 > Task :combined:generateReleaseResources
 > Task :combined:packageReleaseResources
@@ -360,34 +360,34 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:desugarReleaseFileDependencies
 > Task :combined:mergeReleaseStartupProfile
 > Task :combined:processReleaseManifestForPackage
-> Task :combined:processReleaseResources
-> Task :combined:mergeExtDexRelease
-
-> Task :combined:compileReleaseJavaWithJavac
-Note: Some input files use or override a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
-
-> Task :combined:dexBuilderRelease
 > Task :combined:mergeReleaseArtProfile
-> Task :combined:mergeReleaseGlobalSynthetics
 > Task :combined:mergeReleaseShaders
 > Task :combined:compileReleaseShaders NO-SOURCE
 > Task :combined:generateReleaseAssets UP-TO-DATE
 > Task :combined:mergeReleaseAssets
 > Task :combined:extractReleaseVersionControlInfo
 > Task :combined:extractProguardFiles
+> Task :combined:processReleaseJavaRes NO-SOURCE
+> Task :combined:processReleaseResources
 > Task :combined:compressReleaseAssets
+> Task :combined:mergeExtDexRelease
+> Task :combined:mergeReleaseJavaResource
+
+> Task :combined:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :combined:dexBuilderRelease
+> Task :combined:mergeReleaseGlobalSynthetics
 > Task :combined:generateReleaseLintVitalReportModel
 > Task :combined:mergeDexRelease
 > Task :combined:compileReleaseArtProfile
-> Task :combined:processReleaseJavaRes NO-SOURCE
 > Task :combined:collectReleaseDependencies
-> Task :combined:optimizeReleaseResources
 > Task :combined:sdkReleaseDependencyData
 > Task :combined:validateSigningRelease
 > Task :combined:writeReleaseAppMetadata
 > Task :combined:writeReleaseSigningConfigVersions
-> Task :combined:mergeReleaseJavaResource
+> Task :combined:optimizeReleaseResources
 > Task :combined:lintVitalAnalyzeRelease
 > Task :combined:lintVitalReportRelease
 > Task :combined:lintVitalRelease
@@ -403,7 +403,7 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 1m 20s
+BUILD SUCCESSFUL in 1m 31s
 43 actionable tasks: 43 executed
 Verifies
 Verified using v1 scheme (JAR signing): false
@@ -422,8 +422,8 @@ Signer #1 key size (bits): 4096
 Signer #1 public key SHA-256 digest: 192768f7fe3a92c4697fe98f1e65d7173bff4c4a497b038207dd79d6f2af48a4
 Signer #1 public key SHA-1 digest: 5c1f2c34c4c63bb994ae413416d4a38e9609afde
 Signer #1 public key MD5 digest: cca83fde59ccf34c37086ce7408006f4
-c32c1618c720682c6d40cfc52ad23ed85f4213eeec321553f68da8038f28592a  Darkroom-v0.3.2.apk
-c32c1618c720682c6d40cfc52ad23ed85f4213eeec321553f68da8038f28592a  Darkroom-v0.3.2.apk
+56f2d45838aa467dbcda8d7417ed51848c4ee3e1ace6aba71bf1da22490bac21  Darkroom-v0.3.2.apk
+56f2d45838aa467dbcda8d7417ed51848c4ee3e1ace6aba71bf1da22490bac21  Darkroom-v0.3.2.apk
 catalog_validation=PASS
 sqlite_user_version=3
 sqlite_quick_check=ok
@@ -458,11 +458,11 @@ developer_test::Adox Rodinal::Rodinal
 developer_test::Fomadon Excel::Fomadon Excel
 developer_test::Fomadon P::Fomadon P
 developer_test::Fomadon R09::fomadon r 09
-c32c1618c720682c6d40cfc52ad23ed85f4213eeec321553f68da8038f28592a  Darkroom-v0.3.2.apk
+56f2d45838aa467dbcda8d7417ed51848c4ee3e1ace6aba71bf1da22490bac21  Darkroom-v0.3.2.apk
 search_filter_fomatol_film=PASS
 search_filter_fomatol_paper=PASS
 empty_alias_match=PASS
-c32c1618c720682c6d40cfc52ad23ed85f4213eeec321553f68da8038f28592a  Darkroom-v0.3.2.apk
+56f2d45838aa467dbcda8d7417ed51848c4ee3e1ace6aba71bf1da22490bac21  Darkroom-v0.3.2.apk
 developer_profiles=232/232
 manufacturer_records_matched=19
 manufacturer_fields_applied=134
@@ -652,7 +652,6 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:mergeExtDexRelease UP-TO-DATE
 > Task :combined:mergeReleaseArtProfile UP-TO-DATE
 > Task :combined:mergeReleaseShaders UP-TO-DATE
-> Task :combined:processReleaseManifestForPackage
 > Task :combined:compileReleaseShaders NO-SOURCE
 > Task :combined:generateReleaseAssets UP-TO-DATE
 > Task :combined:mergeReleaseAssets
@@ -665,8 +664,9 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:validateSigningRelease UP-TO-DATE
 > Task :combined:writeReleaseAppMetadata UP-TO-DATE
 > Task :combined:writeReleaseSigningConfigVersions UP-TO-DATE
-> Task :combined:processReleaseResources
+> Task :combined:processReleaseManifestForPackage
 > Task :combined:compressReleaseAssets
+> Task :combined:processReleaseResources
 
 > Task :combined:compileReleaseJavaWithJavac
 Note: /home/runner/work/Darkroom-timer/Darkroom-timer/combined/src/main/java/it/darkroom/assistant/AssistantActivityV2.java uses or overrides a deprecated API.
@@ -701,7 +701,7 @@ mdc_combinations=14504
 mdc_dilutions_preserved=776
 rollei_supergrain_complete=PASS
 fomadon_excel_runtime_profile=PASS
-bab4699ce3a064d90384eb252f84f54e901cd91d64bd50cb2dd286391116e6a2  Darkroom-v0.3.3.apk
+f564f52e3fa751ab9839d299cf03d22bdc913f03129e37ea98aad9db0023d477  Darkroom-v0.3.3.apk
 technical_it_schema=v034
 developer_profiles_with_it=79
 auxiliary_chemical_profiles=4
@@ -745,13 +745,13 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:generateReleaseAssets UP-TO-DATE
 > Task :combined:mergeReleaseAssets
 > Task :combined:extractReleaseVersionControlInfo UP-TO-DATE
+> Task :combined:processReleaseManifestForPackage
 > Task :combined:extractProguardFiles UP-TO-DATE
 > Task :combined:processReleaseJavaRes NO-SOURCE
 > Task :combined:mergeReleaseJavaResource UP-TO-DATE
 > Task :combined:collectReleaseDependencies UP-TO-DATE
 > Task :combined:sdkReleaseDependencyData UP-TO-DATE
 > Task :combined:validateSigningRelease UP-TO-DATE
-> Task :combined:processReleaseManifestForPackage
 > Task :combined:writeReleaseAppMetadata UP-TO-DATE
 > Task :combined:writeReleaseSigningConfigVersions UP-TO-DATE
 > Task :combined:compressReleaseAssets
@@ -799,7 +799,7 @@ single_card_mdc_plus_technical=PASS
 original_technical_text_preserved=PASS
 timer_splitgrade_sonoff_preserved=PASS
 personal_data_migration=NO_DESTRUCTIVE_RESET
-8716fa744077bebab919aa760c59430f148f82eac21107729e796d3d75b6211a  Darkroom-v0.3.4.apk
+5316423944cb1e541722284da2e40c90eb42c42d176bf3ea48a82de301e0b56e  Darkroom-v0.3.4.apk
 technical_it_schema=v035_strict
 developer_profiles_total=232
 developer_profiles_manufacturer_sourced=85
@@ -885,7 +885,7 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 5s
+BUILD SUCCESSFUL in 6s
 43 actionable tasks: 18 executed, 25 up-to-date
 release=Darkroom-v0.3.5
 versionName=0.3.5
@@ -907,5 +907,5 @@ mdc_developers_unchanged=232
 mdc_dilutions_unchanged=776
 timer_splitgrade_sonoff_preserved=PASS
 personal_data_migration=NO_DESTRUCTIVE_RESET
-a89b76e84e7986adf6938b151602dcb54de48d1e3af3dcefc6e6acdc0c76b07b  Darkroom-v0.3.5.apk
-Bad Italian preparation ilfotec dd: Diluire ILFOTEC DD Developer 1+4 e usare con ILFOTEC DD Starter seguendo le istruzioni del processo con reintegro.
+e4b8435a47d68e0ea4f1d5a6bc9467294bdecec9aa2cfaac282f93fa666b46ba  Darkroom-v0.3.5.apk
+Bad Italian preparation tmax rs: Preparare la soluzione alla concentrazione di lavoro secondo il formato della confezione. Kodak indica che T-MAX RS Developer and Replenisher produce una soluzione di lavoro utilizzata anche come reintegratore.
