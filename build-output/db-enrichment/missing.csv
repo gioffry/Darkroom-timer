@@ -34,8 +34,8 @@ Bellini DF2 Duo Step,Bellini Foto S.r.l.,"physical_state,preparation,reuse_mode,
 Bellini Euro HC,Bellini Foto S.r.l.,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Bellini FX6a Monobath,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",15,15
 Bellini Hydrofen,Bellini Foto S.r.l.,"preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",111,56
-Bergger Superfine,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",20,16
-Berspeed,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",56,26
+Bergger Superfine,BERGGER,"reuse_mode,shelf_life_unopened,shelf_life_stock,shelf_life_working",20,16
+Berspeed,BERGGER,"reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_working",56,26
 Beutler,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",33,30
 Beutler-Pyro,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,5
 Black/White & Green,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",57,49
@@ -92,7 +92,7 @@ F76+,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_li
 FA-1027,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",46,23
 FD10,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",89,49
 FF No 1 Monobath,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
-Finol,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",43,33
+Finol,Moersch Photochemie,"preparation,reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",43,33
 Foma Retro Special,FOMA BOHEMIA,"shelf_life_unopened,shelf_life_opened,shelf_life_stock",7,6
 Foma Universal,FOMA BOHEMIA,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",16,15
 Foma W-17 Hydrofen,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",18,11
@@ -142,8 +142,8 @@ Microdol-X,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,sh
 Microphen,HARMAN technology / ILFORD,shelf_life_opened,361,112
 Mikratol-2,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",20,7
 Mocon,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",15,15
-Moersch eco,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",8,8
-MZB,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",4,4
+Moersch eco,Moersch Photochemie,"shelf_life_opened,shelf_life_stock",8,8
+MZB,Moersch Photochemie,"preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",4,4
 Nanodol,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,1
 Neofin Blue,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",78,46
 Neopress HC,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",107,24
@@ -158,7 +158,7 @@ PC-Glycol,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,she
 PC-TEA,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",39,28
 PCK,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Perceptol,HARMAN technology / ILFORD,shelf_life_opened,205,80
-PMK,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",128,64
+PMK,BERGGER,"reuse_mode,shelf_life_opened,shelf_life_stock",128,64
 POTA,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",10,7
 PQ Universal,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",19,18
 Prescysol,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
@@ -193,7 +193,7 @@ Silvermax,ADOX Fotowerke GmbH,"physical_state,preparation,shelf_life_stock",38,2
 SP-76EC,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",22,12
 SP-Ultra 4LF,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",10,10
 SPD,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",44,17
-Sprint Standard,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",73,61
+Sprint Standard,Sprint Systems of Photography,"shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",73,61
 Spur Dokuspeed SL,SPUR Photochemie Dr. Heidrich und Schain GbR,"preparation,shelf_life_opened,shelf_life_stock",7,1
 Spur Dokuspeed SL-N,SPUR Photochemie Dr. Heidrich und Schain GbR,"preparation,shelf_life_opened,shelf_life_stock",6,1
 Spur HRX,SPUR Photochemie Dr. Heidrich und Schain GbR,"reuse_mode,shelf_life_opened,shelf_life_stock,shelf_life_working",53,46
@@ -210,10 +210,10 @@ Spur Speed-Major,SPUR Photochemie Dr. Heidrich und Schain GbR,"physical_state,pr
 Spur TRX 2000,SPUR Photochemie Dr. Heidrich und Schain GbR,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",66,47
 Spur UFP,SPUR Photochemie Dr. Heidrich und Schain GbR,"preparation,reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",33,33
 Stoeckler,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,1
-Studional,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",97,53
+Studional,BERGGER,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",97,53
 Suprol,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",31,29
-Tanol,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",75,47
-Tanol Speed,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",10,10
+Tanol,Moersch Photochemie,"reuse_mode,shelf_life_opened,shelf_life_stock,shelf_life_working",75,47
+Tanol Speed,Moersch Photochemie,"reuse_mode,shelf_life_opened,shelf_life_stock",10,10
 TD-3,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",3,2
 TFX-2,,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,5
 TMax Dev,Kodak Alaris,"shelf_life_opened,shelf_life_stock",333,104
