@@ -30,7 +30,7 @@ s=s.replace('versionCode 19','versionCode 20')
 s=s.replace('versionCode=19','versionCode=20')
 Path('/tmp/build_v029_generated.sh').write_text(s,encoding='utf-8')
 PY
-bash /tmp/build_v029_generated.sh
+bash -x /tmp/build_v029_generated.sh
 
 python3 combined/validate_v029_catalog.py
 
