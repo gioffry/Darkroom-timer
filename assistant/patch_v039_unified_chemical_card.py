@@ -66,7 +66,7 @@ replacement = r'''    private void startProductAddFlow(Product p) {
     }
 
     private void askOpeningDate'''
-s, n = pattern.subn(replacement, s, count=1)
+s, n = pattern.subn(lambda _m: replacement, s, count=1)
 if n != 1:
     raise SystemExit('startProductAddFlow replacement failed')
 
@@ -151,7 +151,7 @@ replacement = r'''    private void showProductDetails(String name) {
     }
 
     private void showEditProductDialog'''
-s, n = pattern.subn(replacement, s, count=1)
+s, n = pattern.subn(lambda _m: replacement, s, count=1)
 if n != 1:
     raise SystemExit('showProductDetails replacement failed')
 
@@ -282,7 +282,7 @@ replacement = r'''    private void showDevelopmentResult(DevTimeEngine.Result re
     }
 
     private void renderFilmCapacity'''
-s, n = pattern.subn(replacement, s, count=1)
+s, n = pattern.subn(lambda _m: replacement, s, count=1)
 if n != 1:
     raise SystemExit('showDevelopmentResult unified-card replacement failed')
 
