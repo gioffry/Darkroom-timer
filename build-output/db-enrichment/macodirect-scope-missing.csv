@@ -10,13 +10,13 @@ Ecoprint Universal,MACO ecoprint universal developer,sold_out,NO,"reuse_mode,at_
 Ilford Multigrade,Ilford Multigrade developer,available,YES,,5,5,https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/
 PQ Universal,Ilford PQ Universal,available,YES,,19,18,https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/
 PMK,Bergger P.M.K. liquide universal developer,sold_out,YES,,128,64,https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/
-Rollei Supergrain,Rollei Supergrain,available,NO,"preparation,reuse_mode,at_least_one_shelf_life",45,33,https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/
+Rollei Supergrain,Rollei Supergrain,available,NO,"reuse_mode,at_least_one_shelf_life",45,33,https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/
 Spur HRX,Spur HRX film developer,sold_out,NO,reuse_mode,53,46,https://www.macodirect.de/en/spur/
 Spur SD 2525,SPUR SD 2525 film developer,sold_out,NO,"reuse_mode,capacity_text",31,28,https://www.macodirect.de/en/spur/
-Spur SLD,Spur SLD Professional film developer,sold_out,NO,"physical_state,preparation,reuse_mode,capacity_text,at_least_one_shelf_life",128,46,https://www.macodirect.de/en/spur/
-Spur Speed-Major,Spur Speed-Major film developer,sold_out,NO,"physical_state,preparation,reuse_mode,capacity_text,at_least_one_shelf_life",184,32,https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/5786/spur-speed-major-film-developer-250ml
+Spur SLD,Spur SLD Professional film developer,sold_out,NO,"reuse_mode,at_least_one_shelf_life",128,46,https://www.macodirect.de/en/spur/
+Spur Speed-Major,Spur Speed-Major film developer,sold_out,NO,"reuse_mode,capacity_text,at_least_one_shelf_life",184,32,https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/5786/spur-speed-major-film-developer-250ml
 Spur Dokuspeed SL-N,Spur Dokuspeed SL-N,sold_out,YES,,6,1,https://www.macodirect.de/en/spur/
-Spur Nanotech UR,Spur Nanotech UR,current_listing,NO,"preparation,reuse_mode,capacity_text,at_least_one_shelf_life",12,2,https://www.macodirect.de/en/spur/
-Spur TRX 2000,Spur TRX 2000,current_listing,NO,"physical_state,preparation,reuse_mode,capacity_text,at_least_one_shelf_life",66,47,https://www.macodirect.de/en/spur/
+Spur Nanotech UR,Spur Nanotech UR,current_listing,YES,,12,2,https://www.macodirect.de/en/spur/
+Spur TRX 2000,Spur TRX 2000,current_listing,NO,"reuse_mode,capacity_text,at_least_one_shelf_life",66,47,https://www.macodirect.de/en/spur/
 Spur SHADOWmax,Spur SHADOWmax,current_listing,NO,"reuse_mode,capacity_text,at_least_one_shelf_life",67,14,https://www.macodirect.de/en/spur/
 Spur Omega X,Spur Omega X,current_listing,NO,"reuse_mode,capacity_text",6,6,https://www.macodirect.de/en/spur/

@@ -178,7 +178,7 @@ Rollei RLC Low Contrast,Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS,NO,"reu
 Rollei RLS Low Speed,Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",48,34
 Rollei RPX-D,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",13,8
 Rollei RSL Superlith,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
-Rollei Supergrain,Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS,NO,"preparation,reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",45,33
+Rollei Supergrain,Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",45,33
 Rollo Pyro,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",9,6
 Romek PQ7,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",13,10
 Romek PQ9,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
@@ -199,15 +199,15 @@ Spur Dokuspeed SL-N,SPUR Photochemie Dr. Heidrich und Schain GbR,YES,"shelf_life
 Spur HRX,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,shelf_life_opened,shelf_life_stock,shelf_life_working",53,46
 Spur Modular UR,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Spur Nanospeed,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
-Spur Nanotech UR,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",12,2
+Spur Nanotech UR,SPUR Photochemie Dr. Heidrich und Schain GbR,YES,"shelf_life_unopened,shelf_life_opened,shelf_life_stock",12,2
 Spur NHC,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",49,18
 Spur Omega X,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,capacity_text,shelf_life_opened,shelf_life_stock",6,6
 Spur PXD,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",13,9
 Spur SD 2525,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,capacity_text,shelf_life_opened,shelf_life_stock,shelf_life_working",31,28
 Spur SHADOWmax,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",67,14
-Spur SLD,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",128,46
-Spur Speed-Major,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",184,32
-Spur TRX 2000,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",66,47
+Spur SLD,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",128,46
+Spur Speed-Major,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",184,32
+Spur TRX 2000,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",66,47
 Spur UFP,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",33,33
 Stoeckler,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,1
 Studional,BERGGER,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",97,53
