@@ -20,8 +20,8 @@ Agfa Ansco 48M,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_
 Agfa Ansco 72,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Amaloco AM74,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",83,41
 Arista Liquid,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",94,32
-Arista Premium,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",28,28
 Arista® 76 Powder,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,3
+Arista® Premium,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",28,28
 Arista® Premium Liquid,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Arista® Premium Powder,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",4,2
 Ars-Imago FD,ars-imago,YES,"shelf_life_unopened,shelf_life_stock,shelf_life_working",78,33
@@ -30,7 +30,7 @@ Ars-Imago Monobath,ars-imago,YES,shelf_life_stock,3,3
 Atomal 49,ADOX Fotowerke GmbH,YES,"shelf_life_opened,shelf_life_working",132,64
 AVR-3,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",17,9
 Bellini B&W Ecofilm,Bellini Foto S.r.l.,NO,"reuse_mode,capacity_text,shelf_life_stock",4,4
-Bellini DF2 Duo Step,Bellini Foto S.r.l.,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",104,69
+Bellini DF2 Duo Step,Bellini Foto S.r.l.,NO,"capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",104,69
 Bellini Euro HC,Bellini Foto S.r.l.,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Bellini FX6a Monobath,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",15,15
 Bellini Hydrofen,Bellini Foto S.r.l.,NO,"reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",111,56
@@ -122,7 +122,7 @@ Hypercat,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,s
 ID-11,HARMAN technology / ILFORD,YES,,764,212
 ID-62,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 ID-68,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",6,5
-Ilford Multigrade,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,5
+Ilford Multigrade,HARMAN technology / ILFORD,YES,shelf_life_stock,5,5
 Ilfosol 3,HARMAN technology / ILFORD,YES,shelf_life_stock,308,116
 Ilfotec DD,HARMAN technology / ILFORD,YES,shelf_life_stock,145,42
 Ilfotec DD-X,HARMAN technology / ILFORD,YES,"shelf_life_unopened,shelf_life_stock,shelf_life_working",339,109
@@ -158,9 +158,9 @@ PC-Glycol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,
 PC-TEA,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",39,28
 PCK,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Perceptol,HARMAN technology / ILFORD,YES,,205,80
-PMK,BERGGER,NO,"reuse_mode,shelf_life_stock",128,64
+PMK,BERGGER,YES,shelf_life_stock,128,64
 POTA,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",10,7
-PQ Universal,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",19,18
+PQ Universal,HARMAN technology / ILFORD,YES,shelf_life_stock,19,18
 Prescysol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Prescysol EF,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",3,3
 Promicrol,Champion Photochemistry International Ltd,YES,"shelf_life_opened,shelf_life_stock",192,48
@@ -195,7 +195,7 @@ SP-Ultra 4LF,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_te
 SPD,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",44,17
 Sprint Standard,Sprint Systems of Photography,NO,"shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",73,61
 Spur Dokuspeed SL,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"preparation,shelf_life_opened,shelf_life_stock",7,1
-Spur Dokuspeed SL-N,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"preparation,shelf_life_opened,shelf_life_stock",6,1
+Spur Dokuspeed SL-N,SPUR Photochemie Dr. Heidrich und Schain GbR,YES,"shelf_life_opened,shelf_life_stock",6,1
 Spur HRX,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,shelf_life_opened,shelf_life_stock,shelf_life_working",53,46
 Spur Modular UR,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Spur Nanospeed,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
