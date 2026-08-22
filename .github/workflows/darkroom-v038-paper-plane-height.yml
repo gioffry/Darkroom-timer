@@ -91,7 +91,7 @@ jobs:
             validation-v038-bundled-db.txt
 
       - name: Publish build metadata
-        if: always()
+        if: always() && github.event_name != 'pull_request'
         run: |
           set -euo pipefail
           mkdir -p build-output/v038
