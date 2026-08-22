@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MDC_FIRST_MANUFACTURER_FILL_ONLY",
+  "scope": "MACODIRECT_CURRENT_ONLY",
+  "checkedAt": "2026-08-22",
+  "records": [
+    {
+      "matchNames": ["Rollei Supergrain"],
+      "manufacturer": "Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS",
+      "productName": "ROLLEI SUPERGRAIN",
+      "reuseMode": "fresh_working_solution_recommended",
+      "reuseInstructions": "Rollei's current product FAQ states that developers are sensitive to oxidation and lose activity with reuse; fresh working solution is generally the more reliable choice. No Supergrain-specific replenishment procedure is published in the manufacturer data sheet.",
+      "shelfLifeUnopened": "Rollei's current chemistry FAQ on the Supergrain product page gives general manufacturer guidance: unopened concentrates usually keep about 1–2 years when stored cool and dark. This is general Rollei chemistry guidance, not a Supergrain-specific guaranteed shelf-life figure.",
+      "storageNotes": "Store airtight, cool and away from light; minimize air exposure after opening. The Supergrain manufacturer data sheet documents 1+9, 1+12 and 1+15 working dilutions.",
+      "sourceTitle": "Rollei Supergrain product page and official SUPERGRAIN data sheet",
+      "sourceUrl": "https://shop.rolleianalog.com/en/products/rollei-supergrain",
+      "sourceDate": "current"
+    }
+  ]
+}
