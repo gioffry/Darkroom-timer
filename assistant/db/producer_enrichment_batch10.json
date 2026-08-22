@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MDC_FIRST_MANUFACTURER_FILL_ONLY",
+  "checkedAt": "2026-08-22",
+  "records": [
+    {
+      "matchNames": ["D-76"],
+      "manufacturer": "Kodak Alaris",
+      "productName": "KODAK PROFESSIONAL D-76 Developer",
+      "reuseMode": "stock_reusable_or_replenished_1+1_one_shot",
+      "reuseInstructions": "Full-strength D-76 may be reused with time compensation: Kodak specifies increasing development time by 15% after every four rolls per US gallon processed. It can also be replenished with D-76R. D-76 diluted 1+1 must be mixed just before use and discarded after one batch; do not reuse or replenish 1+1.",
+      "sourceTitle": "KODAK Developer D-76 Technical Data J-78",
+      "sourceUrl": "https://business.kodakmoments.com/sites/prod/files/files/resources/j78.pdf",
+      "sourceDate": "Kodak technical publication"
+    },
+    {
+      "matchNames": ["Fomadon R09"],
+      "manufacturer": "FOMA BOHEMIA spol. s r.o.",
+      "productName": "FOMADON R09",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute the concentrate with water immediately before use; the FOMA technical sheet documents 1+25 and 1+50 as recommended working dilutions.",
+      "reuseMode": "one_shot",
+      "reuseInstructions": "FOMA explicitly describes R09 as a one-shot developer. Prepare the diluted solution immediately before use and discard it after processing.",
+      "shelfLifeOpened": "Concentrate remains usable for at least 6 months after opening when the screw top is tightly closed.",
+      "shelfLifeWorking": "Diluted working solution has only a short keeping time and should be mixed immediately before use.",
+      "storageNotes": "Keep concentrate in the closed package before dilution to limit oxidation; normal storage temperature 10-25 C.",
+      "sourceTitle": "FOMADON R09 manufacturer technical data 8-1/A/01-08",
+      "sourceUrl": "https://www.arnaudlemorillon.com/media/pdf/Fomadon_R09.pdf",
+      "sourceDate": "FOMA technical sheet 01-08"
+    },
+    {
+      "matchNames": ["Promicrol"],
+      "manufacturer": "Champion Photochemistry International Ltd",
+      "productName": "B&W PROMICROL Fine Grain Film Developer",
+      "capacityText": "In replenished 1+9 use, replenish at 300 ml per square metre of processed film: 17 ml per 135-36, 15 ml per 120, 30 ml per 220, 4 ml per 4x5 sheet and 16 ml per 8x10 sheet. One-shot use is at 1+14.",
+      "sourceTitle": "Champion B&W PROMICROL Fine Grain Film Developer Technical Data Sheet",
+      "sourceUrl": "https://manuals.sterremuur.nl/Photo/filmdevelopers/Promicrol%20tds.pdf",
+      "sourceDate": "2003-04"
+    },
+    {
+      "matchNames": ["Adotech III"],
+      "manufacturer": "ADOX Fotowerke GmbH",
+      "productName": "ADOX ADOTECH III",
+      "physicalState": "liquid concentrate",
+      "preparation": "Prepare 500 ml working solution from 50 ml concentrate and water, dilution 1+9.",
+      "reuseMode": "two_roll_sequential_reuse",
+      "reuseInstructions": "A 500 ml working solution may process two 35mm or two 120 films one after another. Increase development time by 10-15% for the second roll.",
+      "capacityText": "500 ml working solution processes two 35mm or 120 films sequentially; the 100 ml concentrate bottle therefore processes four films total.",
+      "shelfLifeWorking": "Working solution stored in a completely filled air-free glass bottle keeps for 4 weeks.",
+      "storageNotes": "ADOX recommends protective gas or squeezing the concentrate bottle so no air remains after partial use.",
+      "sourceTitle": "ADOX CMS 20 and ADOTECH III Processing Instructions",
+      "sourceUrl": "https://www.adox.de/Technical_Informations/CMS20_ADOTECHIII_instructions.pdf",
+      "sourceDate": "2014"
+    },
+    {
+      "matchNames": ["Adotech IV"],
+      "manufacturer": "ADOX Fotowerke GmbH",
+      "productName": "ADOX ADOTECH IV",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute concentrate 1+14 with water for use with ADOX CMS 20 II.",
+      "reuseMode": "one_shot",
+      "reuseInstructions": "ADOX describes ADOTECH IV as an easy-to-use one-shot developer.",
+      "capacityText": "100 ml concentrate makes about 1500 ml working solution and is sufficient for up to six 35mm or 120 films.",
+      "shelfLifeWorking": "Diluted ADOTECH IV keeps up to 14 days in completely filled bottles; refrigeration can extend working-solution life.",
+      "storageNotes": "Do not refrigerate the concentrate because precipitation may occur; do not store concentrate below about 11-13 C.",
+      "sourceTitle": "ADOX ADOTECH IV / CMS 20 II manufacturer data sheet",
+      "sourceUrl": "https://www.adox.de/adox-chemie/adox-filmentwickler/adotech-ii/",
+      "sourceDate": "current manufacturer page + data sheet"
+    },
+    {
+      "matchNames": ["Microdol-X"],
+      "manufacturer": "Eastman Kodak Company",
+      "productName": "KODAK MICRODOL-X Developer",
+      "physicalState": "powder developer; Kodak also supplied a liquid form",
+      "preparation": "Use the prepared stock solution full strength, or dilute stock 1+3 immediately before processing. Kodak instructs that 1+3 is prepared just before use and discarded after that batch.",
+      "sourceTitle": "KODAK MICRODOL-X Developer Technical Data J-4027 and Kodak B&W Darkroom Dataguide AJ-3",
+      "sourceUrl": "https://business.kodakmoments.com/sites/default/files/files/resources/j4027.pdf",
+      "sourceDate": "2003-11"
+    }
+  ]
+}
