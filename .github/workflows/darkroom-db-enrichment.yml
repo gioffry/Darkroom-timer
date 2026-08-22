@@ -31,6 +31,7 @@ jobs:
           python3 assistant/db/enrich_developer_profiles.py
           python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch2.json
           python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch3.json
+          python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch4.json
 
       - name: Audit enriched database
         run: |
@@ -66,6 +67,7 @@ jobs:
             assistant/db/producer_enrichment.json
             assistant/db/producer_enrichment_batch2.json
             assistant/db/producer_enrichment_batch3.json
+            assistant/db/producer_enrichment_batch4.json
 
       - name: Publish audit metadata
         if: always()
