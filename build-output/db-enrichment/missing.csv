@@ -6,7 +6,7 @@ A&B Lith,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,s
 ABC Pyro,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 ACU-1,Acufine Chemicals,NO,"capacity_text,shelf_life_unopened,shelf_life_opened",36,23
 Acufine,Acufine Chemicals,NO,"shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",118,65
-Acurol-N,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_opened,shelf_life_stock,shelf_life_working",110,50
+Acurol-N,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,shelf_life_opened,shelf_life_stock,shelf_life_working",110,50
 Adotech III,ADOX Fotowerke GmbH,NO,"preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock",2,1
 Adotech IV,ADOX Fotowerke GmbH,NO,"preparation,reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",7,2
 Adox HR-DEV,ADOX Fotowerke GmbH,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",71,48
@@ -19,9 +19,9 @@ Agfa Ansco 47,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_t
 Agfa Ansco 48M,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Agfa Ansco 72,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Amaloco AM74,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",83,41
-Arista Liquid,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",94,32
 Arista Premium,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",28,28
 Arista® 76 Powder,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,3
+Arista® Liquid,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",94,32
 Arista® Premium Liquid,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Arista® Premium Powder,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",4,2
 Ars-Imago FD,ars-imago,YES,"shelf_life_unopened,shelf_life_stock,shelf_life_working",78,33
@@ -33,7 +33,7 @@ Bellini B&W Ecofilm,Bellini Foto S.r.l.,NO,"reuse_mode,capacity_text,shelf_life_
 Bellini DF2 Duo Step,Bellini Foto S.r.l.,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",104,69
 Bellini Euro HC,Bellini Foto S.r.l.,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Bellini FX6a Monobath,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",15,15
-Bellini Hydrofen,Bellini Foto S.r.l.,NO,"preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",111,56
+Bellini Hydrofen,Bellini Foto S.r.l.,NO,"reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",111,56
 Bergger Superfine,BERGGER,NO,"reuse_mode,shelf_life_unopened,shelf_life_stock,shelf_life_working",20,16
 Berspeed,BERGGER,NO,"reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_working",56,26
 Beutler,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",33,30
@@ -158,7 +158,7 @@ PC-Glycol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,
 PC-TEA,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",39,28
 PCK,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Perceptol,HARMAN technology / ILFORD,YES,,205,80
-PMK,BERGGER,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",128,64
+PMK,BERGGER,NO,"reuse_mode,shelf_life_stock",128,64
 POTA,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",10,7
 PQ Universal,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",19,18
 Prescysol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
@@ -208,7 +208,7 @@ Spur SHADOWmax,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,capac
 Spur SLD,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",128,46
 Spur Speed-Major,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",184,32
 Spur TRX 2000,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",66,47
-Spur UFP,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"preparation,reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",33,33
+Spur UFP,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",33,33
 Stoeckler,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,1
 Studional,BERGGER,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",97,53
 Suprol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",31,29
