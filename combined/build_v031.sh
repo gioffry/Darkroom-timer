@@ -72,7 +72,7 @@ ASSIST=combined/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
 STORE=combined/src/main/java/it/darkroom/assistant/FullCatalogStore.java
 MDC=combined/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
 CHEM=combined/src/main/java/it/darkroom/assistant/ChemistrySpecEngine.java
-MAINT=combined/src/main/java/it/darkroom/timer/MaintenanceActivity.java
+MAINT=combined/src/main/java/it/darkroom/timer/maintenance/UseMaintenanceActivity.java
 MAIN=combined/src/main/java/it/darkroom/timer/MainActivity.java
 
 grep -q 'ROLE_WETTING = 16' "$ASSIST"
