@@ -1,0 +1,48 @@
+# MDC keeps many canonical developer names without manufacturer prefixes (D-76, Xtol, ID-11...).
+# Add lookup/display metadata without changing those canonical MDC identities.
+p = ROOT / 'assistant/src/main/java/it/darkroom/assistant/FullCatalogStore.java'
+s = p.read_text(encoding='utf-8')
+s = s.replace('''        try(Cursor c=d.rawQuery("SELECT name FROM developers",null)){\n            while(c.moveToNext()) add(map,q,c.getString(0),"","MDC_OFFLINE_DEVELOPER");\n        }''', '''        try(Cursor c=d.rawQuery("SELECT name FROM developers",null)){\n            while(c.moveToNext()) {\n                String name=c.getString(0);\n                add(map,q,name,developerAliases(name),"MDC_OFFLINE_DEVELOPER|"+developerManufacturer(name));\n            }\n        }''', 1)
+# If a chemical isn't in the curated local catalog, expose the MDC developer as a proper FILM_DEVELOPER record.
+old = '''        }\n    }\n\n    static FilmInfo filmInfo(String name) {'''
+new = '''        }\n        String canonical = canonicalDeveloper(name);\n        if (canonical != null) {\n            return new Chemical(canonical, developerManufacturer(canonical),\n                    "FILM_DEVELOPER|CHEMISTRY", "",\n                    "https://www.digitaltruth.com/devchart.php", "MASSIVE_DEV_CHART",\n                    ROLE_FILM_DEV | ROLE_CHEMISTRY, false,\n                    MdcOfflineStore.dilutionsForDeveloper(canonical), new String[0], null);\n        }\n        return null;\n    }\n\n    static FilmInfo filmInfo(String name) {'''
+if old not in s: raise SystemExit('v029 FullCatalogStore chemical fallback marker missing')
+s = s.replace(old,new,1)
+marker = '''    private static void add(Map<String,Candidate> map,String q,String name,String aliases,String snippet){'''
+helpers = r'''    private static String developerAliases(String name) {
+        String n=norm(name); List<String> a=new ArrayList<>();
+        String m=developerManufacturer(name);
+        if (!m.isEmpty()) a.add(m + " " + name);
+        if (n.equals("d 76")) { a.add("Kodak D-76"); a.add("Kodak D76"); }
+        if (n.equals("xtol")) { a.add("Kodak XTOL"); a.add("Kodak Xtol"); }
+        if (n.equals("hc 110")) { a.add("Kodak HC-110"); a.add("Kodak HC110"); }
+        if (n.equals("tmax dev")) { a.add("Kodak T-Max Developer"); a.add("Kodak TMax Developer"); }
+        if (n.equals("tmax rs")) { a.add("Kodak T-Max RS"); }
+        if (n.equals("id 11")) { a.add("Ilford ID-11"); a.add("Ilford ID11"); }
+        if (n.equals("ilfotec dd x")) { a.add("Ilford DD-X"); a.add("Ilford DDX"); }
+        if (n.equals("rodinal")) { a.add("Adox Rodinal"); a.add("Adonal"); a.add("Agfa Rodinal"); }
+        return String.join("|", a);
+    }
+
+    private static String developerManufacturer(String name) {
+        String n=norm(name);
+        if (n.startsWith("foma ") || n.startsWith("fomadon ")) return "FOMA";
+        if (n.startsWith("ilford ") || n.startsWith("ilfo") || n.equals("id 11") ||
+                n.equals("microphen") || n.equals("perceptol")) return "ILFORD";
+        if (n.equals("d 76") || n.equals("d 76d") || n.equals("hc 110") || n.equals("xtol") ||
+                n.startsWith("tmax ") || n.equals("d 96") || n.equals("d 97")) return "KODAK";
+        if (n.equals("rodinal") || n.equals("adonal") || n.startsWith("adox ") || n.startsWith("adotech ")) return "ADOX";
+        if (n.startsWith("rollei ")) return "ROLLEI";
+        if (n.startsWith("bellini ")) return "BELLINI";
+        if (n.startsWith("bergger ")) return "BERGGER";
+        if (n.startsWith("tetenal ") || n.equals("ultrafin") || n.startsWith("ultrafin ")) return "TETENAL";
+        if (n.startsWith("fuji ")) return "FUJIFILM";
+        if (n.startsWith("ars imago ")) return "ARS-IMAGO";
+        return "";
+    }
+
+'''
+if marker not in s: raise SystemExit('v029 FullCatalogStore add marker missing')
+s = s.replace(marker, helpers + marker, 1)
+p.write_text(s, encoding='utf-8')
+print('v029 MDC manufacturer aliases added')
