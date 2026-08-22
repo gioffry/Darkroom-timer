@@ -25,9 +25,12 @@ PY
 python3 - <<'PY'
 from pathlib import Path
 s=Path('combined/build_v030.sh').read_text(encoding='utf-8')
-for marker in ['Darkroom v0.3.0','Darkroom-v0.3.0','versionCode="21"']:
+for marker in ['Darkroom v0.3.0','Darkroom-v0.3.0','versionCode="21"',"s=s.replace('0.2.8','0.3.0')"]:
     if marker not in s:
         raise SystemExit('v0.3.1 source build marker missing: '+marker)
+# Critical nested target: build_v030 itself transforms build_v028 0.2.8 -> 0.3.0.
+# Advance that target too, otherwise the inner reconstruction still emits 0.3.0.
+s=s.replace("s=s.replace('0.2.8','0.3.0')", "s=s.replace('0.2.8','0.3.1')", 1)
 s=s.replace('Darkroom v0.3.0','Darkroom v0.3.1')
 s=s.replace('Darkroom-v0.3.0','Darkroom-v0.3.1')
 s=s.replace('versionName="0.3.0"','versionName="0.3.1"')
