@@ -20,8 +20,8 @@ Agfa Ansco 48M,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_
 Agfa Ansco 72,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Amaloco AM74,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",83,41
 Arista Liquid,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",94,32
+Arista Premium,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",28,28
 Arista® 76 Powder,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,3
-Arista® Premium,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",28,28
 Arista® Premium Liquid,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Arista® Premium Powder,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",4,2
 Ars-Imago FD,ars-imago,YES,"shelf_life_unopened,shelf_life_stock,shelf_life_working",78,33
@@ -29,9 +29,9 @@ Ars-Imago FE,ars-imago,YES,"shelf_life_unopened,shelf_life_stock,shelf_life_work
 Ars-Imago Monobath,ars-imago,YES,shelf_life_stock,3,3
 Atomal 49,ADOX Fotowerke GmbH,YES,"shelf_life_opened,shelf_life_working",132,64
 AVR-3,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",17,9
-Bellini B&W Ecofilm,Bellini Foto S.r.l.,NO,"reuse_mode,capacity_text,shelf_life_stock",4,4
+Bellini B&W Ecofilm,Bellini Foto S.r.l.,YES,shelf_life_stock,4,4
 Bellini DF2 Duo Step,Bellini Foto S.r.l.,NO,"capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",104,69
-Bellini Euro HC,Bellini Foto S.r.l.,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
+Bellini Euro HC,Bellini Foto S.r.l.,YES,shelf_life_stock,2,2
 Bellini FX6a Monobath,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",15,15
 Bellini Hydrofen,Bellini Foto S.r.l.,NO,"reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",111,56
 Bergger Superfine,BERGGER,NO,"reuse_mode,shelf_life_unopened,shelf_life_stock,shelf_life_working",20,16
@@ -72,7 +72,7 @@ D-96,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf
 D-97,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 D175,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 D2D,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
-Dektol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",27,19
+Dektol,Eastman Kodak Company / Kodak Professional,YES,"shelf_life_unopened,shelf_life_opened",27,19
 Diafine,Acufine Chemicals,NO,"capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",107,72
 DiXactol Ultra,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",7,7
 DK-50,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",39,26
@@ -82,7 +82,7 @@ DK-76b,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,she
 Dokumol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",3,2
 DS-10,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",3,3
 Eco Pro,EcoPro / LegacyPro,NO,"reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_working",932,144
-Ecoprint Universal,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",8,8
+Ecoprint Universal,Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",8,8
 Emofin,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",52,38
 Eukobrom,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",3,2
 Exactol Lux,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
@@ -148,7 +148,7 @@ Nanodol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,sh
 Neofin Blue,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",78,46
 Neopress HC,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",107,24
 Neutol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
-Nucleol BF200,Bellini Foto S.r.l. / Chimifoto Ornano,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",85,38
+Nucleol BF200,Bellini Foto S.r.l. / Chimifoto Ornano,NO,"reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",85,38
 Obsidian Aqua,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Ornano Gradual ST20,Bellini Foto S.r.l. / Chimifoto Ornano,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",74,34
 Paranol S,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",85,45
