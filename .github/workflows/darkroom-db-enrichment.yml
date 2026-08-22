@@ -29,6 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 assistant/db/enrich_developer_profiles.py
+          python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch2.json
 
       - name: Audit enriched database
         run: |
@@ -62,6 +63,7 @@ jobs:
             developer-db-missing.csv
             developer-db-summary.txt
             assistant/db/producer_enrichment.json
+            assistant/db/producer_enrichment_batch2.json
 
       - name: Publish audit metadata
         if: always()
