@@ -1,0 +1,16 @@
+developer_db_runtime=PASS
+hierarchy=MDC_FIRST_MANUFACTURER_FILL_ONLY
+profiles=232
+combinations=14504
+mdc_dilutions=776
+rollei_supergrain=PASS
+fomadon_excel_runtime=PASS
+catalog_cache_refresh=v033_schema4
+personal_data_migration=NO_DESTRUCTIVE_RESET
+versionName=0.3.3
+versionCode=24
+base_version=0.3.2
+rollei_supergrain_only_final_scope=PASS
+other_macodirect_incomplete_left_unchanged=PASS
+runtime_profile_wiring=PASS
+sqlite_release_audit=PASS
