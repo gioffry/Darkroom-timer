@@ -1,0 +1,1 @@
+Trigger v0.3.6 after product-name validation fix.
