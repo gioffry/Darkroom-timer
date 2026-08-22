@@ -1,0 +1,114 @@
+name: Build Darkroom v0.3.1 Full Offline Catalog
+
+on:
+  push:
+    branches:
+      - feature-darkroom-v031-assistant-full-offline-catalog
+    paths-ignore:
+      - 'build-output/v031/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature-darkroom-v031-assistant-full-offline-catalog
+          fetch-depth: 0
+
+      - name: Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK 34
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Gradle 8.13
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 -o "$RUNNER_TEMP/gradle.zip" https://services.gradle.org/distributions/gradle-8.13-bin.zip
+          unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/gradle-8.13/bin" >> "$GITHUB_PATH"
+
+      - name: FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Prepare stable signing
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_B64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/darkroom-signing.p12"
+
+      - name: Build and validate v0.3.1
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/darkroom-signing.p12
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          cat combined/v015_assets/home_bottom_parts/00.part combined/v015_assets/home_bottom_parts/01.part combined/v015_assets/home_bottom_parts/02.part combined/v015_assets/home_bottom_parts/03.part > combined/v015_assets/home_bottom.jpg
+          set +e
+          bash combined/build_v031.sh 2>&1 | tee build-v031.log
+          BUILD_RC=${PIPESTATUS[0]}
+          set -e
+          if [ "$BUILD_RC" -ne 0 ]; then exit "$BUILD_RC"; fi
+          test -f Darkroom-v0.3.1.apk
+          test -f Darkroom-v0.3.1.sha256
+          cat validation-v031-catalog.txt
+
+      - name: Upload APK artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Darkroom-v0.3.1
+          if-no-files-found: error
+          path: |
+            Darkroom-v0.3.1.apk
+            Darkroom-v0.3.1.sha256
+            certificate-v015.txt
+            apk-badging-v015.txt
+            apk-badging-v031.txt
+            validation-v015.txt
+            validation-v031-catalog.txt
+            apk-listing-v031.txt
+
+      - name: Publish build metadata
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p build-output/v031
+          printf '%s\n' "$GITHUB_RUN_ID" > build-output/v031/run-id.txt
+          printf '%s\n' "${{ job.status }}" > build-output/v031/status.txt
+          if [ -f Darkroom-v0.3.1.sha256 ]; then cp Darkroom-v0.3.1.sha256 build-output/v031/Darkroom-v0.3.1.sha256; fi
+          if [ -f apk-badging-v031.txt ]; then cp apk-badging-v031.txt build-output/v031/apk-badging-v0.3.1.txt; fi
+          if [ -f validation-v031-catalog.txt ]; then cp validation-v031-catalog.txt build-output/v031/validation-v0.3.1.txt; fi
+          if [ "${{ job.status }}" != "success" ]; then
+            {
+              echo 'Darkroom v0.3.1 BUILD FAILED'
+              echo "commit=${GITHUB_SHA}"
+              echo '--- tail build-v031.log ---'
+              if [ -f build-v031.log ]; then tail -n 600 build-v031.log; else echo 'build-v031.log unavailable'; fi
+            } > build-output/v031/BUILD_FAILED.txt
+          else
+            rm -f build-output/v031/BUILD_FAILED.txt
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- build-output/v031
+          git commit -m "Record Darkroom v0.3.1 build metadata [skip ci]" || exit 0
+          git push origin HEAD:feature-darkroom-v031-assistant-full-offline-catalog
