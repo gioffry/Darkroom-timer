@@ -92,7 +92,7 @@ F76+,Clayton Chemical Company,NO,"physical_state,capacity_text,shelf_life_unopen
 FA-1027,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",46,23
 FD10,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",89,49
 FF No 1 Monobath,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
-Finol,Moersch Photochemie,NO,"preparation,reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",43,33
+Finol,Moersch Photochemie,YES,"shelf_life_unopened,shelf_life_opened,shelf_life_stock",43,33
 Foma Retro Special,FOMA BOHEMIA,YES,"shelf_life_opened,shelf_life_stock",7,6
 Foma Universal,FOMA BOHEMIA,YES,"shelf_life_opened,shelf_life_stock",16,15
 Foma W-17 Hydrofen,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",18,11
@@ -143,7 +143,7 @@ Microphen,HARMAN technology / ILFORD,YES,,361,112
 Mikratol-2,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",20,7
 Mocon,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",15,15
 Moersch eco,Moersch Photochemie,YES,"shelf_life_opened,shelf_life_stock",8,8
-MZB,Moersch Photochemie,NO,"preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",4,4
+MZB,Moersch Photochemie,YES,"shelf_life_unopened,shelf_life_opened,shelf_life_working",4,4
 Nanodol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,1
 Neofin Blue,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",78,46
 Neopress HC,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",107,24
@@ -212,8 +212,8 @@ Spur UFP,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,shelf_life_
 Stoeckler,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,1
 Studional,BERGGER,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",97,53
 Suprol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",31,29
-Tanol,Moersch Photochemie,NO,"reuse_mode,shelf_life_opened,shelf_life_stock,shelf_life_working",75,47
-Tanol Speed,Moersch Photochemie,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",10,10
+Tanol,Moersch Photochemie,YES,"shelf_life_opened,shelf_life_stock,shelf_life_working",75,47
+Tanol Speed,Moersch Photochemie,YES,"shelf_life_opened,shelf_life_stock",10,10
 TD-3,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",3,2
 TFX-2,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,5
 TMax Dev,Kodak Alaris,YES,"shelf_life_opened,shelf_life_stock",333,104
