@@ -29,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 assistant/db/enrich_developer_profiles.py
-          for batch in assistant/db/producer_enrichment_batch{2..11}.json; do
+          for batch in assistant/db/producer_enrichment_batch{2..12}.json; do
             python3 assistant/db/apply_manufacturer_batch.py "$batch"
           done
 
