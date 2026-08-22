@@ -93,14 +93,14 @@ FA-1027,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,sh
 FD10,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",89,49
 FF No 1 Monobath,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Finol,Moersch Photochemie,NO,"preparation,reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",43,33
-Foma Retro Special,FOMA BOHEMIA,YES,"shelf_life_unopened,shelf_life_opened,shelf_life_stock",7,6
-Foma Universal,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",16,15
+Foma Retro Special,FOMA BOHEMIA,YES,"shelf_life_opened,shelf_life_stock",7,6
+Foma Universal,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",16,15
 Foma W-17 Hydrofen,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",18,11
-Fomadon Excel,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",40,29
-Fomadon LQN,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",64,48
-Fomadon LQR,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",14,12
-Fomadon P,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",30,27
-Fomadon R09,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",84,46
+Fomadon Excel,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",40,29
+Fomadon LQN,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",64,48
+Fomadon LQR,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",14,12
+Fomadon P,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",30,27
+Fomadon R09,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",84,46
 FotoApteka A-RSC,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Fuji Microfine,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",26,14
 FX-1,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",13,13
@@ -109,7 +109,7 @@ FX-18,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shel
 FX-19,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",27,27
 FX-2,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",6,6
 FX-37,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",20,17
-FX-39,ADOX Fotowerke GmbH,NO,"preparation,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",110,71
+FX-39,ADOX Fotowerke GmbH,YES,"shelf_life_unopened,shelf_life_stock",110,71
 FX-4,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",4,4
 FX-5,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,5
 FX-55,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",29,25
@@ -119,14 +119,14 @@ GVB-194,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,sh
 HC-110,Kodak Alaris,YES,"shelf_life_unopened,shelf_life_opened",656,209
 Hubl Glycin Paste,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,5
 Hypercat,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",14,10
-ID-11,HARMAN technology / ILFORD,YES,shelf_life_opened,764,212
+ID-11,HARMAN technology / ILFORD,YES,,764,212
 ID-62,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 ID-68,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",6,5
 Ilford Multigrade,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,5
-Ilfosol 3,HARMAN technology / ILFORD,NO,"preparation,shelf_life_unopened,shelf_life_stock",308,116
+Ilfosol 3,HARMAN technology / ILFORD,YES,shelf_life_stock,308,116
 Ilfotec DD,HARMAN technology / ILFORD,NO,"capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",145,42
-Ilfotec DD-X,HARMAN technology / ILFORD,NO,"preparation,shelf_life_unopened,shelf_life_stock,shelf_life_working",339,109
-Ilfotec HC,HARMAN technology / ILFORD,NO,"preparation,shelf_life_working",198,80
+Ilfotec DD-X,HARMAN technology / ILFORD,YES,"shelf_life_unopened,shelf_life_stock,shelf_life_working",339,109
+Ilfotec HC,HARMAN technology / ILFORD,YES,shelf_life_working,198,80
 Ilfotec LC29,HARMAN technology / ILFORD,NO,"preparation,shelf_life_unopened,shelf_life_stock,shelf_life_working",249,81
 Ilfotec RT Rapid,HARMAN technology / ILFORD,YES,shelf_life_stock,5,3
 JOBO Alpha,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
@@ -139,7 +139,7 @@ Melonal,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,sh
 Meritol-Metol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Metolal,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Microdol-X,Eastman Kodak Company,NO,"physical_state,preparation,shelf_life_unopened,shelf_life_opened",144,62
-Microphen,HARMAN technology / ILFORD,YES,shelf_life_opened,361,112
+Microphen,HARMAN technology / ILFORD,YES,,361,112
 Mikratol-2,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",20,7
 Mocon,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",15,15
 Moersch eco,Moersch Photochemie,YES,"shelf_life_opened,shelf_life_stock",8,8
@@ -157,7 +157,7 @@ Parvofin,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,s
 PC-Glycol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,1
 PC-TEA,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",39,28
 PCK,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
-Perceptol,HARMAN technology / ILFORD,YES,shelf_life_opened,205,80
+Perceptol,HARMAN technology / ILFORD,YES,,205,80
 PMK,BERGGER,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",128,64
 POTA,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",10,7
 PQ Universal,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",19,18
@@ -170,7 +170,7 @@ Pyrocat-HD-M,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_te
 Pyrocat-HDC,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Pyrocat-M,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",13,12
 Pyrocat-MC,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
-Rodinal,ADOX Fotowerke,NO,"preparation,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",894,234
+Rodinal,ADOX Fotowerke,NO,"shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",894,234
 Rollei ATP DC,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Rollei D74,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",79,35
 Rollei RHS DC,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",8,7
@@ -189,7 +189,7 @@ Silberra Microl,Silberra,YES,"shelf_life_opened,shelf_life_stock",5,5
 Silberra Pyro-HD,Silberra,NO,"capacity_text,shelf_life_opened,shelf_life_stock",6,4
 Silberra RDN-LQ,Silberra,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",14,10
 Silberra S-76,Silberra,YES,"shelf_life_opened,shelf_life_stock",10,6
-Silvermax,ADOX Fotowerke GmbH,NO,"physical_state,preparation,shelf_life_stock",38,22
+Silvermax,ADOX Fotowerke GmbH,YES,shelf_life_stock,38,22
 SP-76EC,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",22,12
 SP-Ultra 4LF,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",10,10
 SPD,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",44,17
