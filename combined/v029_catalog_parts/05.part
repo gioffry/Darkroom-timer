@@ -1,0 +1,80 @@
+    private static String nz(String s){return s==null?"":s;}
+    private static String emptyToNull(String s){return s==null||s.trim().isEmpty()?null:s.trim();}
+}
+''', encoding='utf-8')
+
+# MdcOfflineStore: bump schema/name, expose DB, and resolve aliases before exact lookup.
+p = ROOT / 'assistant/src/main/java/it/darkroom/assistant/MdcOfflineStore.java'
+s = p.read_text(encoding='utf-8')
+s = s.replace('private static final int DB_VERSION = 2;', 'private static final int DB_VERSION = 3;', 1)
+s = s.replace('private static final String DB_NAME = "mdc_offline_v034.sqlite";', 'private static final String DB_NAME = "mdc_offline_darkroom_v029.sqlite";', 1)
+marker = '    static boolean isReady() {'
+if marker not in s: raise SystemExit('v029 MdcOfflineStore isReady marker missing')
+s = s.replace(marker, '''    static SQLiteDatabase database() {\n        if (helper == null) return null;\n        try { return helper.getReadableDatabase(); } catch (Throwable t) { return null; }\n    }\n\n''' + marker, 1)
+# readiness now also guarantees the unified local technical catalog exists.
+s = s.replace('scalar(db, "SELECT COUNT(*) FROM films") >= 150;', 'scalar(db, "SELECT COUNT(*) FROM films") >= 150 &&\n                scalar(db, "SELECT COUNT(*) FROM catalog_products") >= 20;', 1)
+# canonicalize developer in dilution lookup.
+s = s.replace('''    static String[] dilutionsForDeveloper(String developer) {\n        if (!isReady()) return new String[0];\n        LinkedHashSet<String> vals = new LinkedHashSet<>();''', '''    static String[] dilutionsForDeveloper(String developer) {\n        if (!isReady()) return new String[0];\n        String canonical = FullCatalogStore.canonicalDeveloper(developer);\n        if (canonical != null) developer = canonical;\n        LinkedHashSet<String> vals = new LinkedHashSet<>();''', 1)
+# canonicalize nominal ISO film.
+s = s.replace('''        String n = stripFormat(film);\n        SQLiteDatabase db = helper.getReadableDatabase();''', '''        String n = stripFormat(film);\n        String canonicalFilm = FullCatalogStore.canonicalFilm(n);\n        if (canonicalFilm != null) n = canonicalFilm;\n        SQLiteDatabase db = helper.getReadableDatabase();''', 1)
+# canonicalize formatsForFilm helper introduced by v035.
+s = s.replace('''        SQLiteDatabase db = helper.getReadableDatabase();\n        try (Cursor c = db.rawQuery(\n                "SELECT time35,time120 FROM times WHERE film_norm=?",\n                new String[]{norm(stripFormat(filmName))})) {''', '''        SQLiteDatabase db = helper.getReadableDatabase();\n        String wantedFilm = stripFormat(filmName);\n        String canonicalFilm = FullCatalogStore.canonicalFilm(wantedFilm);\n        if (canonicalFilm != null) wantedFilm = canonicalFilm;\n        try (Cursor c = db.rawQuery(\n                "SELECT time35,time120 FROM times WHERE film_norm=?",\n                new String[]{norm(wantedFilm)})) {''', 1)
+# canonicalize exact time lookup.
+s = s.replace('''        String fn = norm(stripFormat(filmName));\n        String dn = norm(developer);''', '''        String filmCanonical = FullCatalogStore.canonicalFilm(stripFormat(filmName));\n        String devCanonical = FullCatalogStore.canonicalDeveloper(developer);\n        String fn = norm(filmCanonical != null ? filmCanonical : stripFormat(filmName));\n        String dn = norm(devCanonical != null ? devCanonical : developer);''', 1)
+p.write_text(s, encoding='utf-8')
+
+# OnlineCatalogSearch: all runtime search remains local, but now smart/alias-aware and catalog-complete.
+p = ROOT / 'assistant/src/main/java/it/darkroom/assistant/OnlineCatalogSearch.java'
+s = p.read_text(encoding='utf-8')
+s, n = re.subn(r'''    static List<SearchResult> searchChemicals\(String query\) \{.*?\n    \}\n\n    static List<SearchResult> searchFilms\(String query\) \{.*?\n    \}''', '''    static List<SearchResult> searchChemicals(String query) {\n        return FullCatalogStore.searchFilmDevelopers(query, 80);\n    }\n\n    static List<SearchResult> searchFilms(String query) {\n        return FullCatalogStore.searchFilms(query, 100);\n    }''', s, count=1, flags=re.S)
+if n != 1: raise SystemExit('v029 OnlineCatalogSearch search methods replacement failed')
+start = s.find('    static ChemicalData enrichChemical(SearchResult r) {')
+end = s.find('    static FilmData enrichFilm(SearchResult r) {', start)
+if start < 0 or end < 0: raise SystemExit('v029 enrichChemical boundaries missing')
+chem = r'''    static ChemicalData enrichChemical(SearchResult r) {
+        if (r == null) return new ChemicalData("", 0, false, new String[0], new String[0], null, null, -1, "");
+        FullCatalogStore.Chemical local = FullCatalogStore.chemical(r.title);
+        if (local != null) {
+            return new ChemicalData(local.name, local.roles, local.stockPrep,
+                    local.filmDilutions, local.paperDilutions, local.workingDilution,
+                    null, -1, local.sourceUrl);
+        }
+        String canonical = FullCatalogStore.canonicalDeveloper(r.title);
+        if (canonical == null) canonical = r.title;
+        return new ChemicalData(canonical, ROLE_FILM_DEV, false,
+                MdcOfflineStore.dilutionsForDeveloper(canonical), new String[0],
+                null, null, -1, "");
+    }
+
+'''
+s = s[:start] + chem + s[end:]
+start = s.find('    static FilmData enrichFilm(SearchResult r) {')
+end_candidates = [s.find('\n    private static ', start+10), s.find('\n    static ', start+10)]
+end_candidates = [x for x in end_candidates if x > start]
+if not end_candidates: raise SystemExit('v029 enrichFilm end missing')
+end = min(end_candidates)
+film = r'''    static FilmData enrichFilm(SearchResult r) {
+        if (r == null) return new FilmData("", 0, null, "");
+        FullCatalogStore.FilmInfo local = FullCatalogStore.filmInfo(r.title);
+        int iso = local != null && local.iso > 0 ? local.iso : MdcOfflineStore.nominalIsoForFilm(r.title);
+        String src = local == null ? "" : local.sourceUrl;
+        return new FilmData(r.title, iso, null, src);
+    }
+'''
+s = s[:start] + film + s[end:]
+p.write_text(s, encoding='utf-8')
+
+# Activity: expose all required chemistry categories and use the unified local index.
+p = ROOT / 'assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java'
+s = p.read_text(encoding='utf-8')
+s = s.replace('''    private static final int ROLE_FIX = 8;''', '''    private static final int ROLE_FIX = 8;\n    private static final int ROLE_WETTING = 16;\n    private static final int ROLE_WASHING = 32;\n    private static final int ROLE_CHEMISTRY = 64;''', 1)
+old = '''        String[] typeLabels = new String[]{\n                "Rivelatore pellicola", "Rivelatore carta", "Arresto", "Fissaggio"\n        };\n        final int[] typeRoles = new int[]{ROLE_FILM_DEV, ROLE_PAPER_DEV, ROLE_STOP, ROLE_FIX};'''
+new = '''        String[] typeLabels = new String[]{\n                "Rivelatore pellicola", "Rivelatore carta", "Arresto", "Fissaggio",\n                "Imbibente", "Aiuto lavaggio", "Altra chimica"\n        };\n        final int[] typeRoles = new int[]{ROLE_FILM_DEV, ROLE_PAPER_DEV, ROLE_STOP, ROLE_FIX,\n                ROLE_WETTING, ROLE_WASHING, ROLE_CHEMISTRY};'''
+if old not in s: raise SystemExit('v029 add-product type labels marker missing')
+s = s.replace(old,new,1)
+# local role search from DB, preserving curated results as a fallback/operational overlay.
+pat = re.compile(r'''    private List<String> localProductMatchesForRole\(String q, int role\) \{.*?\n    \}''', re.S)
+rep = r'''    private List<String> localProductMatchesForRole(String q, int role) {
+        LinkedHashSet<String> out = new LinkedHashSet<>(FullCatalogStore.searchChemicalNames(q, role, 100));
+        String needle = q == null ? "" : q.toLowerCase(Locale.ROOT).trim();
+        for (Product p : curatedAuxChemistry) {
