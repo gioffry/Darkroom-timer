@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MDC_FIRST_MANUFACTURER_FILL_ONLY",
+  "checkedAt": "2026-08-22",
+  "records": [
+    {
+      "matchNames": ["Sprint Standard"],
+      "manufacturer": "Sprint Systems of Photography",
+      "productName": "SPRINT STANDARD Black & White Film Developer",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute concentrate 1+9 with water to make working solution.",
+      "reuseMode": "one_shot_default_or_replenished_for_bulk_processing",
+      "reuseInstructions": "Sprint's basic negative-processing directions use the developer once only. For larger quantities, Sprint also documents replenished processing.",
+      "capacityText": "1 litre concentrate makes 10 litres working solution, enough for at least 50 rolls of 35mm 36-exposure film; replenished solution from 1 litre concentrate is stated as enough for about 110 rolls.",
+      "sourceTitle": "Sprint Systems - How To Mix STANDARD Black & White Film Developer",
+      "sourceUrl": "https://www.sprintsystems.com/how-to-mix",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Bergger Superfine"],
+      "manufacturer": "BERGGER",
+      "productName": "BERGGER Superfine",
+      "physicalState": "liquid concentrate",
+      "preparation": "Shake the concentrate vigorously and prepare immediately before use by diluting 1+4 with water.",
+      "capacityText": "Use at least 250 ml working solution per film.",
+      "shelfLifeOpened": "Concentrated developer can be used for 9 months after opening.",
+      "sourceTitle": "BERGGER Superfine Data Sheet",
+      "sourceUrl": "https://bergger.com/en/index.php?controller=attachment&id_attachment=12",
+      "sourceDate": "2019-03"
+    },
+    {
+      "matchNames": ["PMK"],
+      "manufacturer": "BERGGER",
+      "productName": "BERGGER PMK",
+      "physicalState": "two-part liquid concentrate",
+      "preparation": "Mix Solution A and Solution B with water at standard dilution 1+2+100. The standard kits provide 250 ml A and 500 ml B and can make 25 litres working solution.",
+      "capacityText": "Up to 1000 square centimetres of film per litre working solution: 2 rolls 135-36, 2 rolls 120, 1 roll 220, 8 sheets 4x5 or 2 sheets 8x10.",
+      "shelfLifeOpened": "Both component solutions are stated to keep up to 10 years, even in half-filled bottles.",
+      "shelfLifeWorking": "Prepared working solution keeps for about one hour in open containers without affecting development quality.",
+      "sourceTitle": "BERGGER PMK Data Sheet",
+      "sourceUrl": "https://bergger.com/fr/index.php?controller=attachment&id_attachment=25",
+      "sourceDate": "2020-01"
+    },
+    {
+      "matchNames": ["Acurol-N"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR ACUROL-N",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute the concentrate with water according to the film and desired image characteristics; SPUR documents a broad dilution range, commonly 1+50 to 1+200.",
+      "capacityText": "At 1+50, 250 ml concentrate yields 50 film developments; at 1+100, 250 ml concentrate yields 100 film developments.",
+      "shelfLifeUnopened": "Sealed original bottle: at least 4-5 years. Do not refrigerate because of precipitation risk.",
+      "sourceTitle": "SPUR ACUROL-N Data Sheet and manufacturer technical article",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-Sheet-acurol-N-210428-eng.pdf",
+      "sourceDate": "2021-04"
+    },
+    {
+      "matchNames": ["Spur HRX"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR HRX",
+      "physicalState": "two-component liquid concentrate",
+      "preparation": "Mix Parts A and B in equal amounts to prepare the working solution, then dilute with water according to the development chart.",
+      "capacityText": "For one 35mm film, the manufacturer specifies approximately 8-10 ml minimum total concentrate; higher working-solution volume may be required at stronger dilutions.",
+      "shelfLifeUnopened": "Part A in unopened original bottle: at least 2.5 years when stored cool; Part B has virtually unlimited shelf life.",
+      "storageNotes": "After opening Part A, SPUR recommends protective gas. Part B does not require protective gas.",
+      "sourceTitle": "SPUR HRX Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-sheet-SPUR-HRX-28.0-4.21.pdf",
+      "sourceDate": "2021-04"
+    },
+    {
+      "matchNames": ["Spur SD 2525"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR SD 2525",
+      "physicalState": "two-component liquid concentrate",
+      "preparation": "Compound the working solution from Part A and Part B according to the dilution specified in the SPUR development chart; it is a two-component developer, not a two-bath process.",
+      "shelfLifeUnopened": "Part A unopened: approximately 2.5-3 years when stored relatively cool, but not below about 10-12 C. Part B has almost unlimited shelf life.",
+      "storageNotes": "SPUR recommends protective gas for opened Part A bottles to extend shelf life.",
+      "sourceTitle": "SPUR SD 2525 Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-Sheet-SPUR-SD-2525-28-04-15.pdf",
+      "sourceDate": "2015-04"
+    },
+    {
+      "matchNames": ["Spur Omega X"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR Omega X",
+      "physicalState": "two-component liquid concentrate",
+      "preparation": "Mix Part A and Part B in equal parts to make the working solution, then follow the film-specific development chart.",
+      "shelfLifeUnopened": "Part A unopened: at least 2 years when stored relatively cool, but not refrigerated. Part B has almost unlimited shelf life.",
+      "shelfLifeWorking": "Prepared working solution is not very durable and should be used within the next hours after preparation.",
+      "sourceTitle": "SPUR Omega X Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-sheet-SPUR-Omega-X.pdf",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Spur SHADOWmax"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR SHADOWmax",
+      "physicalState": "two-component liquid concentrate",
+      "preparation": "Use Part A at the film-specific dilution and add Part B in the X, Y, Z or 0 proportion defined by SPUR. For example, 1+14/Z in 500 ml uses about 33 ml Part A plus 50 ml Part B and water to 500 ml.",
+      "storageNotes": "SPUR recommends distilled water for the working solutions used with SHADOWmax.",
+      "sourceTitle": "SPUR SHADOWmax Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-sheet-SPUR-SHADOWmax-14.06.21.pdf",
+      "sourceDate": "2021-06"
+    },
+    {
+      "matchNames": ["Spur UFP"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR UFP Universal Developer",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute the concentrate according to the film-development chart; for paper the standard dilution is 1+20.",
+      "capacityText": "For film, 250 ml concentrate develops about 30 35mm or roll films on average. For paper at 1+20, one litre working solution develops about 40 18x24 cm RC prints.",
+      "sourceTitle": "SPUR UFP Universal Developer manufacturer information",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/value-professional-quality-spur-ufp-universal-developer-for-film-and-paper.pdf",
+      "sourceDate": "2014"
+    },
+    {
+      "matchNames": ["Bellini Hydrofen"],
+      "manufacturer": "Bellini Foto S.r.l.",
+      "productName": "Bellini HYDROFEN Film Developer",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute the concentrate 1+15 or 1+31 with water for amateur processing; the professional package documents 1+15.",
+      "sourceTitle": "Bellini Foto HYDROFEN Technical Data Sheet",
+      "sourceUrl": "https://www.bellinifoto.it/wp-content/uploads/2020/08/BWDROD.pdf",
+      "sourceDate": "2020"
+    },
+    {
+      "matchNames": ["Bellini Euro HC"],
+      "manufacturer": "Bellini Foto S.r.l.",
+      "productName": "Bellini EURO HC Film Developer",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute 1+31 with water.",
+      "capacityText": "A 500 ml bottle of concentrate makes 16 litres ready-to-use developer at dilution B (1+31).",
+      "sourceTitle": "Bellini Foto EURO HC Film Developer",
+      "sourceUrl": "https://www.bellinifoto.it/en/prodotto/euro-hc-film-developer/",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Bellini B&W Ecofilm"],
+      "manufacturer": "Bellini Foto S.r.l.",
+      "productName": "Bellini ECOFILM B&W Film Developer",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute concentrate 1+1 with water. A 500 ml bottle prepares 1 litre ready-to-use developer.",
+      "sourceTitle": "Bellini Foto ECOFILM Technical Data Sheet",
+      "sourceUrl": "https://www.bellinifoto.it/wp-content/uploads/2020/03/BWDECOFILM-1.pdf",
+      "sourceDate": "2020"
+    }
+  ]
+}
