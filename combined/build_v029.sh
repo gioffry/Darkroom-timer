@@ -48,6 +48,7 @@ grep -q 'assets/mdc_full.sqlite' apk-listing-v029.txt
 ASSIST=combined/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
 STORE=combined/src/main/java/it/darkroom/assistant/FullCatalogStore.java
 MDC=combined/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
+CHEM=combined/src/main/java/it/darkroom/assistant/ChemistrySpecEngine.java
 MAIN=combined/src/main/java/it/darkroom/timer/MainActivity.java
 
 grep -q 'ROLE_WETTING = 16' "$ASSIST"
@@ -56,10 +57,30 @@ grep -q 'FullCatalogStore.searchChemicalNames' "$ASSIST"
 grep -q 'Produttore:' "$ASSIST"
 grep -q 'Diluizione carta:' "$ASSIST"
 grep -q 'Unified OFFLINE catalog' "$STORE"
+grep -q 'Kodak D-76' "$STORE"
+grep -q 'Kodak XTOL' "$STORE"
+grep -q 'Ilford ID-11' "$STORE"
+grep -q 'Ilford DD-X' "$STORE"
+grep -q 'Adox Rodinal' "$STORE"
 grep -q 'mdc_offline_darkroom_v029.sqlite' "$MDC"
 grep -q 'private static final int DB_VERSION = 3;' "$MDC"
+grep -q 'catalogo completamente offline' "$CHEM"
 grep -q 'private static final String APP_VERSION = "0.13.11";' "$MAIN"
 grep -q 'sonoff_rounding_500ms=PASS' validation-v015.txt
+
+python3 - <<'PY'
+from pathlib import Path
+s=Path('combined/src/main/java/it/darkroom/assistant/ChemistrySpecEngine.java').read_text(encoding='utf-8')
+a=s.index('static Spec enrich(')
+b=s.index('private static final class Candidate',a)
+method=s[a:b]
+if 'searchCandidateUrls' in method or 'fetch(' in method or 'HttpURLConnection' in method:
+    raise SystemExit('v029: runtime web enrichment still reachable from ChemistrySpecEngine.enrich')
+store=Path('combined/src/main/java/it/darkroom/assistant/FullCatalogStore.java').read_text(encoding='utf-8')
+for marker in ['developerAliases','developerManufacturer','Kodak D-76','Kodak XTOL','Ilford ID-11','Ilford DD-X','Adox Rodinal']:
+    if marker not in store: raise SystemExit('v029 manufacturer alias missing: '+marker)
+print('v029 runtime-offline + manufacturer alias contract PASS')
+PY
 
 cat >> validation-v029-catalog.txt <<'EOF'
 versionName=0.2.9
@@ -68,6 +89,8 @@ timer_internal=0.13.11
 assistant_catalog_release=FULL_OFFLINE_V029
 fomatol_search_regression=PASS
 smart_search_min_chars=3
+manufacturer_aliases=PASS
+runtime_network_catalog_lookup=DISABLED
 personal_data_migration=NO_DESTRUCTIVE_RESET
 timer_regression=PASS
 sonoff_regression=PASS
