@@ -29,15 +29,9 @@ jobs:
         run: |
           set -euo pipefail
           python3 assistant/db/enrich_developer_profiles.py
-          python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch2.json
-          python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch3.json
-          python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch4.json
-          python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch5.json
-          python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch6.json
-          python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch7.json
-          python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch8.json
-          python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch9.json
-          python3 assistant/db/apply_manufacturer_batch.py assistant/db/producer_enrichment_batch10.json
+          for batch in assistant/db/producer_enrichment_batch{2..11}.json; do
+            python3 assistant/db/apply_manufacturer_batch.py "$batch"
+          done
 
       - name: Audit enriched database
         run: |
