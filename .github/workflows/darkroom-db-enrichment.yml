@@ -1,0 +1,80 @@
+name: Audit Darkroom Enriched Developer Database
+
+on:
+  push:
+    branches:
+      - feature-darkroom-db-enrichment-mdc-first
+    paths-ignore:
+      - 'build-output/db-enrichment/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature-darkroom-db-enrichment-mdc-first
+          fetch-depth: 0
+
+      - name: Build MDC base database
+        run: |
+          set -euo pipefail
+          python3 assistant/build_mdc_sqlite_asset_v032.py
+
+      - name: Enrich missing fields from manufacturers
+        run: |
+          set -euo pipefail
+          python3 assistant/db/enrich_developer_profiles.py
+
+      - name: Audit enriched database
+        run: |
+          set -euo pipefail
+          python3 assistant/db/audit_developer_profiles.py
+          cat developer-db-audit.txt
+
+      - name: Export database summary
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import sqlite3
+          db='assistant/src/main/assets/mdc_full.sqlite'
+          con=sqlite3.connect(db); cur=con.cursor()
+          with open('developer-db-summary.txt','w',encoding='utf-8') as f:
+              for row in cur.execute('''SELECT developer_name,COALESCE(manufacturer,''),COALESCE(physical_state,''),COALESCE(reuse_mode,''),COALESCE(capacity_text,'') FROM developer_profiles ORDER BY developer_name COLLATE NOCASE'''):
+                  f.write('\t'.join(str(x) for x in row)+'\n')
+          con.close()
+          PY
+          sha256sum assistant/src/main/assets/mdc_full.sqlite > developer-db.sqlite.sha256
+
+      - name: Upload database artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Darkroom-Enriched-Developer-Database
+          if-no-files-found: error
+          path: |
+            assistant/src/main/assets/mdc_full.sqlite
+            developer-db.sqlite.sha256
+            developer-db-audit.txt
+            developer-db-missing.csv
+            developer-db-summary.txt
+            assistant/db/producer_enrichment.json
+
+      - name: Publish audit metadata
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p build-output/db-enrichment
+          printf '%s\n' "$GITHUB_RUN_ID" > build-output/db-enrichment/run-id.txt
+          printf '%s\n' "${{ job.status }}" > build-output/db-enrichment/status.txt
+          if [ -f developer-db-audit.txt ]; then cp developer-db-audit.txt build-output/db-enrichment/audit.txt; fi
+          if [ -f developer-db.sqlite.sha256 ]; then cp developer-db.sqlite.sha256 build-output/db-enrichment/database.sha256; fi
+          if [ -f developer-db-missing.csv ]; then cp developer-db-missing.csv build-output/db-enrichment/missing.csv; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- build-output/db-enrichment
+          git commit -m "Record developer database audit [skip ci]" || exit 0
+          git push origin HEAD:feature-darkroom-db-enrichment-mdc-first
