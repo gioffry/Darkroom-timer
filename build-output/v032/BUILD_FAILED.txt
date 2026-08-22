@@ -1,4 +1,0 @@
-Darkroom v0.3.2 BUILD FAILED
-commit=7f5ccab4cc909f9a8ab391ac88bd7472869d132d
---- tail build-v032.log ---
-/tmp/build_v032_generated.sh: line 48: MAINT: unbound variable
