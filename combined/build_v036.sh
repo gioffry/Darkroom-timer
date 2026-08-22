@@ -31,6 +31,8 @@ python3 assistant/db/apply_operational_stock_life_v036.py combined/src/main/asse
   | tee validation-v036-operational.txt
 python3 assistant/db/normalize_full_bottle_only_v036.py combined/src/main/assets/mdc_full.sqlite \
   | tee validation-v036-full-bottle.txt
+python3 assistant/db/sanitize_operational_life_no_working_dilutions_v036.py combined/src/main/assets/mdc_full.sqlite \
+  | tee validation-v036-no-working-dilutions.txt
 
 python3 combined/patch_v036_operational_stock_expiry.py
 
@@ -103,7 +105,6 @@ for table in ('developer_profiles','auxiliary_chemical_profiles'):
         assert c in cols,(table,c)
     bad=cur.execute(f"select count(*) from {table} where coalesce(operational_life_it,'')<>'' and operational_life_condition_it!='bottiglia piena e ben chiusa, con minimo volume d’aria'").fetchone()[0]
     assert bad==0,(table,bad)
-    # The operational field must never be a working 1+X lifetime.
     oneplus=cur.execute(f"select count(*) from {table} where coalesce(operational_life_it,'') glob '*1+*'").fetchone()[0]
     assert oneplus==0,(table,oneplus)
     half=cur.execute(f"select count(*) from {table} where lower(coalesce(operational_life_it,'')) like '%metà bottiglia%' or lower(coalesce(operational_life_it,'')) like '%half full%'").fetchone()[0]
@@ -113,7 +114,6 @@ excel=cur.execute("select operational_life_kind,operational_life_it,operational_
 assert excel and excel[0]=='STOCK_PREPARATO' and excel[2]==12 and '12 mesi' in excel[1]
 fomatol=cur.execute("select operational_life_kind,operational_life_it,operational_life_months,operational_source_kind from auxiliary_chemical_profiles where norm_name='fomatol lqn'").fetchone()
 assert fomatol and fomatol[0]=='CONCENTRATO_APERTO' and fomatol[2]==6 and '6 mesi' in fomatol[1]
-# Date regression matching the user's current example: 22/08/2026 + 6 months.
 y,m,d=2026,8,22
 m2=m-1+6; yy=y+m2//12; mm=m2%12+1; dd=min(d,calendar.monthrange(yy,mm)[1])
 assert (yy,mm,dd)==(2027,2,22)
@@ -144,5 +144,5 @@ print('personal_data_migration=NO_DESTRUCTIVE_RESET')
 con.close()
 PY
 
-cat validation-v035.txt validation-v036-preparations.txt validation-v036-durations.txt validation-v036-operational.txt validation-v036-full-bottle.txt validation-v036-bundled-db.txt > validation-v036.txt
+cat validation-v035.txt validation-v036-preparations.txt validation-v036-durations.txt validation-v036-operational.txt validation-v036-full-bottle.txt validation-v036-no-working-dilutions.txt validation-v036-bundled-db.txt > validation-v036.txt
 sha256sum Darkroom-v0.3.6.apk | tee Darkroom-v0.3.6.sha256
