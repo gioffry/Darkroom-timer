@@ -6,6 +6,9 @@ on:
       - feature-darkroom-v038-paper-plane-height
     paths-ignore:
       - 'build-output/v038/**'
+  pull_request:
+    branches:
+      - feature-darkroom-v037-italian-technical-cleanup
   workflow_dispatch:
 
 permissions:
