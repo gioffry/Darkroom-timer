@@ -1,4 +1,461 @@
 Darkroom v0.3.1 BUILD FAILED
-commit=a2df2116260a2035f61911b7cf89b1c8c7e0b086
+commit=20d54e28e409286270e3a100511a090249c4a572
 --- tail build-v031.log ---
-v0.3.0 artifact validation marker ambiguous
+From https://github.com/gioffry/Darkroom-timer
+ * branch            feature-darkroom-v012-vintage-home-r2 -> FETCH_HEAD
+From https://github.com/gioffry/Darkroom-timer
+ * branch            archive/timer-v0137-baseline -> FETCH_HEAD
+ * branch            archive/assistant-v038-baseline -> FETCH_HEAD
+build_v011 newline fix applied
+v0.12.1 OK build VERSION_NAME
+v0.12.1 OK build VERSION_CODE
+v0.12.1 OK Gradle version
+v0.12.1 OK manifest version
+v0.12.1 OK Timer footer version
+v0.12.1 source it/darkroom/timer/assistant/recipes/MyRecipesActivity.java
+v0.12.1 source it/darkroom/timer/assistant/equipment/OwnedTankPickerActivity.java
+v0.12.1 source it/darkroom/timer/assistant/equipment/MyEquipmentActivity.java
+v0.12.1 source it/darkroom/timer/assistant/search/SmartSearchActivity.java
+v0.12.1 source it/darkroom/timer/assistant/search/SmartSearchEngine.java
+v0.12.1 source it/darkroom/timer/assistant/search/SmartSearchBinder.java
+v0.12.1 source it/darkroom/timer/assistant/search/SmartCatalog.java
+v0.12.1 source it/darkroom/timer/assistant/ui/AssistantUi.java
+v0.12.1 source it/darkroom/timer/assistant/log/DevelopmentLogActivity.java
+v0.12.1 source it/darkroom/timer/assistant/paper/PaperChemistryActivity.java
+v0.12.1 source it/darkroom/timer/assistant/system/DataManagementActivity.java
+v0.12.1 source it/darkroom/timer/assistant/system/CatalogManager.java
+v0.12.1 source it/darkroom/timer/assistant/chemistry/inventory/MyChemistryActivity.java
+v0.12.1 OK bundled catalog v2
+v0.12.1 OK backup catalog version
+v0.12.1 OK backup app version
+v0.12.1 OK backup versionCode
+v0.12.1 OK manifest Smart Search activities
+v0.12.1 OK New Development request codes
+v0.12.1 OK Smart Search pellicola
+v0.12.1 OK Smart Search rivelatore
+v0.12.1 OK canonical film selection
+v0.12.1 OK canonical dilution lookup
+v0.12.1 OK canonical calculate inputs
+v0.12.1 OK calculate canonical developer
+v0.12.1 OK modern owned-tank picker
+v0.12.1 OK tank best failure inline
+v0.12.1 OK tank best success inline
+v0.12.1 OK New Development picker results
+v0.12.1 OK TankPlanner UNKNOWN compatibility semantics
+v0.12.1 TRANSFORM OK — Timer protected; Assistant UX/Smart Catalog applied
+v0.12.1 OK builder preflight normalized to versionCode 58 / versionName 0.12.1
+v0.12.2 OK Gradle version
+v0.12.2 OK manifest version
+v0.12.2 OK Timer footer version
+v0.12.2 OK backup app version
+v0.12.2 OK backup versionCode
+v0.12.2 OK SmartSearch Item human-readable toString
+v0.12.2 OK AutoComplete explicit result-to-name conversion
+v0.12.2 OK multifunction category label
+v0.12.2 OK paper chemistry stock calculation
+v0.12.2 OK paper chemistry SmartSearchEngine import
+v0.12.2 OK restore documented paper chemistry defaults
+v0.12.2 OK paper chemistry manual fallback
+v0.12.2 OK working manual paper chemistry entry
+v0.12.2 OK Prepare Chemistry comment
+v0.12.2 OK Prepare Chemistry 9/9 label
+v0.12.2 TRANSFORM OK — real-device Smart Search and chemistry repairs applied
+v0.12.3 OK Gradle version
+v0.12.3 OK manifest version
+v0.12.3 OK Timer footer version
+v0.12.3 OK backup app version
+v0.12.3 OK backup versionCode
+v0.12.3 source it/darkroom/timer/assistant/search/WebSearchParser.java
+v0.12.3 source it/darkroom/timer/assistant/search/WebProductResolver.java
+v0.12.3 OK Smart Catalog ISO propagation
+v0.12.3 OK disable manual creation globally
+v0.12.3 OK live Internet fallback
+v0.12.3 OK web-found confirmation and correction
+v0.12.3 TRANSFORM OK — ISO propagation + automatic live web discovery + correction-after-import
+v0.12.3 OK manual creation removed and Java newline literals escaped
+v0.13.0 OK Gradle version
+v0.13.0 OK Timer footer version
+v0.13.0 OK remove chemistry-session button from Timer
+v0.13.0 OK remove chemistry snapshot capture
+v0.13.0 OK remove Assistant field from LogEntry
+v0.13.0 OK remove Assistant field parse
+v0.13.0 OK remove Assistant field serialization
+v0.13.0 TRANSFORM OK — Timer-only, Assistant completamente rimosso
+v0.13.1 OK Gradle version
+v0.13.1 OK manifest version
+v0.13.1 OK Timer footer version
+v0.13.1 OK direct-from-base quarter-stop targets
+v0.13.1 OK a-levare f-stop pulse generator
+v0.13.1 OK use subtractive pulses only for F-STOP
+v0.13.1 OK first F-STOP exposure label
+v0.13.1 OK accurate F-STOP technical log
+v0.13.1 OK subsequent F-STOP exposure label
+v0.13.1 TRANSFORM OK — F-STOP a levare, secondi invariati
+v0.13.2 OK Gradle version
+v0.13.2 OK manifest version
+v0.13.2 OK Timer footer version
+v0.13.2 OK masking constants
+v0.13.2 OK shared SCOPRIRE/COPRIRE math
+v0.13.2 OK test method button field
+v0.13.2 OK test method state field
+v0.13.2 OK load test method preference
+v0.13.2 OK test method UI helpers
+v0.13.2 OK test method selector button
+v0.13.2 OK physical strip time preview
+v0.13.2 OK pass masking method to service
+v0.13.2 OK robust chooser retry
+v0.13.2 OK chooser uses physical strip order
+v0.13.2 OK chooser imports physical strip time
+v0.13.2 OK clear stale print/split state when choosing strip
+v0.13.2 OK service masking extra
+v0.13.2 OK safelight retry task field
+v0.13.2 OK service test method state
+v0.13.2 OK service loads masking method
+v0.13.2 OK service pulse plan by physical method
+v0.13.2 OK log masking method
+v0.13.2 OK first physical target label
+v0.13.2 OK subsequent physical target log
+v0.13.2 OK subsequent physical target label
+v0.13.2 OK persist masking method
+v0.13.2 OK persistent safelight restore watchdog
+v0.13.2 OK LogEntry masking field
+v0.13.2 OK parse masking field backwards-compatible
+v0.13.2 OK old row masking default
+v0.13.2 OK serialize masking field
+v0.13.2 OK save masking method with final print
+v0.13.2 OK quick-save masking method
+v0.13.2 OK print card physical strip order
+v0.13.2 OK print card masking label
+v0.13.2 OK log card physical strip order
+v0.13.2 TRANSFORM OK — masking selectable, chooser restored, F-STOP physical mapping fixed, safelight watchdog, stale split cleared
+v0.13.3 OK Gradle version
+v0.13.3 OK manifest version
+v0.13.3 OK Timer footer version
+v0.13.3 OK pending chooser button field
+v0.13.3 OK persistent chooser button in provino panel
+v0.13.3 OK pending chooser helpers
+v0.13.3 OK refresh pending chooser on resume
+v0.13.3 OK clear pending only after strip choice
+v0.13.3 OK NON ORA keeps pending choice visible
+v0.13.3 TRANSFORM OK — preferred-strip choice remains pending after NON ORA; no timing changes
+v0.13.4 OK Gradle version
+v0.13.4 OK manifest version
+v0.13.4 OK Timer footer version
+v0.13.4 OK manual chooser uses forced path
+v0.13.4 OK separate manual/automatic chooser guards
+v0.13.4 TRANSFORM OK — manual pending-strip button bypasses stale dialog guard; timing untouched
+v0.13.5 OK Gradle version
+v0.13.5 OK manifest version
+v0.13.5 OK Timer footer version
+v0.13.5 OK provino contrast reading note
+v0.13.5 TRANSFORM OK — nota lettura contrasto integrata nel pannello PROVINO; timing untouched
+v0.13.6 OK Gradle version
+v0.13.6 OK manifest version
+v0.13.6 OK Timer footer version
+v0.13.6 OK default mode PROVINO
+v0.13.6 OK fixed-bottom page container
+v0.13.6 OK bottom nav order PROVINO STAMPA LOG
+v0.13.6 OK attach fixed bottom navigation
+v0.13.6 TRANSFORM OK — PROVINO default, bottom navigation PROVINO/STAMPA/LOG, contrast note preserved; timing untouched
+v0.13.7 OK Gradle version
+v0.13.7 OK manifest version
+v0.13.7 OK Timer footer version
+v0.13.7 OK flat bottom bar surface
+v0.13.7 OK remove card gaps
+v0.13.7 OK thin divider above bottom nav
+v0.13.7 OK flat nav selected state
+v0.13.7 OK nav active indicator state
+v0.13.7 OK lighter nav typography
+v0.13.7 OK nav indicator setter
+v0.13.7 OK draw active line
+v0.13.7 TRANSFORM OK — flat mockup-style bottom nav; PROVINO default preserved; timing untouched
+progress 20/234 developers, raw_rows=684, failed=0
+progress 40/234 developers, raw_rows=1339, failed=0
+progress 60/234 developers, raw_rows=1682, failed=0
+progress 80/234 developers, raw_rows=2958, failed=0
+progress 100/234 developers, raw_rows=4412, failed=0
+progress 120/234 developers, raw_rows=4881, failed=0
+progress 140/234 developers, raw_rows=7658, failed=0
+progress 160/234 developers, raw_rows=8903, failed=0
+progress 180/234 developers, raw_rows=10477, failed=0
+progress 200/234 developers, raw_rows=10899, failed=0
+progress 220/234 developers, raw_rows=11879, failed=0
+progress 234/234 developers, raw_rows=14527, failed=0
+BUILT SQLITE V032: canonical_index=364 films=347 developers=232 rows=14504 failed=0 rodinal=1 ferrania_p30=1 noisy_films=0 quick_check=ok size=3964928
+v0.1.8 visible-results patch applied
+v0.1.9 search enrichment patch applied
+v0.2.0 source-brain patch applied
+v0.2.1 index fallback patch applied
+v0.2.2 strict entity search + scroll patch applied
+v0.3.0 offline MDC patch applied
+v0.3.1 bundled SQLite patch applied
+v0.3.2 pure offline patch applied
+v0.3.3 startup-safe patch applied
+v0.3.4 SQLite schema version aligned: asset=2 helper=2
+v0.3.5 format selector + curated stop/fix database applied
+v0.3.6 inline visible results patch applied
+v0.3.7 time/search/capacity patch applied
+v0.3.8 edit persistence + simpler reuse text applied
+v029 DB augmented: {'products': 27, 'aliases': 100, 'films': 347, 'developers': 232, 'times': 14504}
+v029 full offline catalog patch applied
+v029 runtime network enrichment disabled
+v029 MDC manufacturer aliases added
+v029 unified chemical metadata fixed
+Combined Darkroom sources prepared
+Darkroom v0.1.3 HOME SAFE OK — mockup approvato + 4 funzioni reali preservate
+WEBP_SOURCE_BYTES=112623
+[swscaler @ 0x56359843c600] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x563598525b80] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x56359843a1c0] deprecated pixel format used, make sure you did set range correctly
+    Last message repeated 2 times
+[swscaler @ 0x563598525b40] deprecated pixel format used, make sure you did set range correctly
+    Last message repeated 2 times
+[image2 @ 0x56359839ba80] The specified filename 'combined/src/main/res/drawable-nodpi/home_vintage.jpg' does not contain an image sequence pattern or a pattern is invalid.
+[image2 @ 0x56359839ba80] Use a pattern such as %03d for an image sequence or use the -update option (with -frames:v 1 if needed) to write a single image.
+v016 enlargement patch applied
+v017 polish applied
+settings scroll fix applied
+v018 r2 enlargement fixes applied
+Darkroom v0.1.9 Uso e Manutenzione patch ready
+Darkroom v0.2.0 enlargement/log flow patch ready
+Darkroom v0.2.0 legacy recipe compatibility patch ready
+Darkroom v0.2.0 visual coherence patch ready
+[swscaler @ 0x55d2717fb600] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x55d2718e4b80] deprecated pixel format used, make sure you did set range correctly
+[swscaler @ 0x55d2717f91c0] deprecated pixel format used, make sure you did set range correctly
+    Last message repeated 2 times
+[swscaler @ 0x55d2718e4b40] deprecated pixel format used, make sure you did set range correctly
+    Last message repeated 2 times
+[image2 @ 0x55d27175aa80] The specified filename 'combined/src/main/res/drawable-nodpi/home_vintage.jpg' does not contain an image sequence pattern or a pattern is invalid.
+[image2 @ 0x55d27175aa80] Use a pattern such as %03d for an image sequence or use the -update option (with -frames:v 1 if needed) to write a single image.
+Darkroom v0.2.1 Home/font/LOG fix patch ready
+v0.2.4 temporary native-button Home applied
+v0.2.5 OK Timer footer version
+v0.2.5 OK provino state constants
+v0.2.5 OK provino UI fields
+v0.2.5 OK provino Split Grade state fields
+v0.2.5 OK load provino Split Grade state
+v0.2.5 OK SINGOLO/SPLIT selector and phase card
+v0.2.5 OK contrast guide field
+v0.2.5 OK initial Split Grade UI refresh
+v0.2.5 OK Split Grade state machine helpers
+v0.2.5 OK lock Split filter type to current phase
+v0.2.5 OK filter changes update dependent Split state
+v0.2.5 OK remove invalid Split total-time constraint
+v0.2.5 OK refresh Split instruction after timing change
+v0.2.5 OK refresh Split instruction after mode UI
+v0.2.5 OK phase-2 whole-strip soft exposure extras
+v0.2.5 OK phase-aware completion banner
+v0.2.5 OK result chooser/state transfer
+v0.2.5 OK phase-aware pending chooser button
+v0.2.5 OK service pre-exposure extras
+v0.2.5 OK service pre-exposure state
+v0.2.5 OK load pre-exposure state
+v0.2.5 OK arm preliminary soft time first
+v0.2.5 OK technical log Split pre-exposure
+v0.2.5 OK arm prompt for whole-strip soft exposure
+v0.2.5 OK exposure message distinguishes preliminary soft
+v0.2.5 OK Split test voice helpers
+v0.2.5 OK transition from whole-strip soft to hard test
+v0.2.5 TRANSFORM OK — guided Split Grade provino engine, single provino preserved
+v0.2.6 OK LogEntry revision fields
+v0.2.6 OK parse tagged revision metadata
+v0.2.6 OK write tagged revision metadata
+v0.2.6 OK persist four Split fields
+v0.2.6 OK voice seconds helper
+v0.2.6 OK Split provino voice without cyan
+v0.2.6 OK complete Split print voice sequence
+v0.2.6 OK burn filter change reminds zeroing
+v0.2.6 LOG/VOICE TRANSFORM OK
+v0.2.6 OK Timer footer version
+v0.2.6 OK revision/print helpers
+v0.2.6 OK single PIANO STAMPA Split management
+v0.2.6 OK route legacy add-plan entry to PIANO STAMPA
+v0.2.6 OK remove old 50/50 Split editor
+v0.2.6 OK locate direct Split start
+v0.2.6 OK direct Split clears revision context
+v0.2.6 OK cancel revision without overwriting print
+v0.2.6 OK commit single revision only after strip choice
+v0.2.6 OK single revision cancel action
+v0.2.6 OK commit guided Split revision
+v0.2.6 OK new log carries Split/revision fields
+v0.2.6 OK remember source log revision id
+v0.2.6 OK loading log clears stale revision draft
+v0.2.6 OK loading log stores active source id
+v0.2.6 OK Split log load avoids total-time label
+v0.2.6 OK log revision display helpers
+v0.2.6 OK automatic log Split fields
+v0.2.6 OK previous revision consultable from log
+v0.2.6 OK log use-for-print Split label
+v0.2.6 PRINT/REVISION TRANSFORM OK
+v0.2.7 OK Timer footer version
+v0.2.7 OK Split provino safelight pause state
+v0.2.7 OK reset Split provino safelight pause state
+v0.2.7 OK safelight ON during Split provino filter change
+v0.2.7 OK safelight OFF again at first hard Split strip
+v0.2.7 TRANSFORM OK — safelight ON only at Split provino filter change, OFF again for hard strips
+v0.2.8 OK Timer internal visual version
+v0.2.8 OK Timer Home size/title
+v0.2.8 OK compact enlarger card padding
+v0.2.8 OK compact settings gear
+v0.2.8 OK compact device status spacing
+v0.2.8 OK compact safelight spacing
+v0.2.8 OK compact enlarger outer spacing
+v0.2.8 OK remove internal Timer footer
+v0.2.8 OK Maintenance Home glyph medium size
+v0.2.8 OK grouped settings
+v0.2.8 OK deduplicated print summary
+v0.2.8 OK rename remove corrections
+v0.2.8 OK conditional enlargement back button
+v0.2.8 OK setup close after saved result
+Darkroom v0.2.8 GRAPHIC REFRESH TRANSFORM OK
+v0.2.9 OK Home film label fit
+v0.2.9 OK Darkroom guide URL
+v0.2.9 OK Darkroom FAQ arrays
+v0.2.9 OK Darkroom root card
+v0.2.9 OK Darkroom FAQ page
+Darkroom v0.2.9 guide + FAQ + Home micro-fix patch ready
+v0.3.0 OK camera manual Drive URLs
+v0.3.0 OK camera FAQ arrays
+v0.3.0 OK manuals intro
+v0.3.0 OK camera manual cards
+v0.3.0 OK FAQ helper 5 or 10
+Darkroom v0.3.0 camera manuals + 25 FAQ patch ready
+
+Welcome to Gradle 8.13!
+
+Here are the highlights of this release:
+ - Daemon JVM auto-provisioning
+ - Enhancements for Scala plugin and JUnit testing
+ - Improvements for build authors and plugin developers
+
+For more details see https://docs.gradle.org/8.13/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :combined:preBuild UP-TO-DATE
+> Task :combined:preReleaseBuild UP-TO-DATE
+> Task :combined:mergeReleaseJniLibFolders
+> Task :combined:mergeReleaseNativeLibs NO-SOURCE
+> Task :combined:stripReleaseDebugSymbols NO-SOURCE
+> Task :combined:extractReleaseNativeSymbolTables NO-SOURCE
+> Task :combined:mergeReleaseNativeDebugMetadata NO-SOURCE
+> Task :combined:javaPreCompileRelease
+> Task :combined:checkReleaseDuplicateClasses
+> Task :combined:checkReleaseAarMetadata
+> Task :combined:generateReleaseResValues
+> Task :combined:mapReleaseSourceSetPaths
+> Task :combined:generateReleaseResources
+> Task :combined:packageReleaseResources
+> Task :combined:mergeReleaseResources
+> Task :combined:createReleaseCompatibleScreenManifests
+> Task :combined:extractDeepLinksRelease
+> Task :combined:parseReleaseLocalResources
+
+> Task :combined:processReleaseMainManifest
+package="it.darkroom.timer" found in source AndroidManifest.xml: /home/runner/work/Darkroom-timer/Darkroom-timer/combined/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="it.darkroom.timer" from the source AndroidManifest.xml: /home/runner/work/Darkroom-timer/Darkroom-timer/combined/src/main/AndroidManifest.xml.
+
+> Task :combined:processReleaseManifest
+> Task :combined:desugarReleaseFileDependencies
+> Task :combined:mergeReleaseStartupProfile
+> Task :combined:mergeReleaseArtProfile
+> Task :combined:mergeReleaseShaders
+> Task :combined:compileReleaseShaders NO-SOURCE
+> Task :combined:generateReleaseAssets UP-TO-DATE
+> Task :combined:mergeReleaseAssets
+> Task :combined:processReleaseManifestForPackage
+> Task :combined:extractReleaseVersionControlInfo
+> Task :combined:extractProguardFiles
+> Task :combined:processReleaseJavaRes NO-SOURCE
+> Task :combined:processReleaseResources
+> Task :combined:compressReleaseAssets
+> Task :combined:mergeExtDexRelease
+> Task :combined:mergeReleaseJavaResource
+
+> Task :combined:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :combined:dexBuilderRelease
+> Task :combined:mergeReleaseGlobalSynthetics
+> Task :combined:generateReleaseLintVitalReportModel
+> Task :combined:mergeDexRelease
+> Task :combined:compileReleaseArtProfile
+> Task :combined:collectReleaseDependencies
+> Task :combined:sdkReleaseDependencyData
+> Task :combined:validateSigningRelease
+> Task :combined:writeReleaseAppMetadata
+> Task :combined:writeReleaseSigningConfigVersions
+> Task :combined:optimizeReleaseResources
+> Task :combined:lintVitalAnalyzeRelease
+> Task :combined:lintVitalReportRelease
+> Task :combined:lintVitalRelease
+> Task :combined:packageRelease
+> Task :combined:createReleaseApkListingFileRedirect
+> Task :combined:assembleRelease
+
+[Incubating] Problems report is available at: file:///home/runner/work/Darkroom-timer/Darkroom-timer/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1m 25s
+43 actionable tasks: 43 executed
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): false
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Darkroom Timer, OU=App Signing, O=Darkroom Timer, C=IT
+Signer #1 certificate SHA-256 digest: fbead305657584b50a9d8892aa19bd9844b412d77db316e7daa5593c94e2a02f
+Signer #1 certificate SHA-1 digest: e8571de937e649ab714669c03c44b1bfa67e1cba
+Signer #1 certificate MD5 digest: 47cfa41624cacafef63a5c339ddd668a
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 4096
+Signer #1 public key SHA-256 digest: 192768f7fe3a92c4697fe98f1e65d7173bff4c4a497b038207dd79d6f2af48a4
+Signer #1 public key SHA-1 digest: 5c1f2c34c4c63bb994ae413416d4a38e9609afde
+Signer #1 public key MD5 digest: cca83fde59ccf34c37086ce7408006f4
+c077054e1f0d4429060c10bcfdd160626a46252a4ec9e688bf298fac8589d2a6  Darkroom-v0.3.1.apk
+c077054e1f0d4429060c10bcfdd160626a46252a4ec9e688bf298fac8589d2a6  Darkroom-v0.3.1.apk
+catalog_validation=PASS
+sqlite_user_version=3
+sqlite_quick_check=ok
+total_products_indexed=599
+total_films=347
+total_film_developers=232
+total_mdc_combinations=14504
+local_technical_products=27
+alias_entries=100
+offline_mode=FULL_BUNDLED_SQLITE
+sources=Massive Dev Chart / Digitaltruth + verified manufacturer catalog-v2
+fomatol_lqn=PASS
+coverage::Fomapan 100::developers=96::dilutions=40
+coverage::Fomapan 200::developers=72::dilutions=38
+coverage::Ilford HP5+::developers=119::dilutions=57
+coverage::Ilford FP4+::developers=110::dilutions=51
+coverage::Kodak Tri-X 400::developers=105::dilutions=57
+film_test::Fomapan 100::fomapan100
+film_test::Fomapan 200::fomapan200
+film_test::Fomapan 400::fomapan400
+film_test::Ilford FP4 Plus::Ilford FP4+
+film_test::Ilford HP5 Plus::ILFORD HP5 PLUS
+film_test::Kodak Tri-X 400::Kodak Tri-X 400
+film_test::Kodak T-Max 100::Kodak TMax 100
+film_test::Kodak T-Max 400::Kodak TMax 400
+developer_test::Kodak D-76::kodak d76
+developer_test::Kodak XTOL::kodak x-tol
+developer_test::Ilford ID-11::ilford id11
+developer_test::Ilford DD-X::ddx
+developer_test::Rodinal::Rodinal
+developer_test::Adox Rodinal::Rodinal
+developer_test::Fomadon Excel::Fomadon Excel
+developer_test::Fomadon P::Fomadon P
+developer_test::Fomadon R09::fomadon r 09
+grep: combined/src/main/java/it/darkroom/timer/MaintenanceActivity.java: No such file or directory

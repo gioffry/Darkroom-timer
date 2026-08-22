@@ -1,0 +1,40 @@
+catalog_validation=PASS
+sqlite_user_version=3
+sqlite_quick_check=ok
+total_products_indexed=599
+total_films=347
+total_film_developers=232
+total_mdc_combinations=14504
+local_technical_products=27
+alias_entries=100
+offline_mode=FULL_BUNDLED_SQLITE
+sources=Massive Dev Chart / Digitaltruth + verified manufacturer catalog-v2
+fomatol_lqn=PASS
+coverage::Fomapan 100::developers=96::dilutions=40
+coverage::Fomapan 200::developers=72::dilutions=38
+coverage::Ilford HP5+::developers=119::dilutions=57
+coverage::Ilford FP4+::developers=110::dilutions=51
+coverage::Kodak Tri-X 400::developers=105::dilutions=57
+film_test::Fomapan 100::fomapan100
+film_test::Fomapan 200::fomapan200
+film_test::Fomapan 400::fomapan400
+film_test::Ilford FP4 Plus::Ilford FP4+
+film_test::Ilford HP5 Plus::ILFORD HP5 PLUS
+film_test::Kodak Tri-X 400::Kodak Tri-X 400
+film_test::Kodak T-Max 100::Kodak TMax 100
+film_test::Kodak T-Max 400::Kodak TMax 400
+developer_test::Kodak D-76::kodak d76
+developer_test::Kodak XTOL::kodak x-tol
+developer_test::Ilford ID-11::ilford id11
+developer_test::Ilford DD-X::ddx
+developer_test::Rodinal::Rodinal
+developer_test::Adox Rodinal::Rodinal
+developer_test::Fomadon Excel::Fomadon Excel
+developer_test::Fomadon P::Fomadon P
+developer_test::Fomadon R09::fomadon r 09
+versionName=0.3.1
+versionCode=22
+base_version=0.3.0
+base_camera_manuals_preserved=PASS
+catalog_release=FULL_OFFLINE_MDC
+personal_data_migration=NO_DESTRUCTIVE_RESET
