@@ -7,8 +7,8 @@ ABC Pyro,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,s
 ACU-1,Acufine Chemicals,NO,"capacity_text,shelf_life_unopened,shelf_life_opened",36,23
 Acufine,Acufine Chemicals,NO,"shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",118,65
 Acurol-N,SPUR Photochemie Dr. Heidrich und Schain GbR,NO,"reuse_mode,shelf_life_opened,shelf_life_stock,shelf_life_working",110,50
-Adotech III,ADOX Fotowerke GmbH,NO,"preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock",2,1
-Adotech IV,ADOX Fotowerke GmbH,NO,"preparation,reuse_mode,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",7,2
+Adotech III,ADOX Fotowerke GmbH,YES,"shelf_life_unopened,shelf_life_opened,shelf_life_stock",2,1
+Adotech IV,ADOX Fotowerke GmbH,YES,"shelf_life_unopened,shelf_life_opened,shelf_life_stock",7,2
 Adox HR-DEV,ADOX Fotowerke GmbH,NO,"physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",71,48
 Adox M-Q Borax,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 ADX II,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",29,29
@@ -19,9 +19,9 @@ Agfa Ansco 47,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_t
 Agfa Ansco 48M,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Agfa Ansco 72,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Amaloco AM74,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",83,41
-Arista Liquid,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",94,32
 Arista Premium,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",28,28
 Arista® 76 Powder,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,3
+Arista® Liquid,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",94,32
 Arista® Premium Liquid,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Arista® Premium Powder,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",4,2
 Ars-Imago FD,ars-imago,YES,"shelf_life_unopened,shelf_life_stock,shelf_life_working",78,33
@@ -64,7 +64,7 @@ D-19,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf
 D-23,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",115,60
 D-25,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 D-72,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",6,6
-D-76,Kodak Alaris,NO,"reuse_mode,shelf_life_unopened,shelf_life_opened",862,239
+D-76,Kodak Alaris,YES,"shelf_life_unopened,shelf_life_opened",862,239
 D-76D,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",7,7
 D-8,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 D-9,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
@@ -100,7 +100,7 @@ Fomadon Excel,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",40
 Fomadon LQN,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",64,48
 Fomadon LQR,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",14,12
 Fomadon P,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",30,27
-Fomadon R09,FOMA BOHEMIA,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",84,46
+Fomadon R09,FOMA BOHEMIA,YES,shelf_life_stock,84,46
 FotoApteka A-RSC,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Fuji Microfine,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",26,14
 FX-1,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",13,13
@@ -138,7 +138,7 @@ Marathon,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,s
 Melonal,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Meritol-Metol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Metolal,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
-Microdol-X,Eastman Kodak Company,NO,"physical_state,preparation,shelf_life_unopened,shelf_life_opened",144,62
+Microdol-X,Eastman Kodak Company,YES,"shelf_life_unopened,shelf_life_opened",144,62
 Microphen,HARMAN technology / ILFORD,YES,,361,112
 Mikratol-2,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",20,7
 Mocon,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",15,15
@@ -163,7 +163,7 @@ POTA,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf
 PQ Universal,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",19,18
 Prescysol,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
 Prescysol EF,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",3,3
-Promicrol,Champion Photochemistry International Ltd,NO,"capacity_text,shelf_life_opened,shelf_life_stock",192,48
+Promicrol,Champion Photochemistry International Ltd,YES,"shelf_life_opened,shelf_life_stock",192,48
 Pyrocat,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Pyrocat-HD,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",136,69
 Pyrocat-HD-M,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",1,1
