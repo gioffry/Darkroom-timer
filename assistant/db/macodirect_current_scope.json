@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-08-22",
+  "basisRunId": "32558160784",
+  "basisIncompleteCount": 186,
+  "scopeRule": "CURRENT_MACODIRECT_LISTING_EXACT_OR_BRAND_PRESERVING",
+  "soldOutStillCountsAsCurrentListing": true,
+  "technicalDataSourceRule": "MACODIRECT_FILTER_ONLY_MANUFACTURER_FOR_TECHNICAL_FIELDS",
+  "records": [
+    {"developer":"Acurol-N","macodirectName":"Spur Acurol-N film developer","status":"available","evidenceUrl":"https://www.macodirect.de/en/spur/"},
+    {"developer":"Bellini B&W Ecofilm","macodirectName":"Bellini ECOFILM","status":"current_listing","evidenceUrl":"https://www.macodirect.de/en/bellini/"},
+    {"developer":"Bellini DF2 Duo Step","macodirectName":"Bellini DUO STEP film developer","status":"available","evidenceUrl":"https://www.macodirect.de/en/bellini/"},
+    {"developer":"Bellini Euro HC","macodirectName":"Bellini EURO HC film developer","status":"available","evidenceUrl":"https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/6734/bellini-euro-hc-film-developer-500ml"},
+    {"developer":"Nucleol BF200","macodirectName":"Bellini Ornano NUCLEOL BF200 film developer","status":"sold_out","evidenceUrl":"https://www.macodirect.de/en/bellini/"},
+    {"developer":"Berspeed","macodirectName":"Bergger BerSpeed fine grain developer","status":"sold_out","evidenceUrl":"https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/"},
+    {"developer":"Dektol","macodirectName":"Kodak Dektol powder paper developer","status":"sold_out","evidenceUrl":"https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/"},
+    {"developer":"Ecoprint Universal","macodirectName":"MACO ecoprint universal developer","status":"sold_out","evidenceUrl":"https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/"},
+    {"developer":"Ilford Multigrade","macodirectName":"Ilford Multigrade developer","status":"available","evidenceUrl":"https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/"},
+    {"developer":"PQ Universal","macodirectName":"Ilford PQ Universal","status":"available","evidenceUrl":"https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/"},
+    {"developer":"PMK","macodirectName":"Bergger P.M.K. liquide universal developer","status":"sold_out","evidenceUrl":"https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/"},
+    {"developer":"Rollei Supergrain","macodirectName":"Rollei Supergrain","status":"available","evidenceUrl":"https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/"},
+    {"developer":"Spur HRX","macodirectName":"Spur HRX film developer","status":"sold_out","evidenceUrl":"https://www.macodirect.de/en/spur/"},
+    {"developer":"Spur SD 2525","macodirectName":"SPUR SD 2525 film developer","status":"sold_out","evidenceUrl":"https://www.macodirect.de/en/spur/"},
+    {"developer":"Spur SLD","macodirectName":"Spur SLD Professional film developer","status":"sold_out","evidenceUrl":"https://www.macodirect.de/en/spur/"},
+    {"developer":"Spur Speed-Major","macodirectName":"Spur Speed-Major film developer","status":"sold_out","evidenceUrl":"https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/5786/spur-speed-major-film-developer-250ml"},
+    {"developer":"Spur Dokuspeed SL-N","macodirectName":"Spur Dokuspeed SL-N","status":"sold_out","evidenceUrl":"https://www.macodirect.de/en/spur/"},
+    {"developer":"Spur Nanotech UR","macodirectName":"Spur Nanotech UR","status":"current_listing","evidenceUrl":"https://www.macodirect.de/en/spur/"},
+    {"developer":"Spur TRX 2000","macodirectName":"Spur TRX 2000","status":"current_listing","evidenceUrl":"https://www.macodirect.de/en/spur/"},
+    {"developer":"Spur SHADOWmax","macodirectName":"Spur SHADOWmax","status":"current_listing","evidenceUrl":"https://www.macodirect.de/en/spur/"},
+    {"developer":"Spur Omega X","macodirectName":"Spur Omega X","status":"current_listing","evidenceUrl":"https://www.macodirect.de/en/spur/"}
+  ]
+}
