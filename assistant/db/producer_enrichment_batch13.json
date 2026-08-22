@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MDC_FIRST_MANUFACTURER_FILL_ONLY",
+  "checkedAt": "2026-08-22",
+  "records": [
+    {
+      "matchNames": ["Ultrafin"],
+      "manufacturer": "Tetenal",
+      "productName": "Tetenal Ultrafin Liquid",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute the liquid concentrate with water according to the film and desired compensation. Tetenal documents working dilutions from approximately 1+10 to 1+30.",
+      "reuseMode": "one_shot",
+      "reuseInstructions": "Tetenal describes Ultrafin Liquid for one-shot film development; prepare the selected working dilution for the current batch and discard after use.",
+      "capacityText": "250 ml concentrate processes up to about 20 films; a 1 litre package up to about 80 films, depending on working dilution and tank volume.",
+      "sourceTitle": "Tetenal B/W Chemistry Catalogue - Ultrafin Liquid",
+      "sourceUrl": "https://www.tetenal.com/",
+      "sourceDate": "Tetenal technical catalogue"
+    },
+    {
+      "matchNames": ["Neofin Blue"],
+      "manufacturer": "Tetenal",
+      "productName": "Tetenal Neofin Blue",
+      "physicalState": "liquid concentrate in portion bottles",
+      "preparation": "Dilute one concentrate portion with water to the film-specific working solution; the product is designed for highly dilute fine-grain one-shot processing.",
+      "reuseMode": "one_shot",
+      "reuseInstructions": "Use the prepared working solution once and discard after the processing batch.",
+      "capacityText": "A 500 ml working solution is intended for approximately one to two films, depending on film area and process conditions.",
+      "sourceTitle": "Tetenal B/W Chemistry Catalogue - Neofin Blue",
+      "sourceUrl": "https://www.tetenal.com/",
+      "sourceDate": "Tetenal technical catalogue"
+    },
+    {
+      "matchNames": ["Neopress HC"],
+      "manufacturer": "Tetenal",
+      "productName": "Tetenal Neopress HC",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute concentrate with water in the manufacturer range approximately 1+15 to 1+31, depending on the process and film.",
+      "reuseMode": "replenishable_processing_system",
+      "reuseInstructions": "Tetenal documents Neopress HC for replenished processing as well as conventional working solutions; maintain activity by replenishment when used as a production bath.",
+      "capacityText": "Tetenal documents capacities up to approximately 160 films per litre of concentrate in replenished/production use, depending on process conditions.",
+      "sourceTitle": "Tetenal B/W Chemistry Catalogue - Neopress HC",
+      "sourceUrl": "https://www.tetenal.com/",
+      "sourceDate": "Tetenal technical catalogue"
+    },
+    {
+      "matchNames": ["Paranol S"],
+      "manufacturer": "Tetenal",
+      "productName": "Tetenal Paranol S",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute concentrate with water; Tetenal documents working dilutions 1+25 and 1+50.",
+      "reuseMode": "one_shot",
+      "reuseInstructions": "Prepare the high-dilution working solution for the current batch and discard it after use.",
+      "capacityText": "A 250 ml concentrate package processes up to about 25 films, depending on working dilution and tank volume.",
+      "sourceTitle": "Tetenal B/W Chemistry Catalogue - Paranol S",
+      "sourceUrl": "https://www.tetenal.com/",
+      "sourceDate": "Tetenal technical catalogue"
+    },
+    {
+      "matchNames": ["Rollei Supergrain"],
+      "manufacturer": "Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS",
+      "productName": "ROLLEI SUPERGRAIN",
+      "physicalState": "liquid developer concentrate",
+      "preparation": "Dilute the concentrate with water. The Rollei data sheet documents 1+9, 1+12 and 1+15 and gives exact concentrate/water quantities for 260 ml working solution.",
+      "capacityText": "The 500 ml concentrate package is intended for roughly 20 to 60 film developments depending on the selected dilution and working volume.",
+      "sourceTitle": "ROLLEI SUPERGRAIN Data Sheet",
+      "sourceUrl": "https://www.rolleianalog.com/wp-content/uploads/2019/09/SUPERGRAIN_Datenblatt_EN.pdf",
+      "sourceDate": "2019-09"
+    },
+    {
+      "matchNames": ["Spur SLD"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR SLD High Speed Developer",
+      "physicalState": "developer concentrate",
+      "preparation": "Dilute the concentrate with water according to the film-specific SPUR development chart. Working dilution and agitation are selected together to control speed and contrast.",
+      "capacityText": "SPUR specifies a minimum of 6 ml concentrate for one 35 mm film; smaller quantities have not been validated by the manufacturer.",
+      "sourceTitle": "SPUR SLD Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Datenblatt-SPUR-SLD.pdf",
+      "sourceDate": "current data sheet"
+    },
+    {
+      "matchNames": ["Spur Speed-Major"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR Speed-Major",
+      "physicalState": "developer concentrate",
+      "preparation": "Dilute the concentrate with water according to the film and target exposure index in the SPUR chart; working dilution is varied together with development time and agitation to obtain the required speed/contrast result.",
+      "sourceTitle": "SPUR Speed-Major Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-sheet-SPUR-Speed-Major-17-01-19.pdf",
+      "sourceDate": "2019-01"
+    },
+    {
+      "matchNames": ["Spur TRX 2000"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR TRX 2000 High Speed Developer",
+      "physicalState": "developer concentrate",
+      "preparation": "Prepare the working solution with distilled water at the film-specific dilution in the SPUR chart. Hard water requires longer development times; the manufacturer used distilled water for its calibrated values.",
+      "sourceTitle": "SPUR TRX 2000 Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-sheet-SPUR-TRX-2000-07.08.19-1.pdf",
+      "sourceDate": "2019-08"
+    },
+    {
+      "matchNames": ["Spur UFP"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR UFP Universal Developer",
+      "physicalState": "developer concentrate",
+      "preparation": "Dilute the concentrate according to the film development chart; for paper the standard manufacturer dilution is 1+20.",
+      "capacityText": "For film, 250 ml concentrate develops about 30 35 mm or roll films on average. For paper at 1+20, one litre working solution develops about 40 RC enlargements 18x24 cm.",
+      "storageNotes": "SPUR describes UFP as a long-shelf-life universal developer but does not provide a numeric keeping time in the cited product information.",
+      "sourceTitle": "SPUR UFP Universal Developer manufacturer information",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/value-professional-quality-spur-ufp-universal-developer-for-film-and-paper.pdf",
+      "sourceDate": "2014"
+    },
+    {
+      "matchNames": ["Spur NHC"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR NHC High Contrast Developer",
+      "physicalState": "developer concentrate",
+      "preparation": "Prepare the working solution from concentrate according to the film-specific SPUR NHC development chart. The product is intended for pictorial high-contrast black-and-white development.",
+      "sourceTitle": "SPUR NHC Data Sheet and current SPUR price list",
+      "sourceUrl": "https://spur-photo.com/category/datenblaetter/",
+      "sourceDate": "current"
+    }
+  ]
+}
