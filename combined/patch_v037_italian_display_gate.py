@@ -68,4 +68,16 @@ if '" useful tank "' not in s or 'safeItalianTechnical(lifeInfo.text)' not in s:
     raise SystemExit('v0.3.7 runtime Italian acceptance markers missing')
 
 p.write_text(s, encoding='utf-8')
+
+# Force a fresh extraction of the cleaned bundled SQLite when upgrading from
+# v0.3.6; otherwise an already-installed app could keep the old English/hybrid
+# database file on disk even though the APK contains the corrected asset.
+m = Path('combined/src/main/java/it/darkroom/assistant/MdcOfflineStore.java')
+ms = m.read_text(encoding='utf-8')
+if 'mdc_offline_darkroom_v036.sqlite' not in ms:
+    raise SystemExit('v0.3.7 expected v0.3.6 DB filename missing')
+ms = ms.replace('mdc_offline_darkroom_v036.sqlite', 'mdc_offline_darkroom_v037.sqlite')
+m.write_text(ms, encoding='utf-8')
+
 print('v0.3.7 runtime Italian display gate applied')
+print('v0.3.7 fresh SQLite copy marker applied')
