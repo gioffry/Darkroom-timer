@@ -124,10 +124,10 @@ ID-62,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shel
 ID-68,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",6,5
 Ilford Multigrade,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,5
 Ilfosol 3,HARMAN technology / ILFORD,YES,shelf_life_stock,308,116
-Ilfotec DD,HARMAN technology / ILFORD,NO,"capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",145,42
+Ilfotec DD,HARMAN technology / ILFORD,YES,shelf_life_stock,145,42
 Ilfotec DD-X,HARMAN technology / ILFORD,YES,"shelf_life_unopened,shelf_life_stock,shelf_life_working",339,109
 Ilfotec HC,HARMAN technology / ILFORD,YES,shelf_life_working,198,80
-Ilfotec LC29,HARMAN technology / ILFORD,NO,"preparation,shelf_life_unopened,shelf_life_stock,shelf_life_working",249,81
+Ilfotec LC29,HARMAN technology / ILFORD,YES,"shelf_life_unopened,shelf_life_stock,shelf_life_working",249,81
 Ilfotec RT Rapid,HARMAN technology / ILFORD,YES,shelf_life_stock,5,3
 JOBO Alpha,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",2,2
 Kalogen,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",15,14
@@ -217,7 +217,7 @@ Tanol Speed,Moersch Photochemie,NO,"reuse_mode,shelf_life_opened,shelf_life_stoc
 TD-3,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",3,2
 TFX-2,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",5,5
 TMax Dev,Kodak Alaris,YES,"shelf_life_opened,shelf_life_stock",333,104
-TMax RS,Kodak Alaris,NO,"preparation,capacity_text,shelf_life_opened,shelf_life_stock",165,53
+TMax RS,Kodak Alaris,YES,"shelf_life_opened,shelf_life_stock",165,53
 Ultrafin,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",141,70
 Ultrafin T-Plus,Tetenal,NO,"reuse_mode,shelf_life_opened,shelf_life_stock",38,35
 Ultrafine Endurance,,NO,"manufacturer,physical_state,preparation,reuse_mode,capacity_text,shelf_life_unopened,shelf_life_opened,shelf_life_stock,shelf_life_working",16,16
