@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MDC_FIRST_MANUFACTURER_FILL_ONLY",
+  "checkedAt": "2026-08-22",
+  "records": [
+    {
+      "matchNames": ["Fomadon Excel"],
+      "manufacturer": "FOMA BOHEMIA",
+      "productName": "FOMADON Excel",
+      "reuseMode": "reusable_until_manufacturer_capacity",
+      "reuseInstructions": "FOMA defines a processing capacity for the working solution and explicitly instructs that, if development is interrupted before that allowed number of films has been processed, the working solution should be stored in darkness and protected from oxidation for later use. Replace it when its guaranteed working life or capacity is reached.",
+      "sourceTitle": "FOMA B&W Photo Materials and Developing Information - capacity and storage of film processing baths",
+      "sourceUrl": "https://www.foma.cz/en/catalogue_bw_photo_materials_and_developing_information",
+      "sourceDate": "2020"
+    },
+    {
+      "matchNames": ["Fomadon P"],
+      "manufacturer": "FOMA BOHEMIA",
+      "productName": "FOMADON P",
+      "reuseMode": "reusable_until_manufacturer_capacity",
+      "reuseInstructions": "FOMA defines a processing capacity for the working solution and explicitly instructs that, if development is interrupted before that allowed number of films has been processed, the working solution should be stored in darkness and protected from oxidation for later use. Replace it when its guaranteed working life or capacity is reached.",
+      "sourceTitle": "FOMA B&W Photo Materials and Developing Information - capacity and storage of film processing baths",
+      "sourceUrl": "https://www.foma.cz/en/catalogue_bw_photo_materials_and_developing_information",
+      "sourceDate": "2020"
+    },
+    {
+      "matchNames": ["Fomadon LQN"],
+      "manufacturer": "FOMA BOHEMIA",
+      "productName": "FOMADON LQN",
+      "reuseMode": "reusable_until_manufacturer_capacity",
+      "reuseInstructions": "FOMA defines a processing capacity for the working solution and explicitly instructs that, if development is interrupted before that allowed number of films has been processed, the working solution should be stored in darkness and protected from oxidation for later use. Replace it when its guaranteed working life or capacity is reached.",
+      "sourceTitle": "FOMA B&W Photo Materials and Developing Information - capacity and storage of film processing baths",
+      "sourceUrl": "https://www.foma.cz/en/catalogue_bw_photo_materials_and_developing_information",
+      "sourceDate": "2020"
+    },
+    {
+      "matchNames": ["Fomadon LQR"],
+      "manufacturer": "FOMA BOHEMIA",
+      "productName": "FOMADON LQR",
+      "reuseMode": "reusable_until_manufacturer_capacity",
+      "reuseInstructions": "FOMA defines a processing capacity for the working solution and explicitly instructs that, if development is interrupted before that allowed number of films has been processed, the working solution should be stored in darkness and protected from oxidation for later use. Replace it when its guaranteed working life or capacity is reached.",
+      "sourceTitle": "FOMA B&W Photo Materials and Developing Information - capacity and storage of film processing baths",
+      "sourceUrl": "https://www.foma.cz/en/catalogue_bw_photo_materials_and_developing_information",
+      "sourceDate": "2020"
+    },
+    {
+      "matchNames": ["Foma Universal"],
+      "manufacturer": "FOMA BOHEMIA",
+      "productName": "FOMA Universal Developer",
+      "reuseMode": "reusable_until_manufacturer_capacity",
+      "reuseInstructions": "FOMA defines a processing capacity for its film-processing working baths and instructs storage in darkness with restricted air access when processing is interrupted before capacity is reached. Use again only within the guaranteed working life.",
+      "sourceTitle": "FOMA B&W Photo Materials and Developing Information - capacity and storage of film processing baths",
+      "sourceUrl": "https://www.foma.cz/en/catalogue_bw_photo_materials_and_developing_information",
+      "sourceDate": "2020"
+    },
+    {
+      "matchNames": ["Rodinal"],
+      "manufacturer": "ADOX Fotowerke GmbH",
+      "productName": "ADOX RODINAL / ADONAL",
+      "shelfLifeUnopened": "ADOX expects its freshly purchased developers to keep at least another 12 months in an unopened original bottle when stored cold and dark; Rodinal is specifically described as unusually tolerant of darkening and long storage.",
+      "storageNotes": "Store cool, dry and dark. ADOX recommends minimizing air in opened developer bottles with protective gas, squeezing suitable bottles or using glass marbles. Rodinal may be dark brown and still remain active; judge it by performance rather than colour alone.",
+      "sourceTitle": "ADOX Developers & Storage / ADOX Rodinal",
+      "sourceUrl": "https://www.adox.de/developers-storage/",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Ultrafin T-Plus"],
+      "manufacturer": "Tetenal",
+      "productName": "Tetenal Ultrafin T-Plus",
+      "reuseMode": "working_solution_reusable_with_time_compensation",
+      "reuseInstructions": "For one litre of 1+4 working solution, films 1-4 use the standard time, films 5-8 use standard time plus 1 minute, and films 9-12 use standard time plus 2 minutes. Maximum capacity is 12 films per litre working solution.",
+      "shelfLifeOpened": "Opened concentrate: maximum 6 months.",
+      "sourceTitle": "Tetenal Ultrafin T-Plus B/W Fine Grain Developer data sheet",
+      "sourceUrl": "https://www.digitaltruth.com/products/tetenal_tech/ultrafin-t-plus-datasheet.pdf",
+      "sourceDate": "Tetenal technical data sheet"
+    }
+  ]
+}
