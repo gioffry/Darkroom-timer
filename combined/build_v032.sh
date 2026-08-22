@@ -17,11 +17,13 @@ s=s.replace("versionCode='22'","versionCode='23'")
 s=s.replace('versionCode 22','versionCode 23')
 s=s.replace('versionCode=22','versionCode=23')
 s=s.replace('v031','v032')
+# Keep the inner temporary generated script distinct from this outer wrapper.
+s=s.replace('/tmp/build_v032_generated.sh','/tmp/build_v031_generated.sh')
 s=s.replace('base_version=0.3.0','base_version=0.3.1')
-Path('/tmp/build_v032_generated.sh').write_text(s,encoding='utf-8')
+Path('/tmp/build_v032_wrapper.sh').write_text(s,encoding='utf-8')
 PY
 
-bash /tmp/build_v032_generated.sh
+bash /tmp/build_v032_wrapper.sh
 
 STORE=combined/src/main/java/it/darkroom/assistant/FullCatalogStore.java
 # Regression: empty alias must never score as a match.
