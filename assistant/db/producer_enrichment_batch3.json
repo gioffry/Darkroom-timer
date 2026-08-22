@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MDC_FIRST_MANUFACTURER_FILL_ONLY",
+  "checkedAt": "2026-08-22",
+  "records": [
+    {
+      "matchNames": ["Bergger Superfine"],
+      "manufacturer": "BERGGER",
+      "productName": "BERGGER Superfine",
+      "physicalState": "liquid concentrate",
+      "preparation": "Shake concentrate thoroughly and prepare the 1+4 working solution immediately before use.",
+      "dilutions": ["1+4"],
+      "capacityText": "Use at least 250 ml working solution per film.",
+      "shelfLifeOpened": "Concentrate: recommended up to 9 months after opening.",
+      "sourceTitle": "BERGGER Superfine Datasheet",
+      "sourceUrl": "https://bergger.com/en/index.php?controller=attachment&id_attachment=12",
+      "sourceDate": "2019-03"
+    },
+    {
+      "matchNames": ["Berspeed"],
+      "manufacturer": "BERGGER",
+      "productName": "BERGGER Berspeed",
+      "physicalState": "powder",
+      "preparation": "Dissolve the powder in demineralized water to prepare the stock solution; prepare diluted working solution just before use when a dilution is required.",
+      "shelfLifeStock": "Prepared solution: 6 months.",
+      "sourceTitle": "BERGGER Berspeed - B&W Film Developer",
+      "sourceUrl": "https://bergger.com/en/page/5-bw-film-developer",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["PMK"],
+      "manufacturer": "BERGGER",
+      "productName": "BERGGER PMK",
+      "physicalState": "two-part liquid concentrate",
+      "preparation": "Mix solution A and solution B with water; standard working dilution is 1+2+100.",
+      "dilutions": ["1+2+100"],
+      "capacityText": "Up to 1000 cm2 film per litre of working solution: approximately 2 rolls of 135-36 or 2 rolls of 120.",
+      "shelfLifeUnopened": "Solutions A and B: up to 10 years, even in half-filled bottles.",
+      "shelfLifeWorking": "Working solution in open containers: about 1 hour without affecting development quality.",
+      "storageNotes": "Keep solutions tightly closed and protected from light.",
+      "sourceTitle": "BERGGER PMK Datasheet",
+      "sourceUrl": "https://bergger.com/en/index.php?controller=attachment&id_attachment=25",
+      "sourceDate": "2020-01"
+    },
+    {
+      "matchNames": ["Studional"],
+      "manufacturer": "BERGGER",
+      "productName": "STUDIONAL",
+      "sourceTitle": "BERGGER Chemicals Catalogue",
+      "sourceUrl": "https://bergger.com/en/chemicals",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Finol"],
+      "manufacturer": "Moersch Photochemie",
+      "productName": "Moersch Finol",
+      "physicalState": "two-part liquid concentrate",
+      "capacityText": "2x100 ml makes 10 litres working solution, capacity 40 films; 2x250 ml makes 25 litres, capacity 200 films.",
+      "sourceTitle": "Moersch Finol",
+      "sourceUrl": "https://www.moersch-photochemie.de/en/product/finol/",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Tanol"],
+      "manufacturer": "Moersch Photochemie",
+      "productName": "Moersch Tanol",
+      "physicalState": "two-part liquid concentrate",
+      "preparation": "Dilute developer and alkali 1+1+100 with demineralized water immediately before development.",
+      "dilutions": ["1+1+100"],
+      "capacityText": "2x100 ml makes 20 litres working solution, capacity 40 films; 2x250 ml makes 25 litres, capacity 100 films.",
+      "shelfLifeUnopened": "Concentrate A: one year or longer; concentrate B: unlimited.",
+      "sourceTitle": "Moersch Tanol",
+      "sourceUrl": "https://www.moersch-photochemie.de/en/product/tanol/",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Tanol Speed"],
+      "manufacturer": "Moersch Photochemie",
+      "productName": "Moersch Tanol Speed",
+      "physicalState": "two-part liquid concentrate",
+      "preparation": "Standard working dilution is 1+1+100; use demineralized water and prepare working solution shortly before development.",
+      "dilutions": ["1+1+100"],
+      "capacityText": "2x100 ml makes 20 litres working solution, capacity 40 films.",
+      "shelfLifeUnopened": "Concentrate A: 18 months or longer; concentrate B: unlimited.",
+      "shelfLifeWorking": "Working solution should be used within approximately 10-15 minutes after mixing.",
+      "sourceTitle": "Moersch Tanol Speed",
+      "sourceUrl": "https://www.moersch-photochemie.de/en/product/tanol-speed/",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Moersch eco"],
+      "manufacturer": "Moersch Photochemie",
+      "productName": "Moersch Eco Film Developer",
+      "physicalState": "two-part liquid concentrate",
+      "preparation": "For most films prepare developer A + activator B + demineralized water at 2+1+50; consult the manufacturer chart for deviations.",
+      "reuseMode": "one_shot",
+      "reuseInstructions": "Designed as a single-use developer.",
+      "capacityText": "At 2+1+50, the supplied 250 ml A + 500 ml B develops 50 rolls of 135 or 120.",
+      "shelfLifeUnopened": "Concentrate A: guaranteed minimum 2 years; concentrate B: unlimited.",
+      "shelfLifeWorking": "Working solution remains usable for a few days, but manufacturer recommends preparing only what will be used immediately.",
+      "storageNotes": "Store concentrates at 15-25 C.",
+      "sourceTitle": "Moersch Eco Film Developer",
+      "sourceUrl": "https://www.moersch-photochemie.de/en/product/eco-film-developer/",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["MZB"],
+      "manufacturer": "Moersch Photochemie",
+      "productName": "Moersch MZB 2 Bath Compensating Developer",
+      "physicalState": "two-bath developer",
+      "sourceTitle": "Moersch MZB 2 Bath Compensating Developer",
+      "sourceUrl": "https://www.moersch-photochemie.de/en/product/mzb-zweibad-ausgleichsentwickler/",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Sprint Standard"],
+      "manufacturer": "Sprint Systems of Photography",
+      "productName": "SPRINT STANDARD B&W Film Developer",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute concentrate 1+9 with water to make the working solution.",
+      "dilutions": ["1+9"],
+      "reuseMode": "one_shot_or_replenished",
+      "reuseInstructions": "Basic negative-processing directions use the developer once; replenishment instructions are available for large-volume processing.",
+      "capacityText": "1 litre concentrate makes 10 litres working solution, enough for at least 50 rolls of 35 mm 36-exposure film; replenished solution can process about 110 rolls.",
+      "sourceTitle": "SPRINT STANDARD B&W Film Developer / How To Mix",
+      "sourceUrl": "https://www.sprintsystems.com/home/p/standard-bampw-film-developer",
+      "sourceDate": "current"
+    }
+  ]
+}
