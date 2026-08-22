@@ -1,0 +1,25 @@
+# Final v0.2.9 rule: no runtime web enrichment. The bundled database/catalog is authoritative.
+p = ROOT / 'assistant/src/main/java/it/darkroom/assistant/ChemistrySpecEngine.java'
+s = p.read_text(encoding='utf-8')
+start = s.find('    static Spec enrich(String productName, String initialSourceUrl, String fallbackInstructions) {')
+end = s.find('\n    private static final class Candidate', start)
+if start < 0 or end < 0: raise SystemExit('v029 ChemistrySpecEngine enrich boundaries missing')
+local_enrich = r'''    static Spec enrich(String productName, String initialSourceUrl, String fallbackInstructions) {
+        // Darkroom 0.2.9: catalogo completamente offline. Non interroga motori di ricerca
+        // o pagine web durante l'uso. Conserva la provenienza registrata nel database.
+        String instructions = isUsefulInstruction(fallbackInstructions) ? fallbackInstructions : null;
+        return new Spec(instructions, REUSE_UNKNOWN, -1, -1,
+                initialSourceUrl == null ? "" : initialSourceUrl);
+    }
+'''
+s = s[:start] + local_enrich + s[end:]
+p.write_text(s, encoding='utf-8')
+
+# Strengthen wording and validation markers used by the Actions wrapper.
+p = ROOT / 'assistant/src/main/java/it/darkroom/assistant/AssistantActivityV2.java'
+s = p.read_text(encoding='utf-8')
+s = s.replace('Recupero dati, preparazione e capacità online…','Recupero dati dal database offline…')
+s = s.replace('La fonte online non contiene istruzioni di preparazione abbastanza chiare da estrarre automaticamente.','Il catalogo offline non contiene istruzioni di preparazione abbastanza dettagliate.')
+s = s.replace('Fonte online disponibile.','Fonte tecnica registrata disponibile.')
+p.write_text(s, encoding='utf-8')
+print('v029 runtime network enrichment disabled')
