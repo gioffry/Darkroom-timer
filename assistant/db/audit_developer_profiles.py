@@ -21,6 +21,8 @@ fields = [
     'manufacturer','physical_state','preparation','reuse_mode','capacity_text',
     'shelf_life_unopened','shelf_life_opened','shelf_life_stock','shelf_life_working'
 ]
+core_fields = ['manufacturer','physical_state','preparation','reuse_mode','capacity_text']
+shelf_fields = ['shelf_life_unopened','shelf_life_opened','shelf_life_stock','shelf_life_working']
 profiles = cur.execute('SELECT * FROM developer_profiles ORDER BY developer_name COLLATE NOCASE').fetchall()
 dev_count = cur.execute('SELECT COUNT(*) FROM developers').fetchone()[0]
 time_count = cur.execute('SELECT COUNT(*) FROM times').fetchone()[0]
@@ -36,14 +38,23 @@ mdc_dilutions = cur.execute("SELECT COUNT(*) FROM developer_dilutions WHERE sour
 manufacturer_dilutions = cur.execute("SELECT COUNT(*) FROM developer_dilutions WHERE source_kind='MANUFACTURER'").fetchone()[0]
 profiles_with_any_dilution = cur.execute('SELECT COUNT(DISTINCT developer_norm) FROM developer_dilutions').fetchone()[0]
 
+def filled(r, field):
+    return bool(str(r[field] or '').strip())
+
+def complete_core(r):
+    return all(filled(r, f) for f in core_fields) and any(filled(r, f) for f in shelf_fields)
+
+profiles_complete_core = sum(1 for r in profiles if complete_core(r))
+profiles_missing_core = len(profiles) - profiles_complete_core
+
 missing_rows = []
 for r in profiles:
-    missing = [f for f in fields if not str(r[f] or '').strip()]
-    missing_rows.append((r['developer_name'], r['manufacturer'] or '', ','.join(missing), r['mdc_combination_count'], r['mdc_film_count']))
+    missing = [f for f in fields if not filled(r, f)]
+    missing_rows.append((r['developer_name'], r['manufacturer'] or '', 'YES' if complete_core(r) else 'NO', ','.join(missing), r['mdc_combination_count'], r['mdc_film_count']))
 
 with OUT_CSV.open('w', newline='', encoding='utf-8') as fh:
     w = csv.writer(fh)
-    w.writerow(['developer','manufacturer','missing_fields','mdc_combinations','mdc_films'])
+    w.writerow(['developer','manufacturer','complete_core','missing_fields','mdc_combinations','mdc_films'])
     w.writerows(missing_rows)
 
 # Regression: FOMADON Excel must now be a real film-developer profile, not an empty shell.
@@ -81,6 +92,9 @@ lines = [
     f'combinations={time_count}',
     f'profiles={len(profiles)}',
     f'profiles_with_manufacturer_source={with_source}',
+    f'profiles_complete_core={profiles_complete_core}',
+    f'profiles_missing_core={profiles_missing_core}',
+    'complete_core_rule=manufacturer+physical_state+preparation+reuse_mode+capacity_text+at_least_one_shelf_life',
     f'profiles_with_any_dilution={profiles_with_any_dilution}',
     f'dilution_rows_mdc={mdc_dilutions}',
     f'dilution_rows_manufacturer_added={manufacturer_dilutions}',
