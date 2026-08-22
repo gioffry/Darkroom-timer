@@ -95,7 +95,7 @@ jobs:
           printf '%s\n' "${{ job.status }}" > build-output/v033/status.txt
           if [ -f Darkroom-v0.3.3.sha256 ]; then cp Darkroom-v0.3.3.sha256 build-output/v033/Darkroom-v0.3.3.sha256; fi
           if [ -f validation-v033-enriched.txt ]; then cp validation-v033-enriched.txt build-output/v033/validation-v0.3.3.txt; fi
-          if [ "$${{ job.status }}" != "success" ]; then
+          if [ "${{ job.status }}" != "success" ]; then
             { echo 'Darkroom v0.3.3 BUILD FAILED'; tail -n 500 build-v033.log 2>/dev/null || true; } > build-output/v033/BUILD_FAILED.txt
           else
             rm -f build-output/v033/BUILD_FAILED.txt
