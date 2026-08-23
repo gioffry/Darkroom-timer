@@ -65,6 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           cat combined/v015_assets/home_bottom_parts/00.part combined/v015_assets/home_bottom_parts/01.part combined/v015_assets/home_bottom_parts/02.part combined/v015_assets/home_bottom_parts/03.part > combined/v015_assets/home_bottom.jpg
+          python3 combined/patch_v043_prebuild_v042_validator.py
           set +e
           bash combined/build_v043.sh 2>&1 | tee build-v043.log
           BUILD_RC=${PIPESTATUS[0]}
@@ -88,6 +89,7 @@ jobs:
             apk-listing-v043.txt
             validation-v043.txt
             validation-v043-rolleiflex-search.txt
+            validation-v043b-app-search.txt
             validation-v043-faq-guard.txt
             validation-v043-bundled-db.txt
 
