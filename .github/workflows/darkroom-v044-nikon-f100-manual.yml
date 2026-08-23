@@ -6,6 +6,9 @@ on:
       - feature-darkroom-v044-nikon-f100-manual
     paths-ignore:
       - 'build-output/v044/**'
+  pull_request:
+    branches:
+      - feature-darkroom-v043-faq-search-rolleiflex
   workflow_dispatch:
 
 permissions:
@@ -89,7 +92,7 @@ jobs:
             validation-v044-bundled-db.txt
 
       - name: Publish build metadata
-        if: always()
+        if: always() && github.event_name != 'pull_request'
         run: |
           set -euo pipefail
           mkdir -p build-output/v044
