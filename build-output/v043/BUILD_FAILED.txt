@@ -1,107 +1,7 @@
 Darkroom v0.4.3 BUILD FAILED
-commit=3f700d2867195cf69a32a9c9f83a2fb2894d2022
+commit=86643923b57e9eb4f6bb8ebed9d623ed20a36da5
 --- tail build-v043.log ---
-
-Here are the highlights of this release:
- - Daemon JVM auto-provisioning
- - Enhancements for Scala plugin and JUnit testing
- - Improvements for build authors and plugin developers
-
-For more details see https://docs.gradle.org/8.13/release-notes.html
-
-Starting a Gradle Daemon (subsequent builds will be faster)
-> Task :combined:preBuild UP-TO-DATE
-> Task :combined:preReleaseBuild UP-TO-DATE
-> Task :combined:mergeReleaseJniLibFolders
-> Task :combined:mergeReleaseNativeLibs NO-SOURCE
-> Task :combined:stripReleaseDebugSymbols NO-SOURCE
-> Task :combined:extractReleaseNativeSymbolTables NO-SOURCE
-> Task :combined:mergeReleaseNativeDebugMetadata NO-SOURCE
-> Task :combined:javaPreCompileRelease
-> Task :combined:checkReleaseDuplicateClasses
-> Task :combined:generateReleaseResValues
-> Task :combined:checkReleaseAarMetadata
-> Task :combined:mapReleaseSourceSetPaths
-> Task :combined:generateReleaseResources
-> Task :combined:packageReleaseResources
-> Task :combined:mergeReleaseResources
-> Task :combined:createReleaseCompatibleScreenManifests
-> Task :combined:extractDeepLinksRelease
-> Task :combined:parseReleaseLocalResources
-
-> Task :combined:processReleaseMainManifest
-package="it.darkroom.timer" found in source AndroidManifest.xml: /home/runner/work/Darkroom-timer/Darkroom-timer/combined/src/main/AndroidManifest.xml.
-Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
-Recommendation: remove package="it.darkroom.timer" from the source AndroidManifest.xml: /home/runner/work/Darkroom-timer/Darkroom-timer/combined/src/main/AndroidManifest.xml.
-
-> Task :combined:processReleaseManifest
-> Task :combined:desugarReleaseFileDependencies
-> Task :combined:mergeReleaseStartupProfile
-> Task :combined:mergeReleaseArtProfile
-> Task :combined:processReleaseManifestForPackage
-> Task :combined:mergeReleaseShaders
-> Task :combined:compileReleaseShaders NO-SOURCE
-> Task :combined:generateReleaseAssets UP-TO-DATE
-> Task :combined:processReleaseResources
-> Task :combined:mergeReleaseAssets
-> Task :combined:mergeExtDexRelease
-
-> Task :combined:compileReleaseJavaWithJavac
-Note: Some input files use or override a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
-
-> Task :combined:dexBuilderRelease
-> Task :combined:mergeReleaseGlobalSynthetics
-> Task :combined:extractReleaseVersionControlInfo
-> Task :combined:extractProguardFiles
-> Task :combined:compressReleaseAssets
-> Task :combined:generateReleaseLintVitalReportModel
-> Task :combined:mergeDexRelease
-> Task :combined:compileReleaseArtProfile
-> Task :combined:processReleaseJavaRes NO-SOURCE
-> Task :combined:collectReleaseDependencies
-> Task :combined:sdkReleaseDependencyData
-> Task :combined:optimizeReleaseResources
-> Task :combined:validateSigningRelease
-> Task :combined:writeReleaseAppMetadata
-> Task :combined:writeReleaseSigningConfigVersions
-> Task :combined:mergeReleaseJavaResource
-> Task :combined:lintVitalAnalyzeRelease
-> Task :combined:lintVitalReportRelease
-> Task :combined:lintVitalRelease
-> Task :combined:packageRelease
-> Task :combined:createReleaseApkListingFileRedirect
-> Task :combined:assembleRelease
-
-[Incubating] Problems report is available at: file:///home/runner/work/Darkroom-timer/Darkroom-timer/build/reports/problems/problems-report.html
-
-Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
-
-You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
-
-For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
-
-BUILD SUCCESSFUL in 1m 25s
-43 actionable tasks: 43 executed
-Verifies
-Verified using v1 scheme (JAR signing): false
-Verified using v2 scheme (APK Signature Scheme v2): true
-Verified using v3 scheme (APK Signature Scheme v3): false
-Verified using v3.1 scheme (APK Signature Scheme v3.1): false
-Verified using v4 scheme (APK Signature Scheme v4): false
-Verified for SourceStamp: false
-Number of signers: 1
-Signer #1 certificate DN: CN=Darkroom Timer, OU=App Signing, O=Darkroom Timer, C=IT
-Signer #1 certificate SHA-256 digest: fbead305657584b50a9d8892aa19bd9844b412d77db316e7daa5593c94e2a02f
-Signer #1 certificate SHA-1 digest: e8571de937e649ab714669c03c44b1bfa67e1cba
-Signer #1 certificate MD5 digest: 47cfa41624cacafef63a5c339ddd668a
-Signer #1 key algorithm: RSA
-Signer #1 key size (bits): 4096
-Signer #1 public key SHA-256 digest: 192768f7fe3a92c4697fe98f1e65d7173bff4c4a497b038207dd79d6f2af48a4
-Signer #1 public key SHA-1 digest: 5c1f2c34c4c63bb994ae413416d4a38e9609afde
-Signer #1 public key MD5 digest: cca83fde59ccf34c37086ce7408006f4
-e728441d1218d7acc82f2a4ab80a16d9d335aee19e7e75b584b78f161a303e63  Darkroom-v0.3.2.apk
-e728441d1218d7acc82f2a4ab80a16d9d335aee19e7e75b584b78f161a303e63  Darkroom-v0.3.2.apk
+9c0d571f3fba9071da78502c2d7b85ae9ef7ba755ab81c3ae421db4333d363ba  Darkroom-v0.3.2.apk
 catalog_validation=PASS
 sqlite_user_version=3
 sqlite_quick_check=ok
@@ -136,11 +36,11 @@ developer_test::Adox Rodinal::Rodinal
 developer_test::Fomadon Excel::Fomadon Excel
 developer_test::Fomadon P::Fomadon P
 developer_test::Fomadon R09::fomadon r 09
-e728441d1218d7acc82f2a4ab80a16d9d335aee19e7e75b584b78f161a303e63  Darkroom-v0.3.2.apk
+9c0d571f3fba9071da78502c2d7b85ae9ef7ba755ab81c3ae421db4333d363ba  Darkroom-v0.3.2.apk
 search_filter_fomatol_film=PASS
 search_filter_fomatol_paper=PASS
 empty_alias_match=PASS
-e728441d1218d7acc82f2a4ab80a16d9d335aee19e7e75b584b78f161a303e63  Darkroom-v0.3.2.apk
+9c0d571f3fba9071da78502c2d7b85ae9ef7ba755ab81c3ae421db4333d363ba  Darkroom-v0.3.2.apk
 developer_profiles=232/232
 manufacturer_records_matched=19
 manufacturer_fields_applied=134
@@ -329,11 +229,11 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:mergeReleaseStartupProfile UP-TO-DATE
 > Task :combined:mergeExtDexRelease UP-TO-DATE
 > Task :combined:mergeReleaseArtProfile UP-TO-DATE
-> Task :combined:processReleaseManifestForPackage
 > Task :combined:mergeReleaseShaders UP-TO-DATE
 > Task :combined:compileReleaseShaders NO-SOURCE
 > Task :combined:generateReleaseAssets UP-TO-DATE
 > Task :combined:mergeReleaseAssets
+> Task :combined:processReleaseManifestForPackage
 > Task :combined:extractReleaseVersionControlInfo UP-TO-DATE
 > Task :combined:extractProguardFiles UP-TO-DATE
 > Task :combined:processReleaseJavaRes NO-SOURCE
@@ -343,8 +243,8 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:validateSigningRelease UP-TO-DATE
 > Task :combined:writeReleaseAppMetadata UP-TO-DATE
 > Task :combined:writeReleaseSigningConfigVersions UP-TO-DATE
-> Task :combined:processReleaseResources
 > Task :combined:compressReleaseAssets
+> Task :combined:processReleaseResources
 
 > Task :combined:compileReleaseJavaWithJavac
 Note: /home/runner/work/Darkroom-timer/Darkroom-timer/combined/src/main/java/it/darkroom/assistant/AssistantActivityV2.java uses or overrides a deprecated API.
@@ -379,7 +279,7 @@ mdc_combinations=14504
 mdc_dilutions_preserved=776
 rollei_supergrain_complete=PASS
 fomadon_excel_runtime_profile=PASS
-ee96362304618c291eef13a20e34dbe6b9fdb84a297f7b886e37a1a4aecab57c  Darkroom-v0.3.3.apk
+b2dd1486adaf7acda76edca0db6a802faf31e502292a0de54ff81772779d5c86  Darkroom-v0.3.3.apk
 technical_it_schema=v034
 developer_profiles_with_it=79
 auxiliary_chemical_profiles=4
@@ -424,8 +324,8 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:mergeReleaseAssets
 > Task :combined:extractReleaseVersionControlInfo UP-TO-DATE
 > Task :combined:extractProguardFiles UP-TO-DATE
-> Task :combined:processReleaseJavaRes NO-SOURCE
 > Task :combined:processReleaseManifestForPackage
+> Task :combined:processReleaseJavaRes NO-SOURCE
 > Task :combined:mergeReleaseJavaResource UP-TO-DATE
 > Task :combined:collectReleaseDependencies UP-TO-DATE
 > Task :combined:sdkReleaseDependencyData UP-TO-DATE
@@ -477,7 +377,7 @@ single_card_mdc_plus_technical=PASS
 original_technical_text_preserved=PASS
 timer_splitgrade_sonoff_preserved=PASS
 personal_data_migration=NO_DESTRUCTIVE_RESET
-bde693e21b04700f90ef26bb0114006a5286c92a78a031472cc2a57cada955c5  Darkroom-v0.3.4.apk
+ecde5099deb0a2a59ae0fc51e3b42186a4127fc3495c2253d20e3443896d4ad6  Darkroom-v0.3.4.apk
 technical_it_schema=v035_strict
 developer_profiles_total=232
 developer_profiles_manufacturer_sourced=85
@@ -518,6 +418,7 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 
 > Task :combined:processReleaseManifest
 > Task :combined:desugarReleaseFileDependencies UP-TO-DATE
+> Task :combined:processReleaseManifestForPackage
 > Task :combined:mergeReleaseStartupProfile UP-TO-DATE
 > Task :combined:mergeExtDexRelease UP-TO-DATE
 > Task :combined:mergeReleaseArtProfile UP-TO-DATE
@@ -525,7 +426,6 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:compileReleaseShaders NO-SOURCE
 > Task :combined:generateReleaseAssets UP-TO-DATE
 > Task :combined:mergeReleaseAssets
-> Task :combined:processReleaseManifestForPackage
 > Task :combined:extractReleaseVersionControlInfo UP-TO-DATE
 > Task :combined:extractProguardFiles UP-TO-DATE
 > Task :combined:processReleaseJavaRes NO-SOURCE
@@ -535,8 +435,8 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:validateSigningRelease UP-TO-DATE
 > Task :combined:writeReleaseAppMetadata UP-TO-DATE
 > Task :combined:writeReleaseSigningConfigVersions UP-TO-DATE
-> Task :combined:compressReleaseAssets
 > Task :combined:processReleaseResources
+> Task :combined:compressReleaseAssets
 
 > Task :combined:compileReleaseJavaWithJavac
 Note: /home/runner/work/Darkroom-timer/Darkroom-timer/combined/src/main/java/it/darkroom/assistant/AssistantActivityV2.java uses or overrides a deprecated API.
@@ -585,7 +485,7 @@ mdc_developers_unchanged=232
 mdc_dilutions_unchanged=776
 timer_splitgrade_sonoff_preserved=PASS
 personal_data_migration=NO_DESTRUCTIVE_RESET
-f0efa6dee1f26835851488b2000522b8ec431c35905c7d2cbad95f75ecf71002  Darkroom-v0.3.5.apk
+d5ac465aa072c8fce6392580e1f77d90adb50348bb8598bd4e1b3e2d55b9471d  Darkroom-v0.3.5.apk
 developer_preparation_raw=79
 developer_preparation_clean_italian=79
 preparation_translation_coverage=79/79
@@ -660,13 +560,13 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:compileReleaseShaders NO-SOURCE
 > Task :combined:generateReleaseAssets UP-TO-DATE
 > Task :combined:mergeReleaseAssets
+> Task :combined:processReleaseManifestForPackage
 > Task :combined:extractReleaseVersionControlInfo UP-TO-DATE
 > Task :combined:extractProguardFiles UP-TO-DATE
 > Task :combined:processReleaseJavaRes NO-SOURCE
 > Task :combined:mergeReleaseJavaResource UP-TO-DATE
 > Task :combined:collectReleaseDependencies UP-TO-DATE
 > Task :combined:sdkReleaseDependencyData UP-TO-DATE
-> Task :combined:processReleaseManifestForPackage
 > Task :combined:validateSigningRelease UP-TO-DATE
 > Task :combined:writeReleaseAppMetadata UP-TO-DATE
 > Task :combined:writeReleaseSigningConfigVersions UP-TO-DATE
@@ -720,7 +620,7 @@ mdc_developers_unchanged=232
 mdc_dilutions_unchanged=776
 timer_splitgrade_sonoff_preserved=PASS
 personal_data_migration=NO_DESTRUCTIVE_RESET
-999d2c836c41981ffbd870d4d96e344f5bee2b1e5399874296244077c4cbb530  Darkroom-v0.3.6.apk
+12dbc808999625bbe91793ebed5a3385d12e5786264d29cea058f4101b818ac5  Darkroom-v0.3.6.apk
 release_layer=v037_italian_visible_cleanup
 operational_structured_rows_regenerated_it=45
 d76_capacity_it=PASS
@@ -764,13 +664,13 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:processReleaseManifest
 > Task :combined:desugarReleaseFileDependencies UP-TO-DATE
 > Task :combined:mergeReleaseStartupProfile UP-TO-DATE
+> Task :combined:processReleaseManifestForPackage
 > Task :combined:mergeExtDexRelease UP-TO-DATE
 > Task :combined:mergeReleaseArtProfile UP-TO-DATE
 > Task :combined:mergeReleaseShaders UP-TO-DATE
 > Task :combined:compileReleaseShaders NO-SOURCE
 > Task :combined:generateReleaseAssets UP-TO-DATE
 > Task :combined:mergeReleaseAssets
-> Task :combined:processReleaseManifestForPackage
 > Task :combined:extractReleaseVersionControlInfo UP-TO-DATE
 > Task :combined:extractProguardFiles UP-TO-DATE
 > Task :combined:processReleaseJavaRes NO-SOURCE
@@ -780,8 +680,8 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:validateSigningRelease UP-TO-DATE
 > Task :combined:writeReleaseAppMetadata UP-TO-DATE
 > Task :combined:writeReleaseSigningConfigVersions UP-TO-DATE
-> Task :combined:compressReleaseAssets
 > Task :combined:processReleaseResources
+> Task :combined:compressReleaseAssets
 
 > Task :combined:compileReleaseJavaWithJavac
 Note: /home/runner/work/Darkroom-timer/Darkroom-timer/combined/src/main/java/it/darkroom/assistant/AssistantActivityV2.java uses or overrides a deprecated API.
@@ -791,11 +691,11 @@ Note: Recompile with -Xlint:deprecation for details.
 > Task :combined:mergeReleaseGlobalSynthetics UP-TO-DATE
 > Task :combined:generateReleaseLintVitalReportModel
 > Task :combined:optimizeReleaseResources
-> Task :combined:mergeDexRelease
-> Task :combined:compileReleaseArtProfile
 > Task :combined:lintVitalAnalyzeRelease
 > Task :combined:lintVitalReportRelease
 > Task :combined:lintVitalRelease
+> Task :combined:mergeDexRelease
+> Task :combined:compileReleaseArtProfile
 > Task :combined:packageRelease
 > Task :combined:createReleaseApkListingFileRedirect
 > Task :combined:assembleRelease
@@ -808,7 +708,7 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 5s
+BUILD SUCCESSFUL in 4s
 43 actionable tasks: 18 executed, 25 up-to-date
 release=Darkroom-v0.3.7
 versionName=0.3.7
@@ -827,7 +727,7 @@ mdc_films_unchanged=347
 mdc_developers_unchanged=232
 mdc_dilutions_unchanged=776
 timer_splitgrade_sonoff_preserved=PASS
-64b55d027a5e14a1701f1b161e7c08906ae673c717b5c5f4ed5e198a70318b21  Darkroom-v0.3.7.apk
+f7d2ab332afc3aa20d4e327590fa548b229620c24afa400b271ae17053f6171c  Darkroom-v0.3.7.apk
 Darkroom v0.3.8 paper-plane height patch ready
 > Task :combined:preBuild UP-TO-DATE
 > Task :combined:preReleaseBuild UP-TO-DATE
@@ -854,6 +754,7 @@ Setting the namespace via the package attribute in the source AndroidManifest.xm
 Recommendation: remove package="it.darkroom.timer" from the source AndroidManifest.xml: /home/runner/work/Darkroom-timer/Darkroom-timer/combined/src/main/AndroidManifest.xml.
 
 > Task :combined:processReleaseManifest
+> Task :combined:processReleaseManifestForPackage
 > Task :combined:desugarReleaseFileDependencies UP-TO-DATE
 > Task :combined:mergeReleaseStartupProfile UP-TO-DATE
 > Task :combined:mergeExtDexRelease UP-TO-DATE
@@ -871,7 +772,6 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:sdkReleaseDependencyData UP-TO-DATE
 > Task :combined:validateSigningRelease UP-TO-DATE
 > Task :combined:writeReleaseAppMetadata UP-TO-DATE
-> Task :combined:processReleaseManifestForPackage
 > Task :combined:writeReleaseSigningConfigVersions UP-TO-DATE
 > Task :combined:processReleaseResources
 
@@ -917,7 +817,7 @@ mdc_times_unchanged=14504
 mdc_films_unchanged=347
 mdc_developers_unchanged=232
 mdc_dilutions_unchanged=776
-06a88cf8cd6752ef8a6baa193cf23dc86bd5685d4dea45d0f0873b911a0a0cb1  Darkroom-v0.3.8.apk
+8ab06909cf7fb7cde76071e2fc81f434c932451e0ce4c6f09aa82cc5abf7d0fb  Darkroom-v0.3.8.apk
 Darkroom v0.3.9 settings order patch ready
 > Task :combined:preBuild UP-TO-DATE
 > Task :combined:preReleaseBuild UP-TO-DATE
@@ -1007,7 +907,7 @@ mdc_times_unchanged=14504
 mdc_films_unchanged=347
 mdc_developers_unchanged=232
 mdc_dilutions_unchanged=776
-67b9e4ace7506fe5ad8c3519192c371751966715abff55ac11887b0e3d02aa76  Darkroom-v0.3.9.apk
+5a74165b4c052827efadac5c1d8027d016e4a1cec468c69c4939d8476811f4fc  Darkroom-v0.3.9.apk
 Darkroom v0.4.0 Minolta manual/FAQ patch ready
 > Task :combined:preBuild UP-TO-DATE
 > Task :combined:preReleaseBuild UP-TO-DATE
@@ -1038,12 +938,12 @@ Recommendation: remove package="it.darkroom.timer" from the source AndroidManife
 > Task :combined:mergeReleaseStartupProfile UP-TO-DATE
 > Task :combined:mergeExtDexRelease UP-TO-DATE
 > Task :combined:mergeReleaseArtProfile UP-TO-DATE
-> Task :combined:processReleaseManifestForPackage
 > Task :combined:mergeReleaseShaders UP-TO-DATE
 > Task :combined:compileReleaseShaders NO-SOURCE
 > Task :combined:generateReleaseAssets UP-TO-DATE
 > Task :combined:mergeReleaseAssets UP-TO-DATE
 > Task :combined:compressReleaseAssets UP-TO-DATE
+> Task :combined:processReleaseManifestForPackage
 > Task :combined:extractReleaseVersionControlInfo UP-TO-DATE
 > Task :combined:extractProguardFiles UP-TO-DATE
 > Task :combined:processReleaseJavaRes NO-SOURCE
@@ -1102,7 +1002,7 @@ mdc_times_unchanged=14504
 mdc_films_unchanged=347
 mdc_developers_unchanged=232
 mdc_dilutions_unchanged=776
-242ae78fbe7f9d954e12580baad17b0dee384290dcf4b4677eb0e8b6a2f52b16  Darkroom-v0.4.0.apk
+1c907664b66a091d01e012e392ab9cf7fcb93d4b532b36388e8751a704e4b524  Darkroom-v0.4.0.apk
 Darkroom v0.4.1 Nikon L35AF2 manual/FAQ patch ready
 > Task :combined:preBuild UP-TO-DATE
 > Task :combined:preReleaseBuild UP-TO-DATE
@@ -1199,5 +1099,105 @@ mdc_times_unchanged=14504
 mdc_films_unchanged=347
 mdc_developers_unchanged=232
 mdc_dilutions_unchanged=776
-22a0b61de03a64e891bf1962290f218b78cb5a0143845f0ff93c5ac59d60ff46  Darkroom-v0.4.1.apk
-v0.4.2 Color3 question count != 11
+be24379bae873fb2ef4223af7cd93c0c03420767f8b4e746205ad64a528ae2dc  Darkroom-v0.4.1.apk
+Darkroom v0.4.2 technique FAQ patch ready
+> Task :combined:preBuild UP-TO-DATE
+> Task :combined:preReleaseBuild UP-TO-DATE
+> Task :combined:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :combined:mergeReleaseNativeLibs NO-SOURCE
+> Task :combined:stripReleaseDebugSymbols NO-SOURCE
+> Task :combined:extractReleaseNativeSymbolTables NO-SOURCE
+> Task :combined:mergeReleaseNativeDebugMetadata NO-SOURCE
+> Task :combined:checkReleaseDuplicateClasses UP-TO-DATE
+> Task :combined:javaPreCompileRelease UP-TO-DATE
+> Task :combined:checkReleaseAarMetadata UP-TO-DATE
+> Task :combined:generateReleaseResValues UP-TO-DATE
+> Task :combined:mapReleaseSourceSetPaths UP-TO-DATE
+> Task :combined:generateReleaseResources UP-TO-DATE
+> Task :combined:mergeReleaseResources UP-TO-DATE
+> Task :combined:packageReleaseResources UP-TO-DATE
+> Task :combined:parseReleaseLocalResources UP-TO-DATE
+> Task :combined:createReleaseCompatibleScreenManifests
+> Task :combined:extractDeepLinksRelease UP-TO-DATE
+
+> Task :combined:processReleaseMainManifest
+package="it.darkroom.timer" found in source AndroidManifest.xml: /home/runner/work/Darkroom-timer/Darkroom-timer/combined/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="it.darkroom.timer" from the source AndroidManifest.xml: /home/runner/work/Darkroom-timer/Darkroom-timer/combined/src/main/AndroidManifest.xml.
+
+> Task :combined:processReleaseManifest
+> Task :combined:desugarReleaseFileDependencies UP-TO-DATE
+> Task :combined:mergeReleaseStartupProfile UP-TO-DATE
+> Task :combined:mergeExtDexRelease UP-TO-DATE
+> Task :combined:mergeReleaseArtProfile UP-TO-DATE
+> Task :combined:mergeReleaseShaders UP-TO-DATE
+> Task :combined:compileReleaseShaders NO-SOURCE
+> Task :combined:generateReleaseAssets UP-TO-DATE
+> Task :combined:mergeReleaseAssets UP-TO-DATE
+> Task :combined:compressReleaseAssets UP-TO-DATE
+> Task :combined:extractReleaseVersionControlInfo UP-TO-DATE
+> Task :combined:extractProguardFiles UP-TO-DATE
+> Task :combined:processReleaseJavaRes NO-SOURCE
+> Task :combined:mergeReleaseJavaResource UP-TO-DATE
+> Task :combined:collectReleaseDependencies UP-TO-DATE
+> Task :combined:sdkReleaseDependencyData UP-TO-DATE
+> Task :combined:validateSigningRelease UP-TO-DATE
+> Task :combined:writeReleaseAppMetadata UP-TO-DATE
+> Task :combined:writeReleaseSigningConfigVersions UP-TO-DATE
+> Task :combined:processReleaseManifestForPackage
+> Task :combined:processReleaseResources
+
+> Task :combined:compileReleaseJavaWithJavac
+Note: /home/runner/work/Darkroom-timer/Darkroom-timer/combined/src/main/java/it/darkroom/timer/maintenance/UseMaintenanceActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :combined:dexBuilderRelease
+> Task :combined:mergeReleaseGlobalSynthetics UP-TO-DATE
+> Task :combined:generateReleaseLintVitalReportModel
+> Task :combined:optimizeReleaseResources
+> Task :combined:lintVitalAnalyzeRelease
+> Task :combined:lintVitalReportRelease
+> Task :combined:lintVitalRelease
+> Task :combined:mergeDexRelease
+> Task :combined:compileReleaseArtProfile
+> Task :combined:packageRelease
+> Task :combined:createReleaseApkListingFileRedirect
+> Task :combined:assembleRelease
+
+[Incubating] Problems report is available at: file:///home/runner/work/Darkroom-timer/Darkroom-timer/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 3s
+43 actionable tasks: 16 executed, 27 up-to-date
+color3_questions=11
+color3_answers=11
+color3_lamp_replacement=PASS
+process_wash_questions=4
+process_wash_answers=4
+jobo_wetting_agent_separate_container=PASS
+jobo_no_rotary_wetting_agent=PASS
+film_wash_5_10_20=PASS
+rc_wash_2min=PASS
+release=Darkroom-v0.4.2
+versionName=0.4.2
+versionCode=33
+base_version=0.4.1
+change_scope=COLOR3_LAMP_PLUS_TECHNIQUE_FAQS
+color3_faq_count=11
+process_wash_faq_count=4
+nikon_l35af2_manual_faq_unchanged=PASS
+minolta_manual_faq_unchanged=PASS
+paper_plane_logic_unchanged=PASS
+enlargement_exposure_formula_unchanged=PASS
+sonoff_final_step_seconds=0.5
+mdc_times_unchanged=14504
+mdc_films_unchanged=347
+mdc_developers_unchanged=232
+mdc_dilutions_unchanged=776
+08addcddac29f89a81d5d6e4fc2024fdb37bb8394d27170c3bc553966eddcfdd  Darkroom-v0.4.2.apk
+v0.4.3: root search marker missing
