@@ -9,10 +9,10 @@ if anchor not in code:
     raise SystemExit('v0.4.5 r2: validation anchor missing')
 code = code.replace(anchor, helper + anchor, 1)
 repls = {
-    "if q_min.count('            \\\"') != 12:": "if count_java_strings(q_min) != 12:",
-    "if a_min.count('            \\\"') != 12:": "if count_java_strings(a_min) != 12:",
-    "if out[qz_start:qz_end].count('            \\\"') != 11:": "if count_java_strings(out[qz_start:qz_end]) != 11:",
-    "if out[az_start:az_end].count('            \\\"') != 11:": "if count_java_strings(out[az_start:az_end]) != 11:",
+    "q_min.count('            \"')": "count_java_strings(q_min)",
+    "a_min.count('            \"')": "count_java_strings(a_min)",
+    "out[qz_start:qz_end].count('            \"')": "count_java_strings(out[qz_start:qz_end])",
+    "out[az_start:az_end].count('            \"')": "count_java_strings(out[az_start:az_end])",
 }
 for old,new in repls.items():
     if old not in code:
