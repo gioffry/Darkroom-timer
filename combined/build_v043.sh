@@ -7,6 +7,7 @@ set -euo pipefail
 
 bash combined/build_v042.sh
 python3 combined/patch_v043_rolleiflex_faq_search.py | tee validation-v043-rolleiflex-search.txt
+python3 combined/patch_v043b_search_app_faq.py | tee validation-v043b-app-search.txt
 
 python3 - <<'PY'
 from pathlib import Path
@@ -50,6 +51,7 @@ MDC=combined/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
 grep -Fq 'Cerca nelle FAQ…' "$MAINT"
 grep -Fq 'renderFaqSearchResults' "$MAINT"
 grep -Fq 'renderSingleFaq' "$MAINT"
+grep -Fq 'addFaqMatches(hits,"APP DARKROOM",Q_DARKROOM,A_DARKROOM,q);' "$MAINT"
 grep -Fq 'FILTRI E ACCESSORI ROLLEIFLEX' "$MAINT"
 grep -Fq 'ROLLEIFLEX 3.5 — ACCESSORI' "$MAINT"
 grep -Fq 'ROLLEIFLEX 2.8 — ACCESSORI' "$MAINT"
@@ -68,7 +70,7 @@ python3 - <<'PY' | tee validation-v043-faq-guard.txt
 from pathlib import Path
 s=Path('combined/src/main/java/it/darkroom/timer/maintenance/UseMaintenanceActivity.java').read_text(encoding='utf-8')
 required=[
-'Cerca nelle FAQ…','addFaqMatches(hits,"MEOPTA OPEMUS 6"','addFaqMatches(hits,"ROLLEIFLEX 3.5 — GENERALE"','addFaqMatches(hits,"ROLLEIFLEX 2.8 — GENERALE"',
+'Cerca nelle FAQ…','addFaqMatches(hits,"APP DARKROOM",Q_DARKROOM,A_DARKROOM,q);','addFaqMatches(hits,"MEOPTA OPEMUS 6"','addFaqMatches(hits,"ROLLEIFLEX 3.5 — GENERALE"','addFaqMatches(hits,"ROLLEIFLEX 2.8 — GENERALE"',
 'Rolleifilter Sport','Gelb Mittel','Hellgrün','Hellrot','Hellblau','Rolleinar 1','Rolleinar 2','Rolleiparkeil 1','Rolleiparkeil 2','Heidosmat-Rolleinar 1','puntino rosso'
 ]
 for x in required: assert x in s,x
@@ -76,6 +78,7 @@ for a,b,n in [
 ('Q_R35_GENERAL','A_R35_GENERAL',10),('Q_R35_SPORT','A_R35_SPORT',1),('Q_R35_YELLOW','A_R35_YELLOW',3),('Q_R35_GREEN','A_R35_GREEN',4),('Q_R35_RED','A_R35_RED',4),('Q_R35_BLUE','A_R35_BLUE',3),('Q_R35_R1','A_R35_R1',8),('Q_R35_R2','A_R35_R2',8),('Q_R28_GENERAL','A_R28_GENERAL',3),('Q_R28_HOOD','A_R28_HOOD',1),('Q_R28_R1','A_R28_R1',5)]:
     x=s.index('private static final String[] '+a); y=s.index('private static final String[] '+b,x); assert s[x:y].count('            "')==n,(a,n)
 print('global_faq_search=PASS')
+print('app_darkroom_in_global_search=PASS')
 print('search_question_and_answer=PASS')
 print('search_direct_single_faq=PASS')
 print('rolleiflex_35_accessory_sections=8')
@@ -133,5 +136,5 @@ print('mdc_dilutions_unchanged=776')
 con.close()
 PY
 
-cat validation-v042.txt validation-v043-rolleiflex-search.txt validation-v043-faq-guard.txt validation-v043-bundled-db.txt > validation-v043.txt
+cat validation-v042.txt validation-v043-rolleiflex-search.txt validation-v043b-app-search.txt validation-v043-faq-guard.txt validation-v043-bundled-db.txt > validation-v043.txt
 sha256sum Darkroom-v0.4.3.apk | tee Darkroom-v0.4.3.sha256
