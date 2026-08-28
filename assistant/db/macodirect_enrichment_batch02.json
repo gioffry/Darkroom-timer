@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MDC_FIRST_MANUFACTURER_FILL_ONLY",
+  "checkedAt": "2026-08-22",
+  "scope": "MACODIRECT_CURRENT_LISTINGS_ONLY",
+  "records": [
+    {
+      "matchNames": ["Bellini B&W Ecofilm"],
+      "manufacturer": "Bellini Foto S.r.l.",
+      "productName": "Bellini ECOFILM B&W Film Developer",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute concentrate 1+1 with water; a 500 ml bottle makes 1 litre of ready-to-use working developer.",
+      "reuseMode": "reusable_with_time_compensation",
+      "reuseInstructions": "For films 1-5 use normal developing time; for films 6-10 increase development time by 15%; for films 11-15 increase by 30%.",
+      "capacityText": "14-15 films 135-36 or 120 per litre of working solution; 50-60 sheet films 9x12 cm per litre.",
+      "shelfLifeUnopened": "Unopened concentrate: Bellini B&W developer guideline 1-2 years after purchase under suitable storage conditions.",
+      "shelfLifeOpened": "Concentrate in a capped bottle with air expelled: Bellini guideline 6-8 weeks.",
+      "shelfLifeWorking": "Working solution: Bellini guideline 2 weeks left open or 4 weeks in a capped bottle.",
+      "sourceTitle": "Bellini ECOFILM Technical Data Sheet",
+      "sourceUrl": "https://www.bellinifoto.it/wp-content/uploads/2020/03/BWDECOFILM-1.pdf",
+      "sourceDate": "current Bellini technical sheet"
+    },
+    {
+      "matchNames": ["Bellini Euro HC"],
+      "manufacturer": "Bellini Foto S.r.l.",
+      "productName": "Bellini EURO HC Film Developer",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute 1+31. For 300 ml working solution use 9 ml concentrate plus 291 ml water.",
+      "reuseMode": "one_shot",
+      "reuseInstructions": "Bellini explicitly marks the 1+31 working solution as One-Shot / Singolo Utilizzo.",
+      "capacityText": "500 ml concentrate yields approximately 50-60 films 135-36; the package makes about 15-16 litres of working developer at 1+31.",
+      "sourceTitle": "Bellini EURO HC Film Developer Technical Data Sheet",
+      "sourceUrl": "https://www.bellinifoto.it/wp-content/uploads/2021/10/EURO-HC.pdf",
+      "sourceDate": "current Bellini technical sheet"
+    },
+    {
+      "matchNames": ["Bellini Euro HC"],
+      "shelfLifeUnopened": "Bellini B&W developer guideline: unopened concentrate 1-2 years after purchase under suitable storage conditions.",
+      "shelfLifeOpened": "Bellini B&W developer guideline: concentrate in a capped bottle with air expelled 6-8 weeks.",
+      "shelfLifeWorking": "Bellini B&W developer guideline: working solution 2 weeks left open or 4 weeks in a capped bottle.",
+      "sourceTitle": "Bellini B&W Developer Shelf-Life Guidance",
+      "sourceUrl": "https://www.bellinifoto.it/wp-content/uploads/2024/01/BWDEK76.pdf",
+      "sourceDate": "current Bellini B&W guidance"
+    },
+    {
+      "matchNames": ["Dektol"],
+      "manufacturer": "Eastman Kodak Company / Kodak Professional",
+      "productName": "KODAK PROFESSIONAL DEKTOL Developer",
+      "physicalState": "powder developer",
+      "preparation": "Mix the complete package to the marked stock-solution volume; for tray use dilute 1 part stock developer with 2 parts water (1+2). Kodak does not recommend dividing powdered packages for partial mixing.",
+      "reuseMode": "reusable_until_capacity_or_working_day_limit",
+      "reuseInstructions": "Use the tray working solution during the working day and discard when its useful capacity or one-working-day keeping limit is reached.",
+      "capacityText": "Useful tray capacity: about 32 sheets 8x10 inch per litre of working solution (120 sheets per US gallon).",
+      "shelfLifeStock": "Prepared stock solution in a full closed container: approximately 6 months.",
+      "shelfLifeWorking": "Working solution in tray: 1 working day.",
+      "sourceTitle": "KODAK PROFESSIONAL Chemicals for Black-and-White Papers, Publication E103CP",
+      "sourceUrl": "https://business.kodakmoments.com/sites/default/files/files/product-categories/e103cp.pdf",
+      "sourceDate": "Kodak Publication E103CP"
+    },
+    {
+      "matchNames": ["Ecoprint Universal"],
+      "manufacturer": "Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS",
+      "productName": "MACO ecoprint universal developer",
+      "physicalState": "liquid concentrate",
+      "preparation": "For paper use 1+7; example 1 litre working solution uses 125 ml concentrate plus 825 ml water. For film use 1+12; example 260 ml working solution uses 20 ml concentrate plus 240 ml water.",
+      "capacityText": "Paper: up to 100 sheets 8x10 inch per litre of working solution. The current manufacturer page does not publish a film-capacity figure.",
+      "sourceTitle": "MACO ecoprint universal developer manufacturer product information",
+      "sourceUrl": "https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/1613/maco-ecoprint-universal-developer-1l",
+      "sourceDate": "current MACO product page"
+    },
+    {
+      "matchNames": ["Nucleol BF200"],
+      "manufacturer": "Bellini Foto S.r.l. / Chimifoto Ornano",
+      "productName": "Chimifoto Ornano NUCLEOL BF200",
+      "physicalState": "two-part liquid concentrate (Part A + Part B)",
+      "preparation": "Two liquid components A and B are combined according to the product development instructions; Bellini identifies the retail kit as a 100 ml A+B pyrocatechin-based developer system.",
+      "sourceTitle": "Bellini / Chimifoto Ornano NUCLEOL BF200 product information",
+      "sourceUrl": "https://www.bellinifoto.it/en/categoria-prodotto/prodotti-amatoriali-en/amateur-products-for-bw/",
+      "sourceDate": "current Bellini catalogue"
+    }
+  ]
+}

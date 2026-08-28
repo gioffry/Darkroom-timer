@@ -1,0 +1,80 @@
+        str(r.get('id') or ('catalog-'+compact(name))), name, norm(name), compact(name),
+        str(r.get('manufacturer','')), '|'.join(cats), roles, '|'.join(aliases),
+        str(r.get('subtitle','')), sid, source_url, str(r.get('verificationStatus','')),
+        physical, '|'.join(film_d), '|'.join(paper_d), working, 1 if stock else 0,
+        nominal_iso, '|'.join(formats)))
+    pid = str(r.get('id') or ('catalog-'+compact(name)))
+    aliases2 = [name] + aliases
+    # Small spelling/legacy alias layer. These are lookup aliases, never equivalence claims.
+    n = norm(name)
+    extras = []
+    if 'd 76' in n or 'd76' in compact(name): extras += ['d76','d-76']
+    if 'xtol' in compact(name): extras += ['xtol','x tol']
+    if 'hp5' in compact(name): extras += ['hp5','hp5+','hp5 plus']
+    if 'fp4' in compact(name): extras += ['fp4','fp4+','fp4 plus']
+    if 'tri x' in n or 'trix' in compact(name): extras += ['trix','tri-x','tri x']
+    if 't max' in n or 'tmax' in compact(name): extras += ['tmax','t-max']
+    if 'fomapan 100' in n: extras += ['foma 100']
+    if 'fomapan 200' in n: extras += ['foma 200']
+    if 'fomapan 400' in n: extras += ['foma 400']
+    if 'rodinal' in n: extras += ['rodinal','adox rodinal','adonal']
+    for a in aliases2 + extras:
+        a = str(a).strip()
+        if not a: continue
+        cur.execute('INSERT OR IGNORE INTO catalog_aliases(product_id,alias,norm_alias,compact_alias) VALUES(?,?,?,?)',
+                    (pid,a,norm(a),compact(a)))
+
+cur.execute("INSERT OR REPLACE INTO meta(key,value) VALUES('darkroom_catalog_schema','3')")
+cur.execute("INSERT OR REPLACE INTO meta(key,value) VALUES('darkroom_catalog_source','MDC full + verified local technical catalog v2')")
+cur.execute('PRAGMA user_version=3')
+con.commit()
+quick = cur.execute('PRAGMA quick_check').fetchone()[0]
+counts = {
+    'products': cur.execute('SELECT COUNT(*) FROM catalog_products').fetchone()[0],
+    'aliases': cur.execute('SELECT COUNT(*) FROM catalog_aliases').fetchone()[0],
+    'films': cur.execute('SELECT COUNT(*) FROM films').fetchone()[0],
+    'developers': cur.execute('SELECT COUNT(*) FROM developers').fetchone()[0],
+    'times': cur.execute('SELECT COUNT(*) FROM times').fetchone()[0],
+}
+con.close()
+if quick != 'ok' or counts['films'] < 250 or counts['developers'] < 180 or counts['times'] < 3000:
+    raise SystemExit('v029: augmented DB integrity/completeness failed: '+repr(counts)+' quick='+quick)
+print('v029 DB augmented:', counts)
+
+# ---------------------------------------------------------------------------
+# Java: one local SQLite-backed search layer for MDC + verified local chemistry.
+# ---------------------------------------------------------------------------
+java = ROOT / 'assistant/src/main/java/it/darkroom/assistant/FullCatalogStore.java'
+java.write_text(r'''package it.darkroom.assistant;
+
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+/** Unified OFFLINE catalog: full MDC SQLite + verified local darkroom chemistry. */
+final class FullCatalogStore {
+    static final int ROLE_FILM_DEV = 1;
+    static final int ROLE_PAPER_DEV = 2;
+    static final int ROLE_STOP = 4;
+    static final int ROLE_FIX = 8;
+    static final int ROLE_WETTING = 16;
+    static final int ROLE_WASHING = 32;
+    static final int ROLE_CHEMISTRY = 64;
+    static final int ROLE_FILM = 128;
+
+    static final class Chemical {
+        final String name, manufacturer, categories, physicalState, sourceUrl, verification;
+        final int roles;
+        final boolean stockPrep;
+        final String[] filmDilutions, paperDilutions;
+        final String workingDilution;

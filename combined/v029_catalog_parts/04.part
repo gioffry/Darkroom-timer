@@ -1,0 +1,84 @@
+
+    static String canonicalDeveloper(String name) {
+        return canonicalFromTable("developers",name);
+    }
+    static String canonicalFilm(String name) {
+        String direct=canonicalFromTable("films",stripFormat(name));
+        if(direct!=null) return direct;
+        FilmInfo fi=filmInfo(stripFormat(name));
+        if(fi!=null) return canonicalFromTable("films",fi.displayName);
+        return null;
+    }
+
+    private static String catalogCanonical(String name) {
+        SQLiteDatabase d=db(); if(d==null) return null;
+        String n=norm(name), cp=compact(name);
+        try(Cursor c=d.rawQuery("SELECT name FROM catalog_products WHERE norm_name=? OR compact_name=? LIMIT 1",new String[]{n,cp})){
+            if(c.moveToFirst()) return c.getString(0);
+        }
+        try(Cursor c=d.rawQuery("SELECT p.name FROM catalog_aliases a JOIN catalog_products p ON p.id=a.product_id WHERE a.norm_alias=? OR a.compact_alias=? LIMIT 1",new String[]{n,cp})){
+            if(c.moveToFirst()) return c.getString(0);
+        }
+        return null;
+    }
+
+    private static String canonicalFromTable(String table,String wanted) {
+        if(wanted==null) return null; SQLiteDatabase d=db(); if(d==null)return null;
+        String q=norm(wanted), qc=compact(wanted); String best=null; int bestScore=0;
+        try(Cursor c=d.rawQuery("SELECT name FROM "+table,null)){
+            while(c.moveToNext()){
+                String name=c.getString(0); int s=score(q,qc,name,"");
+                if(s>bestScore){bestScore=s;best=name;}
+            }
+        }
+        if(bestScore>=700) return best;
+        String alias=catalogCanonical(wanted);
+        if(alias!=null && !alias.equalsIgnoreCase(wanted)){
+            try(Cursor c=d.rawQuery("SELECT name FROM "+table,null)){
+                while(c.moveToNext()){
+                    String name=c.getString(0); int s=score(norm(alias),compact(alias),name,"");
+                    if(s>bestScore){bestScore=s;best=name;}
+                }
+            }
+        }
+        return bestScore>=620?best:null;
+    }
+
+    private static void add(Map<String,Candidate> map,String q,String name,String aliases,String snippet){
+        int s=score(q,compact(q),name,aliases); if(s<=0)return; String k=norm(name);
+        Candidate old=map.get(k); if(old==null||s>old.score)map.put(k,new Candidate(name,aliases,snippet,s));
+    }
+    private static List<OnlineCatalogSearch.SearchResult> results(Map<String,Candidate> map,int max){
+        List<Candidate> cs=sorted(map); List<OnlineCatalogSearch.SearchResult> out=new ArrayList<>();
+        for(Candidate c:cs){out.add(new OnlineCatalogSearch.SearchResult(c.name,"",c.snippet)); if(out.size()>=max)break;} return out;
+    }
+    private static List<Candidate> sorted(Map<String,Candidate> map){
+        List<Candidate> cs=new ArrayList<>(map.values());
+        Collections.sort(cs,(a,b)->a.score!=b.score?Integer.compare(b.score,a.score):a.name.compareToIgnoreCase(b.name)); return cs;
+    }
+    private static int score(String q,String qc,String name,String aliases){
+        if(q==null||q.length()<3)return 0; String n=norm(name), nc=compact(name);
+        int best=scoreOne(q,qc,n,nc);
+        if(aliases!=null&&!aliases.trim().isEmpty())for(String a:aliases.split("\\|")){
+            String an=norm(a); if(an.isEmpty())continue;
+            best=Math.max(best,scoreOne(q,qc,an,compact(a)));
+        }
+        return best;
+    }
+    private static int scoreOne(String q,String qc,String n,String nc){
+        if(n==null||n.isEmpty()||nc==null||nc.isEmpty())return 0;
+        if(n.equals(q)||nc.equals(qc))return 1000;
+        if(n.startsWith(q)||nc.startsWith(qc))return 950;
+        if(q.startsWith(n)||qc.startsWith(nc)||q.endsWith(" "+n)||qc.endsWith(nc))return 930;
+        for(String t:n.split(" "))if(!t.isEmpty()&&t.startsWith(q))return 910;
+        if(n.contains(q)||(!qc.isEmpty()&&nc.contains(qc)))return 850;
+        String[] qt=q.split(" "); boolean all=true; for(String t:qt)if(!n.contains(t)){all=false;break;} if(all)return 760;
+        return 0;
+    }
+    private static String norm(String s){
+        String x=Normalizer.normalize(s==null?"":s,Normalizer.Form.NFD).replaceAll("\\p{M}+","").toLowerCase(Locale.ROOT).replace('–',' ').replace('—',' ').replace('-',' ');
+        return x.replaceAll("[^a-z0-9+]+"," ").trim().replaceAll("\\s+"," ");
+    }
+    private static String compact(String s){return norm(s).replaceAll("[^a-z0-9]+","");}
+    private static String stripFormat(String s){if(s==null)return "";return s.replaceAll("(?i)\\s*[—-]\\s*(35\\s*mm|120)\\s*$","").trim();}
+    private static String[] split(String s){if(s==null||s.trim().isEmpty())return new String[0];String[] r=s.split("\\|");List<String>o=new ArrayList<>();for(String x:r)if(!x.trim().isEmpty())o.add(x.trim());return o.toArray(new String[0]);}

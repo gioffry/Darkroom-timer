@@ -1,0 +1,63 @@
+            if ((p.roles & role) != 0 && p.name.toLowerCase(Locale.ROOT).contains(needle)) out.add(p.name);
+        }
+        return new ArrayList<>(out);
+    }'''
+s, n = pat.subn(rep,s,count=1)
+if n != 1: raise SystemExit('v029 localProductMatchesForRole replacement failed')
+# unified product resolution, official/local catalog before MDC identity fallback.
+pat = re.compile(r'''    private Product findProduct\(String name\) \{.*?\n    \}\n\n    private FilmStock findFilm''', re.S)
+rep = r'''    private Product findProduct(String name) {
+        if (name == null) return null;
+        String wanted = name.trim();
+        Product saved = loadSavedProduct(wanted);
+        if (saved != null) return saved;
+
+        FullCatalogStore.Chemical cat = FullCatalogStore.chemical(wanted);
+        if (cat != null && (cat.roles & ~128) != 0) {
+            String[] filmDil = cat.filmDilutions;
+            String[] paperDil = cat.paperDilutions;
+            String working = cat.workingDilution;
+            return new Product(cat.name, cat.roles, cat.stockPrep,
+                    filmDil, paperDil, working, null, -1, cat.sourceUrl,
+                    ChemistrySpecEngine.REUSE_UNKNOWN, -1, -1);
+        }
+
+        String canonical = FullCatalogStore.canonicalDeveloper(wanted);
+        if (canonical != null) {
+            Product savedCanonical = loadSavedProduct(canonical);
+            if (savedCanonical != null) return savedCanonical;
+            return offlineDeveloperProduct(canonical);
+        }
+        Product curated = curatedAuxByName(wanted);
+        if (curated != null) return curated;
+        for (Product p : fallbackProducts) if (p.name.equalsIgnoreCase(wanted)) return p;
+        return null;
+    }
+
+    private FilmStock findFilm'''
+s, n = pat.subn(rep,s,count=1)
+if n != 1: raise SystemExit('v029 findProduct replacement failed')
+# expand manual type mapping used by edit dialog.
+s = s.replace('''            case 4: return ROLE_FIX;\n            default: return ROLE_FILM_DEV;''', '''            case 4: return ROLE_FIX;\n            case 5: return ROLE_WETTING;\n            case 6: return ROLE_WASHING;\n            case 7: return ROLE_CHEMISTRY;\n            default: return ROLE_FILM_DEV;''', 1)
+s = s.replace('''        if ((role & ROLE_FIX) != 0) return 4;\n        return 0;''', '''        if ((role & ROLE_FIX) != 0) return 4;\n        if ((role & ROLE_WETTING) != 0) return 5;\n        if ((role & ROLE_WASHING) != 0) return 6;\n        if ((role & ROLE_CHEMISTRY) != 0) return 7;\n        return 0;''', 1)
+# Expand edit product type list if the legacy list is still present.
+s = s.replace('''        String[] types = new String[]{"Rivelatore pellicola", "Rivelatore carta",\n                "Rivelatore pellicola + carta", "Arresto", "Fissaggio"};''', '''        String[] types = new String[]{"Rivelatore pellicola", "Rivelatore carta",\n                "Rivelatore pellicola + carta", "Arresto", "Fissaggio",\n                "Imbibente", "Aiuto lavaggio", "Altra chimica"};''', 1)
+# Add catalog metadata to the product sheet, including the mandatory FOMATOL regression fields.
+needle = '''        msg.append("\\n\\n").append(reuseDescription(p));'''
+insert = '''        FullCatalogStore.Chemical catalogInfo = FullCatalogStore.chemical(p.name);\n        if (catalogInfo != null) {\n            msg.append("\\n\\nProduttore: ").append(catalogInfo.manufacturer.isEmpty() ? "—" : catalogInfo.manufacturer);\n            msg.append("\\nCategoria: ").append(catalogInfo.categories.replace("|", " · "));\n            if (!catalogInfo.physicalState.isEmpty()) msg.append("\\nStato: ").append(catalogInfo.physicalState);\n            if (catalogInfo.paperDilutions.length > 0) msg.append("\\nDiluizione carta: ").append(join(catalogInfo.paperDilutions));\n            if (catalogInfo.filmDilutions.length > 0) msg.append("\\nDiluizione pellicola: ").append(join(catalogInfo.filmDilutions));\n            if (!catalogInfo.sourceUrl.isEmpty()) msg.append("\\nFonte: produttore / catalogo tecnico verificato");\n        }\n        msg.append("\\n\\n").append(reuseDescription(p));'''
+if needle not in s: raise SystemExit('v029 product detail marker missing')
+s = s.replace(needle,insert,1)
+# Wording: database is local/offline, not online.
+repls = {
+    'Ricerca online dopo 3 lettere.':'Ricerca nel database dopo 3 lettere.',
+    'Cerco online…':'Cerco nel database…',
+    'Recupero ISO e formato…':'Recupero dati pellicola…',
+    'Scheda locale; il tempo verrà cercato online.':'Pellicola presente nel database.',
+    'Scheda pellicola recuperata online.':'Pellicola presente nel database.',
+    'Cerco online la combinazione esatta…':'Cerco la combinazione nel database…',
+    'Fonte online salvata':'Fonte salvata'
+}
+for a,b in repls.items(): s=s.replace(a,b)
+p.write_text(s, encoding='utf-8')
+
+print('v029 full offline catalog patch applied')

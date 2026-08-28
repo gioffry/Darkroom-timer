@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MDC_FIRST_MANUFACTURER_FILL_ONLY",
+  "checkedAt": "2026-08-22",
+  "records": [
+    {
+      "matchNames": ["Ilfotec LC29"],
+      "manufacturer": "HARMAN technology / ILFORD",
+      "productName": "ILFORD ILFOTEC LC29",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute the concentrate with water immediately before use. ILFORD documents 1+9, 1+19 and 1+29.",
+      "reuseMode": "one_shot_or_reuse_during_one_working_session",
+      "reuseInstructions": "The diluted developer can be used one-shot or reused during one working session. Reuse is supported at 1+9 and 1+19; 1+29 is not recommended for reuse.",
+      "capacityText": "Per 500 ml bottle: at 1+9, 16 films one-shot or 50 reused; at 1+19, 32 one-shot or 50 reused; at 1+29, 50 one-shot and reuse is not recommended.",
+      "shelfLifeOpened": "Concentrate stored at 4-20 C: 24 months in full tightly capped bottles; 4 months in half-full tightly capped bottles.",
+      "storageNotes": "Store in original containers in cool, dry conditions at 4-20 C.",
+      "sourceTitle": "ILFORD ILFOTEC LC29 Technical Information",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1951/product/547/",
+      "sourceDate": "2020-01"
+    },
+    {
+      "matchNames": ["Ilfotec DD"],
+      "manufacturer": "HARMAN technology / ILFORD",
+      "productName": "ILFORD ILFOTEC DD",
+      "physicalState": "liquid concentrate",
+      "preparation": "Dilute concentrate 1+4 with water to make working-strength replenisher. For machine-tank developer add ILFOTEC DD STARTER at 1+250, equivalent to 4 ml starter per litre.",
+      "reuseMode": "replenished_system_or_unreplenished_reuse_with_time_compensation",
+      "reuseInstructions": "Designed primarily for replenished systems. In unreplenished deep tanks, one litre can be reused for up to 10 rolls with approximately 10% development-time increase for each successive film after the first; ILFORD recommends replenishment as the more consistent method.",
+      "capacityText": "Unreplenished working-strength developer: up to 10 rolls of 135-36 or 120 per litre. A 5 litre concentrate bottle makes 25 litres working strength and provides replenishment for about 500 rolls of 135-36.",
+      "shelfLifeUnopened": "Full unopened concentrate stored at 5-20 C: 2 years.",
+      "shelfLifeOpened": "Once opened, use concentrate completely within 3 months and keep tightly sealed until use.",
+      "shelfLifeWorking": "Replenished process-tank developer: general replacement guide 6-12 months. Unreplenished working solution: 6 months full capped; 2 months under floating lid; 1 month half-full tightly capped.",
+      "storageNotes": "Use floating lids/covers on developer and replenisher tanks when idle; store concentrate cool at 5-20 C.",
+      "sourceTitle": "ILFORD ILFOTEC DD Film Developer and Replenisher Technical Information",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/574/product/1729/",
+      "sourceDate": "2010-06"
+    },
+    {
+      "matchNames": ["TMax RS"],
+      "manufacturer": "Kodak Alaris",
+      "productName": "KODAK PROFESSIONAL T-MAX RS Developer and Replenisher",
+      "physicalState": "liquid concentrate",
+      "preparation": "Prepare working-strength solution according to package size; Kodak states T-MAX RS Developer and Replenisher is supplied to make working-strength solution that is also used as replenisher.",
+      "reuseMode": "replenished_system",
+      "reuseInstructions": "Use the mixed solution as the working-tank solution or replenisher. Kodak recommends T-MAX RS for replenished systems. Add 45 ml replenisher for each 135-36 or 120 roll or 8x10-inch sheet processed.",
+      "capacityText": "Kodak matrix gives a useful tank capacity of 16 8x10-inch sheets per US gallon, about 4 per litre, and notes that capacity can be increased by replenishment.",
+      "shelfLifeUnopened": "Concentrate in a full closed container: indefinite according to Kodak's black-and-white chemistry matrix.",
+      "shelfLifeWorking": "Working-tank solution: up to 6 months in a full closed container; the Kodak matrix also lists 24 hours in a tray and 1 month in a tank under its working-solution keeping properties.",
+      "sourceTitle": "KODAK PROFESSIONAL T-MAX Developers J-86 and B&W Chemicals Matrix E103CF",
+      "sourceUrl": "https://kodakprofessional.com/sites/default/files/wysiwyg/pro/chemistry/j86.pdf",
+      "sourceDate": "Kodak technical publication"
+    }
+  ]
+}

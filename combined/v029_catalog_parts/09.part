@@ -1,0 +1,31 @@
+# Make chemical() return structured metadata for both verified local products and MDC-only developers.
+p = ROOT / 'assistant/src/main/java/it/darkroom/assistant/FullCatalogStore.java'
+s = p.read_text(encoding='utf-8')
+start = s.find('    static Chemical chemical(String name) {')
+end = s.find('    static FilmInfo filmInfo(String name) {', start)
+if start < 0 or end < 0: raise SystemExit('v029 FullCatalogStore chemical method boundaries missing')
+method = r'''    static Chemical chemical(String name) {
+        if(name==null) return null; SQLiteDatabase d=db(); if(d==null) return null;
+        String canonical = catalogCanonical(name);
+        if(canonical!=null) {
+            try(Cursor c=d.rawQuery("SELECT name,manufacturer,categories,physical_state,source_url,verification,roles,stock_prep,film_dilutions,paper_dilutions,working_dilution FROM catalog_products WHERE norm_name=? LIMIT 1",new String[]{norm(canonical)})){
+                if(c.moveToFirst()) {
+                    return new Chemical(c.getString(0),nz(c.getString(1)),nz(c.getString(2)),nz(c.getString(3)),nz(c.getString(4)),nz(c.getString(5)),c.getInt(6),c.getInt(7)!=0,split(c.getString(8)),split(c.getString(9)),emptyToNull(c.getString(10)));
+                }
+            }
+        }
+        String dev = canonicalDeveloper(name);
+        if (dev != null) {
+            return new Chemical(dev, developerManufacturer(dev),
+                    "FILM_DEVELOPER|CHEMISTRY", "",
+                    "https://www.digitaltruth.com/devchart.php", "MASSIVE_DEV_CHART",
+                    ROLE_FILM_DEV | ROLE_CHEMISTRY, false,
+                    MdcOfflineStore.dilutionsForDeveloper(dev), new String[0], null);
+        }
+        return null;
+    }
+
+'''
+s = s[:start] + method + s[end:]
+p.write_text(s, encoding='utf-8')
+print('v029 unified chemical metadata fixed')

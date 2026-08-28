@@ -1,0 +1,80 @@
+    tech['paperDilutions'] = pd
+    fql.setdefault('sourceId','foma-fomatol-lqn')
+
+con = sqlite3.connect(DB)
+cur = con.cursor()
+cur.executescript('''
+DROP TABLE IF EXISTS catalog_sources;
+DROP TABLE IF EXISTS catalog_products;
+DROP TABLE IF EXISTS catalog_aliases;
+CREATE TABLE catalog_sources(
+ id TEXT PRIMARY KEY, author TEXT, title TEXT, url TEXT, source_type TEXT, verification TEXT
+);
+CREATE TABLE catalog_products(
+ id TEXT PRIMARY KEY,
+ name TEXT NOT NULL,
+ norm_name TEXT NOT NULL,
+ compact_name TEXT NOT NULL,
+ manufacturer TEXT,
+ categories TEXT NOT NULL,
+ roles INTEGER NOT NULL,
+ aliases TEXT,
+ subtitle TEXT,
+ source_id TEXT,
+ source_url TEXT,
+ verification TEXT,
+ physical_state TEXT,
+ film_dilutions TEXT,
+ paper_dilutions TEXT,
+ working_dilution TEXT,
+ stock_prep INTEGER NOT NULL DEFAULT 0,
+ nominal_iso INTEGER NOT NULL DEFAULT 0,
+ formats TEXT
+);
+CREATE UNIQUE INDEX idx_catalog_product_norm ON catalog_products(norm_name);
+CREATE INDEX idx_catalog_roles ON catalog_products(roles);
+CREATE TABLE catalog_aliases(
+ product_id TEXT NOT NULL,
+ alias TEXT NOT NULL,
+ norm_alias TEXT NOT NULL,
+ compact_alias TEXT NOT NULL,
+ UNIQUE(product_id,norm_alias)
+);
+CREATE INDEX idx_catalog_alias_norm ON catalog_aliases(norm_alias);
+''')
+for sid, s in sources.items():
+    cur.execute('INSERT OR REPLACE INTO catalog_sources VALUES(?,?,?,?,?,?)', (
+        sid, s.get('author',''), s.get('title',''), s.get('url',''),
+        s.get('sourceType',''), s.get('verificationStatus','')))
+
+for r in records:
+    name = str(r.get('name','')).strip()
+    if not name: continue
+    cats = arr(r.get('categories'))
+    roles = 0
+    for c in cats: roles |= ROLE_MAP.get(c,0)
+    if roles == 0: continue
+    tech = r.get('technical') if isinstance(r.get('technical'), dict) else {}
+    aliases = arr(r.get('aliases'))
+    film_d = first_list(tech,'filmDilutions')
+    paper_d = first_list(tech,'paperDilutions')
+    generic_d = first_list(tech,'dilutions')
+    if not film_d and ('FILM_DEVELOPER' in cats): film_d = generic_d
+    if not paper_d and ('PAPER_DEVELOPER' in cats): paper_d = generic_d
+    working = str(tech.get('workingDilution') or tech.get('workingSolution') or '').strip()
+    if not working and (('STOP_BATH' in cats) or ('FIXER' in cats)) and generic_d:
+        working = generic_d[0]
+    physical = str(tech.get('physicalState') or tech.get('state') or '').strip()
+    stock = bool(tech.get('stockPreparation') or tech.get('requiresStockPreparation') or False)
+    if not stock and any(str(x).lower() == 'stock' for x in film_d + paper_d):
+        stock = True
+    try: nominal_iso = int(tech.get('nominalIso') or 0)
+    except Exception: nominal_iso = 0
+    formats = arr(tech.get('formats'))
+    sid = str(r.get('sourceId',''))
+    source_url = str((sources.get(sid) or {}).get('url',''))
+    cur.execute('''INSERT OR REPLACE INTO catalog_products
+      (id,name,norm_name,compact_name,manufacturer,categories,roles,aliases,subtitle,
+       source_id,source_url,verification,physical_state,film_dilutions,paper_dilutions,
+       working_dilution,stock_prep,nominal_iso,formats)
+      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (

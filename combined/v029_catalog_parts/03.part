@@ -1,0 +1,80 @@
+        Chemical(String name,String manufacturer,String categories,String physicalState,String sourceUrl,
+                 String verification,int roles,boolean stockPrep,String[] filmDilutions,
+                 String[] paperDilutions,String workingDilution) {
+            this.name=name; this.manufacturer=manufacturer; this.categories=categories;
+            this.physicalState=physicalState; this.sourceUrl=sourceUrl; this.verification=verification;
+            this.roles=roles; this.stockPrep=stockPrep; this.filmDilutions=filmDilutions;
+            this.paperDilutions=paperDilutions; this.workingDilution=workingDilution;
+        }
+    }
+
+    static final class FilmInfo {
+        final String displayName, sourceUrl;
+        final int iso;
+        FilmInfo(String displayName,int iso,String sourceUrl){this.displayName=displayName;this.iso=iso;this.sourceUrl=sourceUrl;}
+    }
+
+    private static final class Candidate {
+        final String name, aliases, snippet;
+        final int score;
+        Candidate(String name,String aliases,String snippet,int score){this.name=name;this.aliases=aliases;this.snippet=snippet;this.score=score;}
+    }
+
+    private static SQLiteDatabase db() { return MdcOfflineStore.database(); }
+
+    static List<OnlineCatalogSearch.SearchResult> searchFilmDevelopers(String query, int max) {
+        String q=norm(query); if(q.length()<3) return new ArrayList<>();
+        Map<String,Candidate> map=new LinkedHashMap<>();
+        SQLiteDatabase d=db(); if(d==null) return new ArrayList<>();
+        try(Cursor c=d.rawQuery("SELECT name FROM developers",null)){
+            while(c.moveToNext()) add(map,q,c.getString(0),"","MDC_OFFLINE_DEVELOPER");
+        }
+        try(Cursor c=d.rawQuery("SELECT name,aliases,manufacturer FROM catalog_products WHERE (roles & ?)<>0",new String[]{String.valueOf(ROLE_FILM_DEV)})){
+            while(c.moveToNext()) add(map,q,c.getString(0),c.getString(1),"LOCAL_CATALOG_DEVELOPER|"+nz(c.getString(2)));
+        }
+        return results(map,max);
+    }
+
+    static List<OnlineCatalogSearch.SearchResult> searchFilms(String query, int max) {
+        String q=norm(query); if(q.length()<3) return new ArrayList<>();
+        Map<String,Candidate> map=new LinkedHashMap<>();
+        SQLiteDatabase d=db(); if(d==null) return new ArrayList<>();
+        try(Cursor c=d.rawQuery("SELECT name FROM films",null)){
+            while(c.moveToNext()) add(map,q,c.getString(0),"","MDC_OFFLINE_FILM");
+        }
+        try(Cursor c=d.rawQuery("SELECT name,aliases,manufacturer FROM catalog_products WHERE (roles & ?)<>0",new String[]{String.valueOf(ROLE_FILM)})){
+            while(c.moveToNext()) add(map,q,c.getString(0),c.getString(1),"LOCAL_CATALOG_FILM|"+nz(c.getString(2)));
+        }
+        return results(map,max);
+    }
+
+    static List<String> searchChemicalNames(String query, int role, int max) {
+        String q=norm(query); if(q.length()<3) return new ArrayList<>();
+        Map<String,Candidate> map=new LinkedHashMap<>();
+        SQLiteDatabase d=db(); if(d==null) return new ArrayList<>();
+        try(Cursor c=d.rawQuery("SELECT name,aliases,manufacturer FROM catalog_products WHERE (roles & ?)<>0",new String[]{String.valueOf(role)})){
+            while(c.moveToNext()) add(map,q,c.getString(0),c.getString(1),nz(c.getString(2)));
+        }
+        List<Candidate> cs=sorted(map);
+        List<String> out=new ArrayList<>(); for(Candidate c:cs){out.add(c.name); if(out.size()>=max)break;} return out;
+    }
+
+    static Chemical chemical(String name) {
+        if(name==null) return null; SQLiteDatabase d=db(); if(d==null) return null;
+        String canonical = catalogCanonical(name);
+        if(canonical==null) return null;
+        try(Cursor c=d.rawQuery("SELECT name,manufacturer,categories,physical_state,source_url,verification,roles,stock_prep,film_dilutions,paper_dilutions,working_dilution FROM catalog_products WHERE norm_name=? LIMIT 1",new String[]{norm(canonical)})){
+            if(!c.moveToFirst()) return null;
+            return new Chemical(c.getString(0),nz(c.getString(1)),nz(c.getString(2)),nz(c.getString(3)),nz(c.getString(4)),nz(c.getString(5)),c.getInt(6),c.getInt(7)!=0,split(c.getString(8)),split(c.getString(9)),emptyToNull(c.getString(10)));
+        }
+    }
+
+    static FilmInfo filmInfo(String name) {
+        if(name==null) return null; SQLiteDatabase d=db(); if(d==null) return null;
+        String canonical=catalogCanonical(name);
+        if(canonical==null) return null;
+        try(Cursor c=d.rawQuery("SELECT name,nominal_iso,source_url FROM catalog_products WHERE norm_name=? AND (roles & ?)<>0 LIMIT 1",new String[]{norm(canonical),String.valueOf(ROLE_FILM)})){
+            if(c.moveToFirst()) return new FilmInfo(c.getString(0),c.getInt(1),nz(c.getString(2)));
+        }
+        return null;
+    }

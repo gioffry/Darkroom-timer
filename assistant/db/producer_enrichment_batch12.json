@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MDC_FIRST_MANUFACTURER_FILL_ONLY",
+  "checkedAt": "2026-08-22",
+  "records": [
+    {
+      "matchNames": ["Finol"],
+      "manufacturer": "Moersch Photochemie",
+      "productName": "Moersch Finol",
+      "preparation": "Prepare the two-part working solution immediately before use. Standard dilution is 1+1+100, with documented alternatives from 1+1+50 to 1+1+150. Use distilled or demineralised water where possible.",
+      "reuseMode": "fresh_working_solution_per_batch",
+      "reuseInstructions": "Moersch states that the mixed working solution should be stirred well until almost colourless and then used within the next 10-15 minutes; prepare a fresh working solution for each development batch.",
+      "shelfLifeWorking": "Mixed working solution: use within 10-15 minutes after preparation.",
+      "sourceTitle": "Moersch Finol Developing Times Chart",
+      "sourceUrl": "https://www.moersch-photochemie.de/wp-content/uploads/2023/02/Finol-ENGLISH-Oct-16-2015.pdf",
+      "sourceDate": "2015-10"
+    },
+    {
+      "matchNames": ["Tanol"],
+      "manufacturer": "Moersch Photochemie",
+      "productName": "Moersch Tanol",
+      "reuseMode": "fresh_working_solution_per_batch",
+      "reuseInstructions": "Developer and alkali are diluted 1+1+100 with water immediately before development. The high-dilution working bath is prepared for the current processing batch; minimum combined A+B concentrate is 5 ml per film.",
+      "sourceTitle": "Moersch Tanol product information and developing chart",
+      "sourceUrl": "https://www.moersch-photochemie.de/en/product/tanol/",
+      "sourceDate": "current"
+    },
+    {
+      "matchNames": ["Tanol Speed"],
+      "manufacturer": "Moersch Photochemie",
+      "productName": "Moersch Tanol Speed",
+      "reuseMode": "fresh_working_solution_per_batch",
+      "reuseInstructions": "Prepare the two-part working solution immediately before development. Moersch states that after mixing and stirring it should become almost colourless and be used within the next 10-15 minutes.",
+      "sourceTitle": "Moersch Tanol Speed Developing Times Chart",
+      "sourceUrl": "https://www.moersch-photochemie.de/wp-content/uploads/2023/02/TanolSpeed-Data-eng.pdf",
+      "sourceDate": "2008-06"
+    },
+    {
+      "matchNames": ["MZB"],
+      "manufacturer": "Moersch Photochemie",
+      "productName": "Moersch MZB Two-Bath Compensating Developer",
+      "preparation": "Prepare the powder kit as two separate stock solutions A and B, each to 2 litres. Temper both solutions before processing. For rotary development Moersch specifies dilution of both solutions 1+1; single-bath mixing of A and B is also possible when contrast compensation is not required.",
+      "reuseMode": "two_bath_reusable_with_volume_and_dilution_dependent_capacity",
+      "reuseInstructions": "For small working volumes Moersch recommends using bath B only once or twice for reproducibility. With 700 ml or more working volume for one roll, the bath can be used several times without loss of performance. Undiluted B stock can also be used several times; A and B refill packs are available separately when one bath is exhausted first.",
+      "capacityText": "Capacity is dilution- and volume-dependent rather than a single roll count. Moersch states that higher dilution increases capacity; small volumes favour one or two uses of bath B, while working volumes of 700 ml or more may be reused several times without loss of performance.",
+      "shelfLifeStock": "The two stock solutions remain stable for at least 6 months even in partially filled bottles; with exclusion of air Moersch reports about one year based on experience.",
+      "storageNotes": "Keep the stock solutions protected from air to maximize their life. Temper both baths to the processing temperature immediately before use.",
+      "sourceTitle": "Moersch MZB Two-Bath Compensating Developer instructions",
+      "sourceUrl": "https://www.moersch-photochemie.de/en/product/mzb-zweibad-ausgleichsentwickler/",
+      "sourceDate": "current"
+    }
+  ]
+}

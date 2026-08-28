@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MDC_FIRST_MANUFACTURER_FILL_ONLY",
+  "checkedAt": "2026-08-22",
+  "scope": "MACODIRECT_CURRENT_LISTINGS_ONLY",
+  "records": [
+    {
+      "matchNames": ["Spur Nanotech UR"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR Nanotech UR",
+      "preparation": "Prepare the one-part working developer with distilled/deionized water at the film-specific dilution and filling temperature in the SPUR development chart. Pre-soaking is not required.",
+      "reuseMode": "single_or_two_film_by_working_volume",
+      "reuseInstructions": "250 or 300 ml working solution develops one 35 mm film and must then be discarded. 500 or 600 ml develops two 35 mm films or two 120 films; the two films may be processed together or sequentially without extending the second development time, provided the second film is processed within working-solution shelf life.",
+      "capacityText": "250-300 ml working solution: one 35 mm film. 500-600 ml working solution: two 35 mm films or two 120 films.",
+      "shelfLifeWorking": "Working solution: 10-14 days in completely filled bottles; storage in a refrigerator can extend working-solution life.",
+      "storageNotes": "Developer concentrate must not be refrigerated and should be stored above 13 C.",
+      "sourceTitle": "SPUR Nanotech UR Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-sheet-SPUR-Nanotech-UR-05.05.19.pdf",
+      "sourceDate": "2019-05"
+    },
+    {
+      "matchNames": ["Rollei Supergrain"],
+      "manufacturer": "Hans O. Mahn GmbH & Co. KG / MACO PHOTO PRODUCTS",
+      "productName": "ROLLEI SUPERGRAIN",
+      "preparation": "Dilute concentrate with water according to the Rollei data sheet. For 260 ml working solution: 1+9 uses 26 ml concentrate + 234 ml water; 1+12 uses 20 ml concentrate + 240 ml water; 1+15 uses about 16.25 ml concentrate + 243.75 ml water.",
+      "sourceTitle": "ROLLEI SUPERGRAIN Data Sheet",
+      "sourceUrl": "https://www.rolleianalog.com/wp-content/uploads/2019/09/SUPERGRAIN_Datenblatt_EN.pdf",
+      "sourceDate": "2019-09"
+    },
+    {
+      "matchNames": ["Spur SLD"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR SLD High Speed Developer",
+      "physicalState": "liquid developer concentrate",
+      "preparation": "Prepare the working solution with distilled water at the film-specific dilution and temperature in the SPUR SLD development chart.",
+      "capacityText": "SPUR specifies a minimum of 6 ml developer concentrate per 35 mm film; if a selected dilution would provide less concentrate, increase working-solution volume accordingly.",
+      "sourceTitle": "SPUR SLD Data Sheet and Development Chart",
+      "sourceUrl": "https://spur-photo.com/category/datenblaetter/negativ-entwickler/spur-sld-datenblaetter/",
+      "sourceDate": "current SPUR data sheet"
+    },
+    {
+      "matchNames": ["Spur Speed-Major"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR Speed-Major",
+      "physicalState": "liquid developer concentrate",
+      "preparation": "Prepare the working solution with distilled water using the film-specific dilution, filling temperature and agitation shown in the SPUR Speed-Major chart.",
+      "sourceTitle": "SPUR Speed-Major Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-sheet-SPUR-Speed-Major-17-01-19.pdf",
+      "sourceDate": "2019-01"
+    },
+    {
+      "matchNames": ["Spur TRX 2000"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR TRX 2000",
+      "physicalState": "liquid developer concentrate",
+      "preparation": "Prepare the working solution with distilled water at the film-specific dilution and filling temperature in the SPUR TRX 2000 development chart; harder water requires longer development times.",
+      "sourceTitle": "SPUR TRX 2000 Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-sheet-SPUR-TRX-2000-07.08.19-1.pdf",
+      "sourceDate": "2019-08"
+    },
+    {
+      "matchNames": ["Spur SHADOWmax"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR SHADOWmax",
+      "physicalState": "two-component liquid developer concentrate",
+      "preparation": "Prepare Part A at the dilution listed for the film and add Part B according to mode X, Y, Z or 0. Example: 500 ml at 1+14/Z uses 33 ml Part A + 50 ml Part B and distilled water to 500 ml.",
+      "sourceTitle": "SPUR SHADOWmax Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-sheet-SPUR-SHADOWmax-14.06.21.pdf",
+      "sourceDate": "2021-06"
+    },
+    {
+      "matchNames": ["Spur Omega X"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR Omega X",
+      "physicalState": "two-component liquid developer concentrate",
+      "preparation": "Mix Parts A and B in equal amounts. Example: for 260 ml working solution at overall dilution 1+12, use 10 ml Part A + 10 ml Part B and distilled/deionized water to 260 ml.",
+      "shelfLifeUnopened": "Part A: at least 2 years in unopened original bottle when stored relatively cool but not refrigerated. Part B: almost unlimited shelf life.",
+      "shelfLifeWorking": "Prepared working solution is short-lived and should be used within the next hours after preparation.",
+      "sourceTitle": "SPUR Omega X Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-sheet-SPUR-Omega-X.pdf",
+      "sourceDate": "2026-02"
+    },
+    {
+      "matchNames": ["Spur SD 2525"],
+      "manufacturer": "SPUR Photochemie Dr. Heidrich und Schain GbR",
+      "productName": "SPUR SD 2525",
+      "physicalState": "two-component liquid developer concentrate",
+      "preparation": "Combine Part A and Part B according to the overall dilution in the development chart. Example: 500 ml at overall dilution 1+20 uses 12 ml Part A + 12 ml Part B and water to 500 ml.",
+      "shelfLifeUnopened": "Part A: approximately 2.5-3 years in unopened original bottle when stored relatively cool, not below about 10-12 C. Part B: almost unlimited shelf life.",
+      "storageNotes": "Opened Part A is supplied in gas-tight PET; protective gas helps extend shelf life after opening.",
+      "sourceTitle": "SPUR SD 2525 Data Sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-Sheet-SPUR-SD-2525-28-04-15.pdf",
+      "sourceDate": "2015-04"
+    }
+  ]
+}
