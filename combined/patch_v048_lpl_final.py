@@ -59,12 +59,12 @@ enlargement = replace_once(
 )
 enlargement = replace_once(
     enlargement,
-    '''                        "%s · obiettivo %d mm\n%s\nβ finale %.3f\nImmagine proiettata %.1f × %.1f cm\nCrop: %s\nScala colonna: calibrazione fisica rinviata",
+    '''                        "%s · obiettivo %d mm\\n%s\\nβ finale %.3f\\nImmagine proiettata %.1f × %.1f cm\\nCrop: %s\\nScala colonna: calibrazione fisica rinviata",
                         formatLabel(x.negativeCode), lensMm(x.negativeCode), carrierLabel(x.negativeCode),
-                        x.b2, x.pw, x.ph, cropLabel(x.crop)))''',
-    '''                        "%s · obiettivo %d mm\n%s\nβ finale %.3f\nImmagine proiettata %.1f × %.1f cm\nCrop: %s\nDistanza negativo–carta %.1f cm\nScala colonna LPL %.1f",
+                        x.b2, x.pw, x.ph, cropLabel(x.crop))))''',
+    '''                        "%s · obiettivo %d mm\\n%s\\nβ finale %.3f\\nImmagine proiettata %.1f × %.1f cm\\nCrop: %s\\nDistanza negativo–carta %.1f cm\\nScala colonna LPL %.1f",
                         formatLabel(x.negativeCode), lensMm(x.negativeCode), carrierLabel(x.negativeCode),
-                        x.b2, x.pw, x.ph, cropLabel(x.crop), x.negativeToPaperCm, x.columnScale)))''',
+                        x.b2, x.pw, x.ph, cropLabel(x.crop), x.negativeToPaperCm, x.columnScale))))''',
     "resize result",
 )
 enlargement = replace_once(
@@ -109,11 +109,11 @@ enlargement = replace_once(
 enlargement = replace_once(
     enlargement,
     '''        return String.format(Locale.ITALY,
-                "%s · negativo %s\nObiettivo automatico %d mm\n%s\nβ %.3f\nImmagine proiettata %.1f × %.1f cm\nCrop: %s\nScala colonna: calibrazione fisica rinviata",
+                "%s · negativo %s\\nObiettivo automatico %d mm\\n%s\\nβ %.3f\\nImmagine proiettata %.1f × %.1f cm\\nCrop: %s\\nScala colonna: calibrazione fisica rinviata",
                 formatLabel(format), negativeSizeLabel(format), lensMm(format), carrierLabel(format),
                 c.beta, c.pw, c.ph, cropLabel(c.crop));''',
     '''        return String.format(Locale.ITALY,
-                "%s · negativo %s\nObiettivo automatico %d mm\n%s\nβ %.3f\nImmagine proiettata %.1f × %.1f cm\nCrop: %s\nDistanza negativo–carta %.1f cm\nScala colonna LPL %.1f",
+                "%s · negativo %s\\nObiettivo automatico %d mm\\n%s\\nβ %.3f\\nImmagine proiettata %.1f × %.1f cm\\nCrop: %s\\nDistanza negativo–carta %.1f cm\\nScala colonna LPL %.1f",
                 formatLabel(format), negativeSizeLabel(format), lensMm(format), carrierLabel(format),
                 c.beta, c.pw, c.ph, cropLabel(c.crop), c.negativeToPaperCm, c.columnScale);''',
     "setup result",
@@ -122,16 +122,16 @@ enlargement = replace_once(
     enlargement,
     '''    String originSummary(String meta, String format) {
         return paperDisplay(meta) + " · " + formatLabel(format) + " / " + lensMm(format) + " mm"
-                + "\n" + carrierLabel(format)
-                + String.format(Locale.ITALY, "\nβ %.3f · scala fisica non calibrata", num(meta, "beta"));
+                + "\\n" + carrierLabel(format)
+                + String.format(Locale.ITALY, "\\nβ %.3f · scala fisica non calibrata", num(meta, "beta"));
     }''',
     '''    String originSummary(String meta, String format) {
         double beta = num(meta, "beta");
         double scale = num(meta, "columnScale");
         if (Double.isNaN(scale) && beta > 0.0) scale = Lpl7451Geometry.scaleFor(beta, lensMm(format));
         return paperDisplay(meta) + " · " + formatLabel(format) + " / " + lensMm(format) + " mm"
-                + "\n" + carrierLabel(format)
-                + String.format(Locale.ITALY, "\nβ %.3f · scala LPL %.1f", beta, scale);
+                + "\\n" + carrierLabel(format)
+                + String.format(Locale.ITALY, "\\nβ %.3f · scala LPL %.1f", beta, scale);
     }''',
     "origin summary",
 )
