@@ -61,7 +61,8 @@ grep -Fq 'focalCm * (beta + 1.0 / beta + 2.0)' "$GEOMETRY"
 grep -Fq 'columnCalibration=MEASURED_67_73_6MM' "$ENL"
 grep -Fq 'scaleOffsetCm=5.40' "$ENL"
 grep -Fq 'Scala colonna LPL %.1f' "$ENL"
-grep -Fq 'scala LPL %.1f' "$MAIN"
+grep -Fq 'enlargementMetaValue(meta, "columnScale")' "$MAIN"
+grep -Fq 'append("scala LPL ")' "$MAIN"
 grep -Fq 'β / Scala LPL' "$JPEG"
 if grep -Fq 'columnCalibration=PENDING' "$ENL" || grep -Fq 'calibrazione fisica rinviata' "$ENL"; then
   echo 'Pending LPL calibration survived in final app source' >&2
