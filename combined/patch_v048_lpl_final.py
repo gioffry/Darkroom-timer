@@ -64,7 +64,7 @@ enlargement = replace_once(
                         x.b2, x.pw, x.ph, cropLabel(x.crop))))''',
     '''                        "%s · obiettivo %d mm\\n%s\\nβ finale %.3f\\nImmagine proiettata %.1f × %.1f cm\\nCrop: %s\\nDistanza negativo–carta %.1f cm\\nScala colonna LPL %.1f",
                         formatLabel(x.negativeCode), lensMm(x.negativeCode), carrierLabel(x.negativeCode),
-                        x.b2, x.pw, x.ph, cropLabel(x.crop), x.negativeToPaperCm, x.columnScale))))''',
+                        x.b2, x.pw, x.ph, cropLabel(x.crop), x.negativeToPaperCm, x.columnScale)))''',
     "resize result",
 )
 enlargement = replace_once(
@@ -247,6 +247,62 @@ main = main_path.read_text(encoding="utf-8")
 jpeg = jpeg_path.read_text(encoding="utf-8")
 maintenance = maintenance_path.read_text(encoding="utf-8")
 active = "\n".join((geometry, enlargement, main, jpeg, maintenance))
+
+
+def assert_balanced_java(source, label):
+    pairs = {')': '(', ']': '[', '}': '{'}
+    stack = []
+    state = "code"
+    escaped = False
+    i = 0
+    while i < len(source):
+        char = source[i]
+        following = source[i + 1] if i + 1 < len(source) else ""
+        if state == "line_comment":
+            if char == "\n":
+                state = "code"
+        elif state == "block_comment":
+            if char == '*' and following == '/':
+                state = "code"
+                i += 1
+        elif state in ("string", "char"):
+            if escaped:
+                escaped = False
+            elif char == '\\':
+                escaped = True
+            elif (state == "string" and char == '"') or (state == "char" and char == "'"):
+                state = "code"
+        elif char == '/' and following == '/':
+            state = "line_comment"
+            i += 1
+        elif char == '/' and following == '*':
+            state = "block_comment"
+            i += 1
+        elif char == '"':
+            state = "string"
+        elif char == "'":
+            state = "char"
+        elif char in "([{":
+            stack.append((char, i))
+        elif char in ")]}":
+            if not stack or stack[-1][0] != pairs[char]:
+                raise SystemExit(f"v0.4.8 unbalanced Java delimiter in {label} at offset {i}: {char}")
+            stack.pop()
+        i += 1
+    if state in ("string", "char", "block_comment"):
+        raise SystemExit(f"v0.4.8 unterminated Java token in {label}: {state}")
+    if stack:
+        raise SystemExit(f"v0.4.8 unclosed Java delimiter in {label}: {stack[-1][0]}")
+
+
+for label, source in (
+    ("Lpl7451Geometry", geometry),
+    ("EnlargementActivity", enlargement),
+    ("MainActivity", main),
+    ("JpegCardRenderer", jpeg),
+    ("UseMaintenanceActivity", maintenance),
+):
+    assert_balanced_java(source, label)
 
 for marker in (
     "MEASURED_SCALE = 67.0",
