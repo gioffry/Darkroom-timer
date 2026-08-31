@@ -5,6 +5,7 @@ set -euo pipefail
 # Exact base: v0.5.0 corrected large-format A/B chassis workflow.
 
 bash combined/build_v050.sh
+python3 combined/patch_v051_repair_source.py
 python3 combined/patch_v051_sheet_development.py | tee validation-v051-sheet-patch.txt
 
 python3 - <<'PY'
@@ -59,6 +60,7 @@ grep -Fq 'MdcOfflineStore.lookup(' "$ASSIST"
 grep -Fq 'NUMERO LASTRE 4×5' "$ASSIST"
 grep -Fq 'return "4×5 / lastre"' "$ASSIST"
 grep -Fq 'new Tank("JOBO 2520", 270, 2, 1, 6)' "$ASSIST"
+grep -Fq 'new Tank("JOBO 2563", 850, 6, 8, 0)' "$ASSIST"
 grep -Fq 'JOBO 2520 + 2509N' "$ASSIST"
 grep -Fq 'isSheetFormat(selectedFilm.format) ? t.maxSheet' "$ASSIST"
 grep -Fq 'formatDisplay(result.format)' "$ASSIST"
