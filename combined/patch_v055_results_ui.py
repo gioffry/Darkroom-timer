@@ -131,6 +131,14 @@ replacement = r'''    private void showDevelopmentResult(DevTimeEngine.Result re
         filmResultBox.addView(space(20));
     }
 
+    private void addUnifiedChemicalField(LinearLayout parent, String title, String value) {
+        if (value == null || value.trim().isEmpty()) return;
+        TextView heading = label(title, 11, MUTED, true);
+        heading.setPadding(0, dp(8), 0, dp(3));
+        parent.addView(heading);
+        parent.addView(label(value.trim(), 15, WHITE, false));
+    }
+
     private LinearLayout accordionBody() {
         LinearLayout body = new LinearLayout(this);
         body.setOrientation(LinearLayout.VERTICAL);
@@ -194,6 +202,7 @@ for expected in (
     "SCHEDA TECNICA RIVELATORE",
     "RIUTILIZZO BAGNI",
     "addFilmAccordion",
+    "private void addUnifiedChemicalField",
     "body.setVisibility(View.GONE)",
     "selectedFilm != null ? selectedFilm.format",
 ):

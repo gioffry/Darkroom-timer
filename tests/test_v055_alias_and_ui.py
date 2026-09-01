@@ -36,6 +36,7 @@ class AliasAndProgressiveUiTest(unittest.TestCase):
             self.assertIn(title, source)
         self.assertIn("PREPARAZIONE BAGNI", source)
         self.assertIn("body.setVisibility(View.GONE)", source)
+        self.assertIn("private void addUnifiedChemicalField", source)
 
 
 if __name__ == "__main__":
