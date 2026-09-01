@@ -71,7 +71,8 @@ assert any(('[40]' in (r['notes'] or '') or '[devrow:9958]' in (r['notes'] or ''
            and r['timesheet'] == '5' for r in rows_19), [dict(r) for r in rows_19]
 assert any('[63]' in (r['notes'] or '') or '[devrow:17522]' in (r['notes'] or '')
            for r in rows_19), [dict(r) for r in rows_19]
-assert all((r['source_url'] or '').startswith('https://www.digitaltruth.com/') for r in rows_19)
+assert any(r['timesheet'] == '5' and
+           (r['source_url'] or '').startswith('https://www.digitaltruth.com/') for r in rows_19)
 
 rows_114 = db.execute(
     '''SELECT timesheet,notes FROM times

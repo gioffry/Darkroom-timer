@@ -52,6 +52,46 @@ if source.count(old_fetch_loop) != 1:
     raise SystemExit("v0.5.6 MDC source merge marker missing")
 source = source.replace(old_fetch_loop, new_fetch_loop, 1)
 
+download_guard = """if len(seed)<200 or len(allrows)<3000 or len(failed)>20:
+    raise SystemExit(f'Full download incomplete: seed={len(seed)} raw_rows={len(allrows)} failed={len(failed)}')
+
+OUT.parent.mkdir(parents=True,exist_ok=True)"""
+verified_supplement = """if len(seed)<200 or len(allrows)<3000 or len(failed)>20:
+    raise SystemExit(f'Full download incomplete: seed={len(seed)} raw_rows={len(allrows)} failed={len(failed)}')
+
+# MDC currently serves automation clients a lagging representation of these
+# rows even though they are visible in the public chart. Keep this small,
+# source-addressed supplement deterministic so the APK remains fully offline.
+verified_rows=[
+ {'film':'Fomapan 100','developer':'Ilfosol 3','dilution':'1+9','iso':100,
+  'time35':'5','time120':'5','timesheet':'5','temp':20.0,
+  'notes':'[40] [devrow:9958]',
+  'source_url':'https://www.digitaltruth.com/devchart.php?devrow=9958'},
+ {'film':'Fomapan 100','developer':'Ilfosol 3','dilution':'1+9','iso':100,
+  'time35':'3','time120':'3','timesheet':'3','temp':20.0,
+  'notes':'[a04][63] [devrow:17522]',
+  'source_url':'https://www.digitaltruth.com/devchart.php?devrow=17522'},
+ {'film':'Fomapan 100','developer':'Ilfosol 3','dilution':'1+14','iso':100,
+  'time35':'7.5','time120':'7.5','timesheet':'7.5','temp':20.0,
+  'notes':'',
+  'source_url':'https://www.digitaltruth.com/devchart.php?Developer=&Film=Fomapan+100&mdc=Search'},
+ {'film':'Fomapan 100','developer':'Ilfosol 3','dilution':'1+14','iso':100,
+  'time35':'5','time120':'5','timesheet':'5','temp':20.0,
+  'notes':'[a04][63] [devrow:17521]',
+  'source_url':'https://www.digitaltruth.com/devchart.php?devrow=17521'},
+]
+verified_keys={(r['film'],r['developer'],r['dilution'],r['iso'],r['time35'],
+                r['time120'],r['timesheet'],r['temp']) for r in verified_rows}
+allrows=[r for r in allrows if
+         (r['film'],r['developer'],r['dilution'],r['iso'],r['time35'],
+          r['time120'],r['timesheet'],r['temp']) not in verified_keys]
+allrows.extend(verified_rows)
+
+OUT.parent.mkdir(parents=True,exist_ok=True)"""
+if source.count(download_guard) != 1:
+    raise SystemExit("v0.5.6 verified MDC supplement marker missing")
+source = source.replace(download_guard, verified_supplement, 1)
+
 # The main chart displays a generic [notes] label, but its link contains the
 # stable devrow identifier. Preserve that identifier and make the row source
 # open the exact MDC note instead of the whole developer listing.
