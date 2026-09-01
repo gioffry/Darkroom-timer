@@ -113,9 +113,11 @@ activity = replace_once(
 )
 activity = replace_once(
     activity,
-    '''        resultLine(filmResultBox, "RIVELATORE", formatMix(devMix, workingVolumeMl));''',
     '''        resultLine(filmResultBox, "RIVELATORE",
-                formatDeveloperMix(dev.name, dilution, devMix, workingVolumeMl));''',
+                dev.name + "\\n" + formatMix(devMix, workingVolumeMl));''',
+    '''        resultLine(filmResultBox, "RIVELATORE",
+                dev.name + "\\n" +
+                        formatDeveloperMix(dev.name, dilution, devMix, workingVolumeMl));''',
     "multi-component developer display",
 )
 
