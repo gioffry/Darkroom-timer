@@ -53,12 +53,14 @@ OUT.parent.mkdir(parents=True,exist_ok=True)"""
 pipeline = r"""# Independently crawl every canonical film page. These are the pages shown to
 # users by the current Massive Dev Chart and therefore define the release
 # snapshot. A failed page blocks the release instead of silently shipping a
-# partial database.
+# partial database. This index is deliberately sequential and rate-limited:
+# Digitaltruth applies a stricter limit to devchart.php than to the developer
+# text indexes.
 def one_film(film):
     url=('https://www.digitaltruth.com/devchart.php?Developer=&Film=' +
          quote_plus(film) + '&TempUnits=C&TimeUnits=D&mdc=Search')
     last=''
-    for attempt in range(4):
+    for attempt in range(8):
         try:
             txt=fetch(url)
             if not txt or '<html' not in txt.lower():
@@ -66,24 +68,33 @@ def one_film(film):
             return film,parse(txt,url,''),'',url
         except Exception as exc:
             last=repr(exc)
-            time.sleep(.25*(attempt+1))
+            status=getattr(exc,'code',None)
+            if status==429:
+                retry_after=getattr(exc,'headers',{}).get('Retry-After','')
+                try: wait=float(retry_after)
+                except: wait=min(90.0,8.0*(2**attempt))
+                print(f'MDC rate limit for {film}: waiting {wait:.0f}s',flush=True)
+                time.sleep(wait)
+            else:
+                time.sleep(min(15.0,1.0*(2**attempt)))
     return film,[],last,url
 
 film_rows=[]; film_failed=[]; empty_films=[]
-with concurrent.futures.ThreadPoolExecutor(max_workers=4) as ex:
-    futs={ex.submit(one_film,f):f for f in sorted(CANON_FILMS.values())}
-    done=0
-    for future in concurrent.futures.as_completed(futs):
-        film,rows,err,url=future.result(); done+=1
-        if err:
-            film_failed.append((film,err,url))
-        elif rows:
-            film_rows.extend(rows)
-        else:
-            empty_films.append(film)
-        if done%25==0 or done==len(futs):
-            print(f'film progress {done}/{len(futs)}, current_rows={len(film_rows)}, '
-                  f'failed={len(film_failed)}, empty={len(empty_films)}',flush=True)
+films_to_fetch=sorted(CANON_FILMS.values())
+print('MDC film-index cooldown: 30s',flush=True)
+time.sleep(30)
+for done,film_name in enumerate(films_to_fetch,1):
+    film,rows,err,url=one_film(film_name)
+    if err:
+        film_failed.append((film,err,url))
+    elif rows:
+        film_rows.extend(rows)
+    else:
+        empty_films.append(film)
+    if done%25==0 or done==len(films_to_fetch):
+        print(f'film progress {done}/{len(films_to_fetch)}, current_rows={len(film_rows)}, '
+              f'failed={len(film_failed)}, empty={len(empty_films)}',flush=True)
+    time.sleep(.8)
 
 if film_failed:
     raise SystemExit('Current film-page acquisition incomplete: ' + repr(film_failed[:10]))

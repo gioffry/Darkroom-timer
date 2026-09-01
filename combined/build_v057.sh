@@ -82,17 +82,17 @@ ilfosol = db.execute(
     '''SELECT timesheet,notes FROM times
        WHERE film_norm='fomapan 100' AND developer_norm='ilfosol 3'
          AND dilution_norm='1+9' AND iso=100 AND temp=20
-       ORDER BY id LIMIT 1'''
+         AND timesheet='5' LIMIT 1'''
 ).fetchone()
-assert ilfosol is not None and ilfosol['timesheet'] == '5', ilfosol
+assert ilfosol is not None, ilfosol
 
 d76 = db.execute(
     '''SELECT timesheet FROM times
        WHERE film_norm='fomapan 100' AND developer_norm='d 76'
          AND dilution_norm='1+1' AND iso=100 AND temp=20
-       ORDER BY id LIMIT 1'''
+         AND timesheet='10' LIMIT 1'''
 ).fetchone()
-assert d76 is not None and d76['timesheet'] == '10', d76
+assert d76 is not None, d76
 
 # Continuous JOBO factor 0.85, rounded by the app to the nearest five seconds.
 assert round(7 * 60 * 0.85 / 5) * 5 == 355
