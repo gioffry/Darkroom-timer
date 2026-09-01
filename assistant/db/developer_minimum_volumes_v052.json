@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "basis": "Minimum working solution for one 500 cm2 film-equivalent; 4x5 values use one quarter and one half of that chemical capacity, with manufacturer examples and safe practical rounding where documented.",
+  "checkedAt": "2026-09-01",
+  "records": [
+    {
+      "developerNorm": "foma universal",
+      "dilutionNorm": "1+3",
+      "minWorkingMl500cm2": 340,
+      "minWorkingMl4x5One": 85,
+      "minWorkingMl4x5Two": 170,
+      "sourceTitle": "FOMA Developers for Black-and-White Negative Films",
+      "sourceUrl": "https://www.foma.cz/en/film",
+      "note": "One litre of prepared developer has a 12-film capacity and is used 1+3 for film; values are rounded upward to practical 10/5 ml measures."
+    },
+    {
+      "developerNorm": "ilfotec dd x",
+      "dilutionNorm": "1+4",
+      "minWorkingMl500cm2": 320,
+      "minWorkingMl4x5One": 80,
+      "minWorkingMl4x5Two": 160,
+      "sourceTitle": "ILFORD ILFOTEC DD-X Film Developer",
+      "sourceUrl": "https://www.ilfordphoto.com/wp/wp-content/uploads/2019/08/ILFOTEC-DDX-AUG19.pdf",
+      "note": "A one-litre concentrate bottle processes 16 films one-shot at 1+4; 312.5 ml is rounded upward to 320 ml."
+    },
+    {
+      "developerNorm": "ilfosol 3",
+      "dilutionNorm": "1+9",
+      "minWorkingMl500cm2": 320,
+      "minWorkingMl4x5One": 80,
+      "minWorkingMl4x5Two": 160,
+      "sourceTitle": "ILFORD ILFOSOL 3 Film Developer",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/572/product/542/",
+      "note": "500 ml concentrate processes 16 films at 1+9; 312.5 ml is rounded upward to 320 ml."
+    },
+    {
+      "developerNorm": "ilfosol 3",
+      "dilutionNorm": "1+14",
+      "minWorkingMl500cm2": 320,
+      "minWorkingMl4x5One": 80,
+      "minWorkingMl4x5Two": 160,
+      "sourceTitle": "ILFORD ILFOSOL 3 Film Developer",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/572/product/542/",
+      "note": "500 ml concentrate processes 24 films at 1+14; 312.5 ml is rounded upward to 320 ml."
+    },
+    {
+      "developerNorm": "ilfotec lc29",
+      "dilutionNorm": "1+9",
+      "minWorkingMl500cm2": 320,
+      "minWorkingMl4x5One": 80,
+      "minWorkingMl4x5Two": 160,
+      "sourceTitle": "ILFORD ILFOTEC LC29 Technical Information",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1951/product/547/",
+      "note": "A 500 ml bottle processes 16 films one-shot at 1+9; 312.5 ml is rounded upward to 320 ml."
+    },
+    {
+      "developerNorm": "ilfotec lc29",
+      "dilutionNorm": "1+19",
+      "minWorkingMl500cm2": 320,
+      "minWorkingMl4x5One": 80,
+      "minWorkingMl4x5Two": 160,
+      "sourceTitle": "ILFORD ILFOTEC LC29 Technical Information",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1951/product/547/",
+      "note": "A 500 ml bottle processes 32 films one-shot at 1+19; 312.5 ml is rounded upward to 320 ml."
+    },
+    {
+      "developerNorm": "ilfotec lc29",
+      "dilutionNorm": "1+29",
+      "minWorkingMl500cm2": 300,
+      "minWorkingMl4x5One": 75,
+      "minWorkingMl4x5Two": 150,
+      "sourceTitle": "ILFORD ILFOTEC LC29 Technical Information",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1951/product/547/",
+      "note": "A 500 ml bottle processes 50 films one-shot at 1+29."
+    },
+    {
+      "developerNorm": "rodinal",
+      "dilutionNorm": "1+25",
+      "minWorkingMl500cm2": 130,
+      "minWorkingMl4x5One": 32.5,
+      "minWorkingMl4x5Two": 65,
+      "sourceTitle": "ADOX Rodinal / Adonal",
+      "sourceUrl": "https://www.adox.de/adox-film-developer/rodinal-adonal/",
+      "note": "ADOX requires at least 5 ml concentrate per 135 or 120 film."
+    },
+    {
+      "developerNorm": "rodinal",
+      "dilutionNorm": "1+50",
+      "minWorkingMl500cm2": 255,
+      "minWorkingMl4x5One": 63.75,
+      "minWorkingMl4x5Two": 127.5,
+      "sourceTitle": "ADOX Rodinal / Adonal",
+      "sourceUrl": "https://www.adox.de/adox-film-developer/rodinal-adonal/",
+      "note": "ADOX requires at least 5 ml concentrate per 135 or 120 film."
+    },
+    {
+      "developerNorm": "rodinal",
+      "dilutionNorm": "1+100",
+      "minWorkingMl500cm2": 505,
+      "minWorkingMl4x5One": 126.25,
+      "minWorkingMl4x5Two": 252.5,
+      "sourceTitle": "ADOX Rodinal / Adonal",
+      "sourceUrl": "https://www.adox.de/adox-film-developer/rodinal-adonal/",
+      "note": "ADOX requires at least 5 ml concentrate per 135 or 120 film."
+    },
+    {
+      "developerNorm": "xt 3",
+      "dilutionNorm": "1+1",
+      "minWorkingMl500cm2": 300,
+      "minWorkingMl4x5One": 75,
+      "minWorkingMl4x5Two": 150,
+      "sourceTitle": "ADOX XT-3 Developer",
+      "sourceUrl": "https://www.adox.de/xt3-en/",
+      "note": "ADOX's documented 1+1 example uses 150 ml stock plus 150 ml water for one film."
+    }
+  ]
+}
