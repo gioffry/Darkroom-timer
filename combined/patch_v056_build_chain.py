@@ -20,20 +20,20 @@ if injected not in text:
     BUILD_V011.write_text(text, encoding="utf-8")
 
 # Releases v0.3.3-v0.4.8 protected the original 14,504-row snapshot with an
-# exact equality check. A refresh may only add rows, so retain the data-loss
-# guard as a lower bound instead of rejecting a newer valid snapshot.
+# exact equality check. Four rows were duplicate time tuples carrying alternate
+# notes, so the stable chemistry baseline is 14,500 unique combinations.
 changed = 0
 for path in sorted(ROOT.glob("build_v*.sh")):
     if path.name in {"build_v055.sh", "build_v056.sh"}:
         continue
     source = path.read_text(encoding="utf-8")
     updated = source
-    updated = updated.replace("combinations!=14504", "combinations<14504")
+    updated = updated.replace("combinations!=14504", "combinations<14500")
     updated = updated.replace("mdc_dils!=776", "mdc_dils<776")
-    updated = updated.replace("== 14504", ">= 14504")
-    updated = updated.replace("==14504", ">=14504")
-    updated = updated.replace("mdc_times_unchanged=14504", "mdc_times_at_least=14504")
-    updated = updated.replace("mdc_combinations=14504", "mdc_combinations_at_least=14504")
+    updated = updated.replace("== 14504", ">= 14500")
+    updated = updated.replace("==14504", ">=14500")
+    updated = updated.replace("mdc_times_unchanged=14504", "mdc_unique_times_at_least=14500")
+    updated = updated.replace("mdc_combinations=14504", "mdc_unique_combinations_at_least=14500")
     if updated != source:
         path.write_text(updated, encoding="utf-8")
         changed += 1

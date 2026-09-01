@@ -92,7 +92,7 @@ assert '1+3' not in dilutions
 
 # 5 minutes in MDC -> continuous JOBO factor 0.85 -> 4m15s.
 assert round(5 * 60 * 0.85 / 5) * 5 == 255
-assert db.execute('SELECT COUNT(*) FROM times').fetchone()[0] >= 14504
+assert db.execute('SELECT COUNT(*) FROM times').fetchone()[0] >= 14500
 assert db.execute('SELECT COUNT(*) FROM maco_developer_scope').fetchone()[0] == 37
 assert db.execute(
     'SELECT COUNT(*) FROM developer_dilutions WHERE min_working_ml_500cm2 IS NOT NULL'
