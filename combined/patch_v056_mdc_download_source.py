@@ -18,6 +18,40 @@ if source.count(old) != 1:
     raise SystemExit("v0.5.6 MDC source-order marker missing")
 source = source.replace(old, new, 1)
 
+old_fetch_loop = """    last=''
+    for url in urls:
+        for attempt in range(3):
+            try:
+                rows=parse(fetch(url),url,dev)
+                if rows: return dev,rows,''
+                last='no canonical rows'
+            except Exception as e:
+                last=repr(e)
+            time.sleep(.15*(attempt+1))
+    return dev,[],last"""
+new_fetch_loop = """    # Merge instead of replacing: devchart has the current Sheet rows, while
+    # the historical text endpoints still contain some older combinations.
+    # URL order defines priority and the tuple key deliberately ignores notes/source.
+    merged={}; last=''
+    for url in urls:
+        rows=[]
+        for attempt in range(3):
+            try:
+                rows=parse(fetch(url),url,dev)
+                if rows: break
+                last='no canonical rows'
+            except Exception as e:
+                last=repr(e)
+            time.sleep(.15*(attempt+1))
+        for row in rows:
+            key=(row['film'],row['developer'],row['dilution'],row['iso'],
+                 row['time35'],row['time120'],row['timesheet'],row['temp'])
+            merged.setdefault(key,row)
+    return dev,list(merged.values()),('' if merged else last)"""
+if source.count(old_fetch_loop) != 1:
+    raise SystemExit("v0.5.6 MDC source merge marker missing")
+source = source.replace(old_fetch_loop, new_fetch_loop, 1)
+
 # The main chart displays a generic [notes] label, but its link contains the
 # stable devrow identifier. Preserve that identifier and make the row source
 # open the exact MDC note instead of the whole developer listing.
