@@ -59,7 +59,9 @@ ranking_helpers = r'''    private static String timeForFormat(TimeRow row, Strin
     }
 
     private static boolean conflictingSubmission(TimeRow row) {
-        return row != null && row.notes != null && row.notes.contains("[63]");
+        return row != null && row.notes != null &&
+                (row.notes.contains("[63]") || row.notes.contains("[devrow:17521]") ||
+                        row.notes.contains("[devrow:17522]"));
     }
 
     private static String appendWarning(String current, String extra) {
@@ -96,7 +98,8 @@ warning_replacement = '''            if (crossFormat) {
                 if (!warning.isEmpty()) warning += "\\n";
                 warning += "Digitaltruth non riporta un tempo per questo formato: usato il tempo disponibile per un altro formato come punto di partenza.";
             }
-            if (row.notes != null && row.notes.contains("[40]")) {
+            if (row.notes != null &&
+                    (row.notes.contains("[40]") || row.notes.contains("[devrow:9958]"))) {
                 warning = appendWarning(warning,
                         "Nota MDC: questo tempo prevede un prelavaggio di 3–5 minuti.");
             }

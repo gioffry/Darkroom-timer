@@ -67,8 +67,10 @@ rows_19 = db.execute(
 assert rows_19, 'Fomapan 100 / Ilfosol 3 1+9 missing'
 sheet_values_19 = {r['timesheet'] for r in rows_19 if r['timesheet'] not in ('', '-', '—', '#')}
 assert '5' in sheet_values_19, sheet_values_19
-assert any('[40]' in (r['notes'] or '') and r['timesheet'] == '5' for r in rows_19), rows_19
-assert any('[63]' in (r['notes'] or '') for r in rows_19), rows_19
+assert any(('[40]' in (r['notes'] or '') or '[devrow:9958]' in (r['notes'] or ''))
+           and r['timesheet'] == '5' for r in rows_19), [dict(r) for r in rows_19]
+assert any('[63]' in (r['notes'] or '') or '[devrow:17522]' in (r['notes'] or '')
+           for r in rows_19), [dict(r) for r in rows_19]
 assert all((r['source_url'] or '').startswith('https://www.digitaltruth.com/') for r in rows_19)
 
 rows_114 = db.execute(
@@ -76,7 +78,8 @@ rows_114 = db.execute(
        WHERE film_norm='fomapan 100' AND developer_norm='ilfosol 3'
          AND dilution_norm='1+14' AND iso=100 AND temp=20'''
 ).fetchall()
-assert any(r['timesheet'] == '7.5' and '[63]' not in (r['notes'] or '') for r in rows_114), rows_114
+assert any(r['timesheet'] == '7.5' and '[63]' not in (r['notes'] or '') and
+           '[devrow:17521]' not in (r['notes'] or '') for r in rows_114), [dict(r) for r in rows_114]
 
 dilutions = {
     r[0] for r in db.execute(
