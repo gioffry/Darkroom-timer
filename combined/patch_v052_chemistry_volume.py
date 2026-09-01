@@ -26,7 +26,7 @@ def replace_once(text: str, old: str, new: str, label: str) -> str:
 store = STORE.read_text(encoding="utf-8")
 store = replace_once(
     store,
-    '    private static final String DB_NAME = "mdc_offline_darkroom_v029.sqlite";',
+    '    private static final String DB_NAME = "mdc_offline_darkroom_v037.sqlite";',
     '    private static final String DB_NAME = "mdc_offline_darkroom_v052.sqlite";',
     "database filename",
 )
