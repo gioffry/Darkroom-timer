@@ -3,6 +3,7 @@ set -euo pipefail
 
 # Darkroom v0.5.7 - release-gated, dual-index MDC snapshot. The app itself
 # remains fully offline; network access exists only in this release build.
+# No APK is emitted unless every validation below succeeds.
 
 python3 combined/patch_v056_build_chain.py
 python3 combined/patch_v057_build_chain.py
