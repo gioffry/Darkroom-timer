@@ -49,6 +49,7 @@ grep -q 'assets/mdc_full.sqlite' apk-listing-v057.txt
 ASSIST=combined/src/main/java/it/darkroom/assistant/AssistantActivityV2.java
 MDC=combined/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
 grep -Fq 'mdc_offline_darkroom_v057.sqlite' "$MDC"
+grep -Fq 'values.length == 0 && selectedFilmDeveloper != null' "$ASSIST"
 ! grep -Fq 'MdcOfflineStore.syncAsync' "$ASSIST"
 ! grep -Fq 'verified_rows=' assistant/build_mdc_sqlite_asset_v032.py
 grep -Fq 'def one_film(film):' assistant/build_mdc_sqlite_asset_v032.py
@@ -76,7 +77,7 @@ fx39 = db.execute(
 ).fetchone()
 assert fx39 is not None, 'Fomapan 100 / FX-39 / 1+9 / ISO 100 missing'
 assert tuple(fx39[:4]) == ('7','7','7',20.0), tuple(fx39)
-assert 'Film=Fomapan+100' in fx39['source_url'], fx39['source_url']
+assert 'search_text.php?Film=Fomapan+100' in fx39['source_url'], fx39['source_url']
 
 ilfosol = db.execute(
     '''SELECT timesheet,notes FROM times
@@ -107,6 +108,7 @@ print('release=Darkroom-v0.5.7')
 print('versionName=0.5.7')
 print('versionCode=48')
 print('runtime_network_for_mdc=DISABLED')
+print('developer_dilution_fallback=PASS')
 print('snapshot_pipeline=FILM_INDEX_PLUS_DEVELOPER_INDEX')
 print('manual_time_rows=ZERO')
 print('failed_current_film_pages=ZERO')

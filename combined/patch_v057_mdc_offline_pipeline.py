@@ -47,41 +47,12 @@ source = replace_once(
 
 one_marker = "def one(dev):"
 film_parser = r'''def parse_film_page(txt,url,requested_film):
-    """Parse a film-filtered table whose Film cell uses an HTML rowspan."""
-    rows=[]
-    for tr in re.findall(r'(?is)<tr[^>]*>(.*?)</tr>',txt):
-        raw_cells=re.findall(r'(?is)<t[dh][^>]*>(.*?)</t[dh]>',tr)
-        cells=[clean(x) for x in raw_cells]
-        if not cells or cells[0].lower()=='film': continue
-        if len(cells)>=9:
-            film=canonical_film(raw_cells[0],cells[0]) or requested_film
-            offset=1
-        elif len(cells)>=8:
-            # After the first result the filtered Film cell is represented by
-            # rowspan and therefore absent from the physical HTML row.
-            film=requested_film
-            offset=0
-        else:
-            continue
-        iso=parse_iso(cells[offset+2])
-        if not film or not cells[offset] or iso<=0: continue
-        note_index=offset+7
-        devrow=(query_value(raw_cells[note_index],'devrow')
-                if len(raw_cells)>note_index else '')
-        rows.append({
-            'film':film,'developer':cells[offset],
-            'dilution':clean(cells[offset+1]),'iso':iso,
-            'time35':clean_time(cells[offset+3]),
-            'time120':clean_time(cells[offset+4]),
-            'timesheet':clean_time(cells[offset+5]),
-            'temp':parse_temp(cells[offset+6]),
-            'notes':((cells[note_index].strip() + ' ')
-                     if len(cells)>note_index else '') +
-                    (('[devrow:' + devrow + ']') if devrow else ''),
-            'source_url':(('https://www.digitaltruth.com/devchart.php?devrow=' + devrow)
-                          if devrow else url)
-        })
-    return rows
+    """Parse Digitaltruth's row-oriented text index for one film."""
+    rows=parse(txt,url,'')
+    # The endpoint is already filtered, but reject a contaminated response
+    # rather than silently assigning rows to the requested film.
+    wanted=norm(requested_film)
+    return [row for row in rows if norm(row['film'])==wanted]
 
 '''
 source = replace_once(source, one_marker, film_parser + one_marker, "film-page parser")
@@ -95,11 +66,10 @@ pipeline = r"""# Independently crawl every canonical film page. These are the pa
 # users by the current Massive Dev Chart and therefore define the release
 # snapshot. A failed page blocks the release instead of silently shipping a
 # partial database. This index is deliberately sequential and rate-limited:
-# Digitaltruth applies a stricter limit to devchart.php than to the developer
-# text indexes.
+# The film and developer indexes share the same stable row-oriented endpoint.
 def one_film(film):
-    url=('https://www.digitaltruth.com/devchart.php?Developer=&Film=' +
-         quote_plus(film) + '&mdc=Search')
+    url=('https://www.digitaltruth.com/chart/search_text.php?Film=' +
+         quote_plus(film))
     last=''
     for attempt in range(8):
         try:
