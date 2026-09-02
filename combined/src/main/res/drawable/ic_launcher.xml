@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#08090A" android:pathData="M0,0h108v108h-108z"/>
+    <path android:fillColor="#00000000" android:strokeColor="#E8CAA0" android:strokeWidth="2.2"
+        android:pathData="M54,7 A47,47 0,1 1,54,101 A47,47 0,1 1,54,7"/>
+    <path android:fillColor="#00000000" android:strokeColor="#B99A74" android:strokeWidth="0.8"
+        android:pathData="M54,10 A44,44 0,1 1,54,98 A44,44 0,1 1,54,10"/>
+    <!-- central enlarger -->
+    <path android:fillColor="#00000000" android:strokeColor="#E8CAA0" android:strokeWidth="2.0" android:strokeLineJoin="round"
+        android:pathData="M47,18h14v5h-14z M45,24h18v4h-18z M46,29h16v4h-16z M43,34h22v21h-22z M50,55h8v9h-8z"/>
+    <path android:fillColor="#7E231E" android:strokeColor="#E8CAA0" android:strokeWidth="1.4"
+        android:pathData="M54,40 A6,6 0,1 1,54,52 A6,6 0,1 1,54,40"/>
+    <!-- chemistry bottle left -->
+    <path android:fillColor="#00000000" android:strokeColor="#E8CAA0" android:strokeWidth="1.8" android:strokeLineJoin="round"
+        android:pathData="M23,45h7v4l4,6v17h-15v-17l4,-6z M20,65h13"/>
+    <path android:fillColor="#7E231E" android:pathData="M21,66h11v4h-11z"/>
+    <!-- film canister / strip right -->
+    <path android:fillColor="#00000000" android:strokeColor="#E8CAA0" android:strokeWidth="1.8" android:strokeLineJoin="round"
+        android:pathData="M75,47h10v24h-10z M85,51h6v18h-6z M87,54h2 M87,58h2 M87,62h2 M87,66h2"/>
+    <path android:fillColor="#7E231E" android:pathData="M86,52h4v16h-4z"/>
+    <!-- developing tray -->
+    <path android:fillColor="#00000000" android:strokeColor="#E8CAA0" android:strokeWidth="2.0" android:strokeLineJoin="round"
+        android:pathData="M33,68h42l-4,12h-34z M38,73h32"/>
+    <path android:fillColor="#6E1F1B" android:pathData="M38,74h32l-1.3,4h-29.4z"/>
+    <!-- print -->
+    <path android:fillColor="#00000000" android:strokeColor="#E8CAA0" android:strokeWidth="1.6"
+        android:pathData="M40,84h28v10h-28z M43,91l5,-4l4,3l5,-5l7,6"/>
+    <path android:fillColor="#8B2B24" android:pathData="M61,86 A2,2 0,1 1,61,90 A2,2 0,1 1,61,86"/>
+    <!-- darkroom red accents -->
+    <path android:fillColor="#8B2B24" android:strokeColor="#E8CAA0" android:strokeWidth="1.0"
+        android:pathData="M18,30 C15,35 15,39 18,41 C21,39 21,35 18,30z"/>
+    <path android:fillColor="#8B2B24" android:strokeColor="#E8CAA0" android:strokeWidth="1.0"
+        android:pathData="M89,32v9 M86,38h6 M89,41 A2,2 0,1 1,89,45 A2,2 0,1 1,89,41"/>
+</vector>
