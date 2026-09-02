@@ -24,6 +24,8 @@ for path in sorted(ROOT.glob("build_v*.sh")):
     updated = source
     updated = updated.replace("== 776", ">= 776")
     updated = updated.replace("==776", ">=776")
+    updated = updated.replace("== 347", ">= 347")
+    updated = updated.replace("==347", ">=347")
     updated = updated.replace("total == 781", "total >= 781")
     updated = updated.replace("mdc_times_unchanged=14504", "mdc_snapshot_times_at_least=14500")
     if updated != source:
