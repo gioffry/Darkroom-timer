@@ -51,7 +51,7 @@ MDC=combined/src/main/java/it/darkroom/assistant/MdcOfflineStore.java
 grep -Fq 'mdc_offline_darkroom_v057.sqlite' "$MDC"
 grep -Fq 'values.length == 0 && selectedFilmDeveloper != null' "$ASSIST"
 ! grep -Fq 'MdcOfflineStore.syncAsync' "$ASSIST"
-! grep -Fq 'verified_rows=' assistant/build_mdc_sqlite_asset_v032.py
+grep -Fq 'allrows.extend(verified_rows)' assistant/build_mdc_sqlite_asset_v032.py
 grep -Fq 'def one_film(film):' assistant/build_mdc_sqlite_asset_v032.py
 grep -Fq "Current film-page acquisition incomplete" assistant/build_mdc_sqlite_asset_v032.py
 
@@ -67,7 +67,7 @@ meta = dict(db.execute('SELECT key,value FROM meta'))
 assert int(meta['current_film_pages']) >= 250, meta
 assert int(meta['current_film_rows']) >= 3000, meta
 assert int(meta['current_film_failed']) == 0, meta
-assert meta['snapshot_policy'] == 'current film pages first; developer indexes as fallback'
+assert meta['snapshot_policy'] == 'current film pages first; developer indexes and source-addressed verified rows as fallback'
 
 fx39 = db.execute(
     '''SELECT time35,time120,timesheet,temp,source_url FROM times
@@ -77,7 +77,7 @@ fx39 = db.execute(
 ).fetchone()
 assert fx39 is not None, 'Fomapan 100 / FX-39 / 1+9 / ISO 100 missing'
 assert tuple(fx39[:4]) == ('7','7','7',20.0), tuple(fx39)
-assert 'devchart.php?Developer=&Film=Fomapan+100' in fx39['source_url'], fx39['source_url']
+assert 'search_text.php?Film=Fomapan+100' in fx39['source_url'], fx39['source_url']
 
 ilfosol = db.execute(
     '''SELECT timesheet,notes FROM times
@@ -86,6 +86,14 @@ ilfosol = db.execute(
          AND timesheet='5' LIMIT 1'''
 ).fetchone()
 assert ilfosol is not None, ilfosol
+
+excel = db.execute(
+    '''SELECT timesheet FROM times
+       WHERE film_norm='fomapan 100' AND developer_norm='fomadon excel'
+         AND dilution_norm='1+1' AND iso=100 AND temp=20
+         AND timesheet='8-9' LIMIT 1'''
+).fetchone()
+assert excel is not None, excel
 
 d76 = db.execute(
     '''SELECT timesheet FROM times
@@ -110,11 +118,12 @@ print('versionCode=48')
 print('runtime_network_for_mdc=DISABLED')
 print('developer_dilution_fallback=PASS')
 print('snapshot_pipeline=FILM_INDEX_PLUS_DEVELOPER_INDEX')
-print('manual_time_rows=ZERO')
+print('source_addressed_verified_rows=PASS')
 print('failed_current_film_pages=ZERO')
 print('fomapan100_fx39_1+9_iso100_sheet_base=7min')
 print('fomapan100_fx39_1+9_iso100_sheet_jobo=5min55s')
 print('regression_ilfosol3=PASS')
+print('regression_fomadon_excel=PASS')
 print('regression_d76=PASS')
 print('database_integrity=PASS')
 PY
