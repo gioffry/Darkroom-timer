@@ -1,0 +1,7 @@
+Darkroom v0.5.8
+
+- Exact offline MDC lookup always has priority.
+- Audited direct developer equivalence is used only when the exact combination is absent.
+- No fuzzy or transitive equivalence.
+- Equivalent source is disclosed in the result card.
+- Runtime MDC lookup remains fully offline.
