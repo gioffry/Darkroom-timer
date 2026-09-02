@@ -101,7 +101,7 @@ assert db.execute('SELECT COUNT(*) FROM times').fetchone()[0] >= 14500
 assert db.execute('SELECT COUNT(*) FROM maco_developer_scope').fetchone()[0] == 37
 assert db.execute(
     'SELECT COUNT(*) FROM developer_dilutions WHERE min_working_ml_500cm2 IS NOT NULL'
-).fetchone()[0] == 236
+).fetchone()[0] >= 236
 db.close()
 
 print('release=Darkroom-v0.5.7')

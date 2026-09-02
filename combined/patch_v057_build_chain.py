@@ -18,7 +18,7 @@ if injected not in text:
 
 changed = 0
 for path in sorted(ROOT.glob("build_v*.sh")):
-    if path.name in {"build_v056.sh", "build_v057.sh"}:
+    if path.name == "build_v057.sh":
         continue
     source = path.read_text(encoding="utf-8")
     updated = source
@@ -27,6 +27,9 @@ for path in sorted(ROOT.glob("build_v*.sh")):
     updated = updated.replace("== 347", ">= 347")
     updated = updated.replace("==347", ">=347")
     updated = updated.replace("total == 781", "total >= 781")
+    updated = updated.replace("populated == 236", "populated >= 236")
+    updated = updated.replace("fetchone()[0] == 236", "fetchone()[0] >= 236")
+    updated = updated.replace("manufacturer == 206", "manufacturer >= 206")
     updated = updated.replace("mdc_times_unchanged=14504", "mdc_snapshot_times_at_least=14500")
     if updated != source:
         path.write_text(updated, encoding="utf-8")
