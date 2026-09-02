@@ -1,0 +1,2 @@
+One-time source checkpoint for the verified Darkroom v0.5.8 baseline.
+Future builds must compile this materialized source once and must not fetch MDC data.
