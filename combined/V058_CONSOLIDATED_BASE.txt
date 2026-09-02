@@ -1,0 +1,5 @@
+Authoritative Darkroom v0.5.8 source and offline MDC checkpoint.
+Build entrypoint: combined/build_consolidated.sh
+Historical build recursion: disabled.
+MDC network regeneration: disabled.
+Expected Gradle assemblies: one.
