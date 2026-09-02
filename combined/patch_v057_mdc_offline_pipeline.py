@@ -58,7 +58,7 @@ pipeline = r"""# Independently crawl every canonical film page. These are the pa
 # text indexes.
 def one_film(film):
     url=('https://www.digitaltruth.com/devchart.php?Developer=&Film=' +
-         quote_plus(film) + '&TempUnits=C&TimeUnits=D&mdc=Search')
+         quote_plus(film) + '&mdc=Search')
     last=''
     for attempt in range(8):
         try:
