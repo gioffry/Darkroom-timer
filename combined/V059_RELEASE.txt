@@ -1,0 +1,9 @@
+Darkroom v0.5.9
+
+- PROVINO now has a top-level selector: PROVINO STAMPA | CONTATTO 35 mm.
+- CONTATTO 35 mm uses a fixed setup: 24×30, 50 mm, H57, f/8, M10.
+- User-created presets store Pellicola + ISO/EI + calibrated exposure time.
+- Presets persist locally across app restarts and normal APK updates.
+- Tap a preset to recall it; long-press to modify or delete it.
+- Contact-sheet exposure is a single MINIR2-timed exposure and never opens the normal strip chooser.
+- The consolidated build remains single-pass and keeps the v0.5.8 offline MDC database/equivalence behavior unchanged.
