@@ -45,6 +45,47 @@ source = replace_once(
     "film-page developer parsing",
 )
 
+one_marker = "def one(dev):"
+film_parser = r'''def parse_film_page(txt,url,requested_film):
+    """Parse a film-filtered table whose Film cell uses an HTML rowspan."""
+    rows=[]
+    for tr in re.findall(r'(?is)<tr[^>]*>(.*?)</tr>',txt):
+        raw_cells=re.findall(r'(?is)<t[dh][^>]*>(.*?)</t[dh]>',tr)
+        cells=[clean(x) for x in raw_cells]
+        if not cells or cells[0].lower()=='film': continue
+        if len(cells)>=9:
+            film=canonical_film(raw_cells[0],cells[0]) or requested_film
+            offset=1
+        elif len(cells)>=8:
+            # After the first result the filtered Film cell is represented by
+            # rowspan and therefore absent from the physical HTML row.
+            film=requested_film
+            offset=0
+        else:
+            continue
+        iso=parse_iso(cells[offset+2])
+        if not film or not cells[offset] or iso<=0: continue
+        note_index=offset+7
+        devrow=(query_value(raw_cells[note_index],'devrow')
+                if len(raw_cells)>note_index else '')
+        rows.append({
+            'film':film,'developer':cells[offset],
+            'dilution':clean(cells[offset+1]),'iso':iso,
+            'time35':clean_time(cells[offset+3]),
+            'time120':clean_time(cells[offset+4]),
+            'timesheet':clean_time(cells[offset+5]),
+            'temp':parse_temp(cells[offset+6]),
+            'notes':((cells[note_index].strip() + ' ')
+                     if len(cells)>note_index else '') +
+                    (('[devrow:' + devrow + ']') if devrow else ''),
+            'source_url':(('https://www.digitaltruth.com/devchart.php?devrow=' + devrow)
+                          if devrow else url)
+        })
+    return rows
+
+'''
+source = replace_once(source, one_marker, film_parser + one_marker, "film-page parser")
+
 guard = """if len(seed)<200 or len(allrows)<3000 or len(failed)>20:
     raise SystemExit(f'Full download incomplete: seed={len(seed)} raw_rows={len(allrows)} failed={len(failed)}')
 
@@ -65,7 +106,10 @@ def one_film(film):
             txt=fetch(url)
             if not txt or '<html' not in txt.lower():
                 raise RuntimeError('invalid HTML response')
-            return film,parse(txt,url,''),'',url
+            rows=parse_film_page(txt,url,film)
+            if film=='Fomapan 100' and len(rows)<100:
+                raise RuntimeError(f'Fomapan 100 parser smoke test: only {len(rows)} rows')
+            return film,rows,'',url
         except Exception as exc:
             last=repr(exc)
             status=getattr(exc,'code',None)
@@ -81,6 +125,9 @@ def one_film(film):
 
 film_rows=[]; film_failed=[]; empty_films=[]
 films_to_fetch=sorted(CANON_FILMS.values())
+if 'Fomapan 100' not in films_to_fetch:
+    raise SystemExit('Fomapan 100 missing from canonical film index')
+films_to_fetch=['Fomapan 100']+[f for f in films_to_fetch if f!='Fomapan 100']
 print('MDC film-index cooldown: 30s',flush=True)
 time.sleep(30)
 for done,film_name in enumerate(films_to_fetch,1):
