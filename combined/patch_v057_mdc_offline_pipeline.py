@@ -47,12 +47,46 @@ source = replace_once(
 
 one_marker = "def one(dev):"
 film_parser = r'''def parse_film_page(txt,url,requested_film):
-    """Parse Digitaltruth's row-oriented text index for one film."""
-    rows=parse(txt,url,'')
-    # The endpoint is already filtered, but reject a contaminated response
-    # rather than silently assigning rows to the requested film.
-    wanted=norm(requested_film)
-    return [row for row in rows if norm(row['film'])==wanted]
+    """Parse one current film page, including its rowspan-compressed rows.
+
+    Digitaltruth prints the Film cell only on the first data row and uses an
+    HTML rowspan for every following combination. Those following rows have
+    eight cells instead of nine. The developer-filtered parser cannot infer
+    the missing film safely, but here the URL itself identifies it exactly.
+    """
+    rows=[]
+    wanted=CANON_FILMS.get(norm(requested_film))
+    if not wanted:
+        return rows
+    for tr in re.findall(r'(?is)<tr[^>]*>(.*?)</tr>',txt):
+        raw_cells=re.findall(r'(?is)<t[dh][^>]*>(.*?)</t[dh]>',tr)
+        cells=[clean(x) for x in raw_cells]
+        if not cells or any(c.lower()=='developer' for c in cells[:2]):
+            continue
+        if len(cells)>=9:
+            page_film=canonical_film(raw_cells[0],cells[0])
+            if norm(page_film)!=norm(wanted):
+                continue
+            offset=1
+        elif len(cells)>=8:
+            offset=0
+        else:
+            continue
+        iso=parse_iso(cells[offset+2])
+        developer=clean(cells[offset])
+        if not developer or iso<=0:
+            continue
+        rows.append({
+            'film':wanted,'developer':developer,
+            'dilution':clean(cells[offset+1]),'iso':iso,
+            'time35':clean_time(cells[offset+3]),
+            'time120':clean_time(cells[offset+4]),
+            'timesheet':clean_time(cells[offset+5]),
+            'temp':parse_temp(cells[offset+6]),
+            'notes':cells[offset+7].strip() if len(cells)>offset+7 else '',
+            'source_url':url
+        })
+    return rows
 
 '''
 source = replace_once(source, one_marker, film_parser + one_marker, "film-page parser")
@@ -66,10 +100,10 @@ pipeline = r"""# Independently crawl every canonical film page. These are the pa
 # users by the current Massive Dev Chart and therefore define the release
 # snapshot. A failed page blocks the release instead of silently shipping a
 # partial database. This index is deliberately sequential and rate-limited:
-# The film and developer indexes share the same stable row-oriented endpoint.
+# The current chart uses rowspans; parse_film_page expands them offline.
 def one_film(film):
-    url=('https://www.digitaltruth.com/chart/search_text.php?Film=' +
-         quote_plus(film))
+    url=('https://www.digitaltruth.com/devchart.php?Developer=&Film=' +
+         quote_plus(film) + '&mdc=Search')
     last=''
     for attempt in range(8):
         try:
@@ -77,8 +111,20 @@ def one_film(film):
             if not txt or '<html' not in txt.lower():
                 raise RuntimeError('invalid HTML response')
             rows=parse_film_page(txt,url,film)
-            if film=='Fomapan 100' and len(rows)<100:
-                raise RuntimeError(f'Fomapan 100 parser smoke test: only {len(rows)} rows')
+            if film=='Fomapan 100':
+                keys={(norm(r['developer']),norm_dilution(r['dilution']),r['iso'],
+                       r['time35'],r['time120'],r['timesheet'],r['temp']) for r in rows}
+                required={
+                    ('fx 39','1+9',100,'7','7','7',20.0),
+                    ('ilfosol 3','1+9',100,'5','5','5',20.0),
+                    ('d 76','1+1',100,'10','10','10',20.0),
+                    ('fomadon excel','1+1',100,'8-9','8-9','8-9',20.0),
+                }
+                missing=required-keys
+                if len(rows)<100 or missing:
+                    raise SystemExit(
+                        f'Fomapan 100 current-page smoke test failed: '
+                        f'rows={len(rows)} missing={sorted(missing)}')
             return film,rows,'',url
         except Exception as exc:
             last=repr(exc)

@@ -77,7 +77,7 @@ fx39 = db.execute(
 ).fetchone()
 assert fx39 is not None, 'Fomapan 100 / FX-39 / 1+9 / ISO 100 missing'
 assert tuple(fx39[:4]) == ('7','7','7',20.0), tuple(fx39)
-assert 'search_text.php?Film=Fomapan+100' in fx39['source_url'], fx39['source_url']
+assert 'devchart.php?Developer=&Film=Fomapan+100' in fx39['source_url'], fx39['source_url']
 
 ilfosol = db.execute(
     '''SELECT timesheet,notes FROM times
