@@ -797,7 +797,7 @@ inventory_helpers = '''    private LinearLayout chemicalDialogPanel(String title
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(15), dp(10), dp(12), dp(10));
-        row.setMinHeight(dp(58));
+        row.setMinimumHeight(dp(58));
         row.setBackground(bg(CHEM_FILL, 10, CHEM_BORDER, 1));
         TextView product = label(name, 16, WHITE, true);
         product.setGravity(Gravity.CENTER_VERTICAL);
