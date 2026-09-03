@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Consolidated Darkroom v0.6.5 build.
+# Consolidated Darkroom v0.6.6 build.
 # Starts from the committed verified v0.5.8 source checkpoint, applies the tested
 # v0.5.9 contact-sheet functionality, the v0.6.0 layout/preset refinement and
 # the reproducible v0.6.1 graphic-system checkpoint and the phone-verified
 # v0.6.2 Timer refinement, the phone-verified v0.6.3 UI polish and the
-# v0.6.4 Home/inventory graphic revision and the v0.6.5 film-development
-# workflow graphic revision.
+# v0.6.4 Home/inventory graphic revision, the v0.6.5 film-development
+# workflow graphic revision and the v0.6.6 final three-module graphic review.
 # One Gradle assembly only; no historical wrapper and no MDC network regeneration.
 
 START_SECONDS=$SECONDS
@@ -66,7 +66,27 @@ test "$V065_DEV_ENGINE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/da
 test "$V065_CHEM_ENGINE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/ChemistrySpecEngine.java" | cut -d' ' -f1)"
 test "$V065_DATABASE_HASH_BEFORE" = "$(sha256sum "$DATABASE" | cut -d' ' -f1)"
 
-python3 - <<'PY' | tee validation-consolidated-v065-source.txt
+V066_HOME_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/home/HomeActivity.java" | cut -d' ' -f1)
+V066_TIMER_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/MainActivity.java" | cut -d' ' -f1)
+V066_SERVICE_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/SonoffArmService.java" | cut -d' ' -f1)
+V066_TIMING_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/TimingMath.java" | cut -d' ' -f1)
+V066_ENLARGEMENT_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/EnlargementActivity.java" | cut -d' ' -f1)
+V066_MDC_STORE_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/MdcOfflineStore.java" | cut -d' ' -f1)
+V066_DEV_ENGINE_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/DevTimeEngine.java" | cut -d' ' -f1)
+V066_CHEM_ENGINE_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/ChemistrySpecEngine.java" | cut -d' ' -f1)
+V066_DATABASE_HASH_BEFORE=$(sha256sum "$DATABASE" | cut -d' ' -f1)
+python3 combined/patch_v066_remaining_graphics.py | tee validation-v066-remaining-graphics-source.txt
+test "$V066_HOME_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/home/HomeActivity.java" | cut -d' ' -f1)"
+test "$V066_TIMER_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/MainActivity.java" | cut -d' ' -f1)"
+test "$V066_SERVICE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/SonoffArmService.java" | cut -d' ' -f1)"
+test "$V066_TIMING_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/TimingMath.java" | cut -d' ' -f1)"
+test "$V066_ENLARGEMENT_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/EnlargementActivity.java" | cut -d' ' -f1)"
+test "$V066_MDC_STORE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/MdcOfflineStore.java" | cut -d' ' -f1)"
+test "$V066_DEV_ENGINE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/DevTimeEngine.java" | cut -d' ' -f1)"
+test "$V066_CHEM_ENGINE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/ChemistrySpecEngine.java" | cut -d' ' -f1)"
+test "$V066_DATABASE_HASH_BEFORE" = "$(sha256sum "$DATABASE" | cut -d' ' -f1)"
+
+python3 - <<'PY' | tee validation-consolidated-v066-source.txt
 from pathlib import Path
 import re
 import sqlite3
@@ -74,26 +94,26 @@ import sqlite3
 manifest = Path('combined/src/main/AndroidManifest.xml')
 text = manifest.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'android:versionCode="[^"]+"', 'android:versionCode="56"', text, count=1
+    r'android:versionCode="[^"]+"', 'android:versionCode="57"', text, count=1
 )
 text, name_count = re.subn(
-    r'android:versionName="[^"]+"', 'android:versionName="0.6.5"', text, count=1
+    r'android:versionName="[^"]+"', 'android:versionName="0.6.6"', text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.6.5 manifest version update failed')
+    raise SystemExit('v0.6.6 manifest version update failed')
 manifest.write_text(text, encoding='utf-8')
 
 gradle_file = Path('combined/build.gradle')
 text = gradle_file.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 56', text, count=1
+    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 57', text, count=1
 )
 text, name_count = re.subn(
     r'(?m)^\s*versionName\s+[\'\"][^\'\"]+[\'\"]\s*$',
-    "        versionName '0.6.5'", text, count=1
+    "        versionName '0.6.6'", text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.6.5 Gradle version update failed')
+    raise SystemExit('v0.6.6 Gradle version update failed')
 gradle_file.write_text(text, encoding='utf-8')
 
 db = sqlite3.connect('combined/src/main/assets/mdc_full.sqlite')
@@ -205,6 +225,8 @@ assert len({
 store = Path('combined/src/main/java/it/darkroom/assistant/MdcOfflineStore.java').read_text(encoding='utf-8')
 activity = Path('combined/src/main/java/it/darkroom/assistant/AssistantActivityV2.java').read_text(encoding='utf-8')
 home = Path('combined/src/main/java/it/darkroom/timer/home/HomeActivity.java').read_text(encoding='utf-8')
+large_format = Path('combined/src/main/java/it/darkroom/timer/largeformat/LargeFormatActivity.java').read_text(encoding='utf-8')
+maintenance = Path('combined/src/main/java/it/darkroom/timer/maintenance/UseMaintenanceActivity.java').read_text(encoding='utf-8')
 assert 'mdc_offline_darkroom_v058.sqlite' in store
 assert 'if (exact != null) return exact;' in store
 assert 'developer_time_equivalents' in store
@@ -246,13 +268,49 @@ assert 'preparation.setBackground(bg(BG, 13, FILM_BORDER, 1))' in activity
 assert 'header.setBackground(bg(FILM_FILL, 12, 0, 0))' in activity
 assert 'Button register = filmButton("REGISTRA QUESTO SVILUPPO", FILM_ACTION)' in activity
 assert 'Button fresh = filmButton("NUOVO BAGNO / AZZERA CONTATORE", FILM_SECONDARY)' in activity
-assert 'Button calc = actionButton("CALCOLA", BURGUNDY)' in activity  # paper baths frozen
+assert 'PAPER_VISUAL_066' in activity
+assert 'PAPER_FILL = Color.rgb(45, 99, 72)' in activity
+assert 'PAPER_ACTION = Color.rgb(57, 133, 94)' in activity
+assert 'PAPER_ACCENT = Color.rgb(84, 167, 121)' in activity
+assert '1 · CHIMICA DI STAMPA' in activity
+assert '2 · VOLUME E UTILIZZO' in activity
+assert 'Button calc = paperButton("CALCOLA", PAPER_ACTION)' in activity
+assert 'Button register = paperButton("REGISTRA STAMPA", PAPER_ACTION)' in activity
+assert 'Button fresh = paperButton("NUOVO BAGNO / AZZERA CONTATORE", PAPER_SECONDARY)' in activity
+assert 'card.setBackground(bg(BG, 13, PAPER_BORDER, 1))' in activity
+assert 'header.setBackground(bg(PAPER_FILL, 12, 0, 0))' in activity
+assert 'paperInformation = currentScreen == PAPER' in activity
 assert activity.count('calculateFilmOnline();') == 1
 assert activity.count('registerFilmUse(dev, workingVolumeMl, units);') == 1
 assert activity.count('resetFilmBath(dev, workingVolumeMl);') == 1
+assert activity.count('registerPaperUse(lastPaperDeveloper, lastPaperVolume, area);') == 1
+assert activity.count('resetPaperBath(dev, volume);') == 1
 
-print('release=Darkroom-v0.6.5')
-print('versionCode=56')
+assert 'LARGE_FORMAT_VISUAL_066' in large_format
+assert 'VIOLET_FILL = Color.rgb(91, 70, 113)' in large_format
+assert 'VIOLET_ACTION = Color.rgb(113, 83, 143)' in large_format
+assert 'VIOLET_ACCENT = Color.rgb(166, 130, 196)' in large_format
+assert 'TextView now = action("ADESSO", true)' in large_format
+assert 'TextView delete = action("ELIMINA CHASSIS", DELETE_ACTION)' in large_format
+assert 'gap.setBackground(informationBg())' in large_format
+assert 'g.setColor(active ? statusColor(paletteStatus) : VIOLET_FILL)' in large_format
+assert 'g.setStroke(dp(1), VIOLET_BORDER)' in large_format
+assert large_format.count('chassis.remove(chassisItem);') == 1
+
+assert 'MAINTENANCE_VISUAL_066' in maintenance
+assert 'SLATE_FILL = Color.rgb(63, 70, 77)' in maintenance
+assert 'SLATE_ACTION = Color.rgb(79, 88, 97)' in maintenance
+assert 'SLATE_ACCENT = Color.rgb(130, 144, 157)' in maintenance
+assert 'c.setBackground(filledPanelBg(SLATE_FILL,10))' in maintenance
+assert 'q.setBackground(filledPanelBg(SLATE_FILL,9))' in maintenance
+assert 'c.setBackground(outlinedPanelBg())' in maintenance
+assert 'v.setBackground(filledPanelBg(SLATE_ACTION,9))' in maintenance
+assert 'Guida completa v0.2.8' not in maintenance
+assert 'La v0.2.9 aggiunge' not in maintenance
+assert maintenance.count('q.setOnClickListener') == 2
+
+print('release=Darkroom-v0.6.6')
+print('versionCode=57')
 print('timer_internal=0.13.16')
 print('historical_builds=ZERO')
 print('mdc_network_downloads=ZERO')
@@ -296,31 +354,38 @@ print('film_actions=FILLED')
 print('film_information=OUTLINED')
 print('film_result_time=DOMINANT')
 print('film_process_changes=ZERO')
+print('paper_baths_family=GREEN')
+print('paper_baths_workflow=CHEMISTRY_THEN_VOLUME')
+print('paper_baths_process_changes=ZERO')
+print('large_format_family=VIOLET')
+print('large_format_data_changes=ZERO')
+print('maintenance_family=SLATE')
+print('maintenance_reference_changes=ZERO')
 PY
 
-rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.6.5.apk
+rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.6.6.apk
 gradle :combined:assembleRelease --stacktrace
-cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.6.5.apk
+cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.6.6.apk
 
 APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
 AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.6.5.apk > certificate-v065.txt
-"$AAPT" dump badging Darkroom-v0.6.5.apk > apk-badging-v065.txt
-grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v065.txt
-grep -Fq "versionCode='56'" apk-badging-v065.txt
-grep -Fq "versionName='0.6.5'" apk-badging-v065.txt
-grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v065.txt
-unzip -Z1 Darkroom-v0.6.5.apk > apk-listing-v065.txt
-grep -q 'assets/mdc_full.sqlite' apk-listing-v065.txt
+"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.6.6.apk > certificate-v066.txt
+"$AAPT" dump badging Darkroom-v0.6.6.apk > apk-badging-v066.txt
+grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v066.txt
+grep -Fq "versionCode='57'" apk-badging-v066.txt
+grep -Fq "versionName='0.6.6'" apk-badging-v066.txt
+grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v066.txt
+unzip -Z1 Darkroom-v0.6.6.apk > apk-listing-v066.txt
+grep -q 'assets/mdc_full.sqlite' apk-listing-v066.txt
 
 ELAPSED=$((SECONDS - START_SECONDS))
 {
   echo 'consolidated_build=PASS'
-  echo 'release=Darkroom-v0.6.5'
+  echo 'release=Darkroom-v0.6.6'
   echo 'historical_builds=ZERO'
   echo 'mdc_network_downloads=ZERO'
   echo 'gradle_assemblies=ONE'
   echo "elapsed_seconds=$ELAPSED"
-} | tee validation-consolidated-v065.txt
+} | tee validation-consolidated-v066.txt
 
-sha256sum Darkroom-v0.6.5.apk | tee Darkroom-v0.6.5.sha256
+sha256sum Darkroom-v0.6.6.apk | tee Darkroom-v0.6.6.sha256
