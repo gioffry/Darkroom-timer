@@ -150,6 +150,93 @@ main = rep(main, 'contact35NewPresetButton = compactButton("+  NUOVO PRESET");',
 main = rep(main, 'splitRow.setTextColor(Color.BLACK); splitRow.setBackground(roundRect(darkroomMode?RED:SPLIT_ACCENT,8,0,0)); splitRow.setEnabled(false);', 'splitRow.setTextColor(darkroomMode ? RED : SPLIT_ACCENT); splitRow.setBackground(roundRect(BACKGROUND,8,1,darkroomMode ? RED : SPLIT_ACCENT)); splitRow.setEnabled(false);', "outlined combined Split summary")
 main = rep(main, 'Button single=compactButton(label); single.setTextColor(Color.WHITE); single.setBackground(roundRect(darkroomMode?Color.rgb(45,0,0):Color.rgb(55,60,64),8,0,0)); single.setEnabled(false);', 'Button single=compactButton(label); single.setTextColor(darkroomMode ? RED : PRINT_ACCENT); single.setBackground(roundRect(BACKGROUND,8,1,darkroomMode ? RED : PRINT_ACCENT)); single.setEnabled(false);', "outlined single-exposure summary")
 
+# Log selectors are actions too: selection is conveyed by opacity, never by
+# switching an actionable control into an outlined information style.
+main = rep(
+    main,
+    '''        logFavoritesButton.setTextColor(logFavoritesOnly ? Color.BLACK : MUTED);
+        logFavoritesButton.setBackground(roundRect(logFavoritesOnly ? accent : BUTTON, 8, logFavoritesOnly ? 0 : 1, BORDER));
+''',
+    '''        logFavoritesButton.setTextColor(actionInk(accent));
+        logFavoritesButton.setBackground(roundRect(accent, 8, 0, 0));
+        logFavoritesButton.setAlpha(logFavoritesOnly ? 1f : 0.58f);
+''',
+    "filled Log favorite action",
+)
+main = rep(
+    main,
+    '''        logGroupingButton.setBackground(roundRect(logGroupingEnabled ? accent : BUTTON, 8,
+                logGroupingEnabled ? 0 : 1, BORDER));
+        logGroupingButton.setTextColor(logGroupingEnabled
+                ? (darkroomMode ? Color.BLACK : Color.WHITE)
+                : MUTED);
+''',
+    '''        logGroupingButton.setBackground(roundRect(accent, 8, 0, 0));
+        logGroupingButton.setTextColor(actionInk(accent));
+        logGroupingButton.setAlpha(logGroupingEnabled ? 1f : 0.58f);
+''',
+    "filled Log grouping action",
+)
+main = rep(
+    main,
+    '''        b.setBackground(roundRect(selected ? accent : BUTTON, 8, selected ? 0 : 1, BORDER));
+        b.setTextColor(selected ? (darkroomMode ? Color.BLACK : Color.WHITE) : MUTED);
+''',
+    '''        b.setBackground(roundRect(accent, 8, 0, 0));
+        b.setTextColor(actionInk(accent));
+        b.setAlpha(selected ? 1f : 0.58f);
+''',
+    "filled Log filter actions",
+)
+main = rep(
+    main,
+    '''            b35.setBackground(roundRect("35mm".equals(negative[0]) ? LOG_ACCENT : BUTTON, 8, 1, BORDER));
+            b66.setBackground(roundRect("6x6".equals(negative[0]) ? LOG_ACCENT : BUTTON, 8, 1, BORDER));
+            b45.setBackground(roundRect("4x5".equals(negative[0]) ? LOG_ACCENT : BUTTON, 8, 1, BORDER));
+            b35.setTextColor("35mm".equals(negative[0]) ? Color.BLACK : TEXT_PRIMARY);
+            b66.setTextColor("6x6".equals(negative[0]) ? Color.BLACK : TEXT_PRIMARY);
+            b45.setTextColor("4x5".equals(negative[0]) ? Color.BLACK : TEXT_PRIMARY);
+''',
+    '''            int accent = darkroomMode ? RED : LOG_ACCENT;
+            b35.setBackground(roundRect(accent, 8, 0, 0));
+            b66.setBackground(roundRect(accent, 8, 0, 0));
+            b45.setBackground(roundRect(accent, 8, 0, 0));
+            b35.setTextColor(actionInk(accent));
+            b66.setTextColor(actionInk(accent));
+            b45.setTextColor(actionInk(accent));
+            b35.setAlpha("35mm".equals(negative[0]) ? 1f : 0.58f);
+            b66.setAlpha("6x6".equals(negative[0]) ? 1f : 0.58f);
+            b45.setAlpha("4x5".equals(negative[0]) ? 1f : 0.58f);
+''',
+    "filled negative-format actions",
+)
+main = rep(main, "        LinearLayout auto = card();\n        auto.addView(text(\"DATI AUTOMATICI\"", "        LinearLayout auto = informationCard(LOG_ACCENT);\n        auto.addView(text(\"DATI AUTOMATICI\"", "outlined automatic Log information")
+main = rep(main, "        body.setBackground(roundRect(BUTTON, 8, 1, BORDER));", "        body.setBackground(roundRect(BACKGROUND, 8, 1, darkroomMode ? RED : LOG_ACCENT));", "outlined technical Log information")
+main = rep(
+    main,
+    '''        favoriteButton.setTextColor(favorite[0] ? AMBER : MUTED);
+        favoriteButton.setBackground(roundRect(BUTTON, 8, 1, BORDER));
+        favoriteButton.setOnClickListener(v -> {
+            favorite[0] = !favorite[0];
+            favoriteButton.setText(favorite[0] ? "★" : "☆");
+            favoriteButton.setTextColor(favorite[0] ? AMBER : MUTED);
+            favoriteButton.setContentDescription(favorite[0] ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti");
+        });
+''',
+    '''        int favoriteAccent = darkroomMode ? RED : AMBER;
+        favoriteButton.setTextColor(actionInk(favoriteAccent));
+        favoriteButton.setBackground(roundRect(favoriteAccent, 8, 0, 0));
+        favoriteButton.setAlpha(favorite[0] ? 1f : 0.58f);
+        favoriteButton.setOnClickListener(v -> {
+            favorite[0] = !favorite[0];
+            favoriteButton.setText(favorite[0] ? "★" : "☆");
+            favoriteButton.setAlpha(favorite[0] ? 1f : 0.58f);
+            favoriteButton.setContentDescription(favorite[0] ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti");
+        });
+''',
+    "filled per-entry favorite action",
+)
+
 # Plan summary is information: same family colour, but only as an outline.
 main = rep(
     main,
