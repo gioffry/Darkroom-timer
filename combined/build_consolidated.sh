@@ -22,6 +22,7 @@ python3 combined/patch_v059_contact_sheet.py | tee validation-v059-contact-sourc
 python3 combined/patch_v060_contact_layout.py | tee validation-v060-contact-layout-source.txt
 python3 combined/patch_v061_graphic_system.py | tee validation-v061-graphic-system-source.txt
 python3 combined/patch_v061_timer_identity.py | tee validation-v061-timer-identity-source.txt
+python3 combined/patch_v061_split_phase_colours.py | tee validation-v061-split-phase-colours-source.txt
 
 python3 - <<'PY' | tee validation-consolidated-v061-source.txt
 from pathlib import Path
@@ -99,6 +100,7 @@ assert 'count = contactSheet35 ? 1 : Math.max(2, Math.min(20' in service
 visual = Path('combined/src/main/java/it/darkroom/ui/DarkroomVisualSystem.java').read_text(encoding='utf-8')
 assert 'GRAPHIC_SYSTEM_061' in main
 assert 'TIMER_IDENTITY_061' in main
+assert 'SPLIT_PHASE_COLOURS_061' in main
 assert 'SONOFF_STRIP_061' in main
 assert 'TextView deviceName = text("INGRANDITORE"' not in main
 assert 'selectDeviceButton.setContentDescription("Impostazioni Timer e SONOFF")' in main
@@ -107,6 +109,11 @@ assert 'deviceStatus.setText("✓  MINIR2 connesso")' in main
 assert 'safelightStatus.setText("●  Luce rossa attiva")' in main
 assert 'page.addView(actionDock, lp(-1, -2));' in main
 assert 'functionalButton("PIANO DI STAMPA", PLAN_ACCENT)' in main
+assert 'int flowAccent = split ? splitPhaseAccent() : PROVINO_ACCENT;' in main
+assert 'SPLIT_GRADE = Color.rgb(173, 167, 184)' in visual
+assert 'SPLIT_YELLOW = Color.rgb(214, 178, 73)' in visual
+assert 'SPLIT_MAGENTA = Color.rgb(196, 88, 171)' in visual
+assert 'SPLIT_GRADE = Color.rgb(196, 88, 171)' not in visual
 assert len({
     tuple(map(int, value))
     for value in re.findall(
@@ -137,6 +144,8 @@ print('contact35_single_sonoff_exposure=PASS')
 print('sonoff_strip=APPROVED_HORIZONTAL_LAYOUT')
 print('settings_gear=IN_TIMER_HEADING')
 print('functional_colours_distinct=PASS')
+print('split_process_colour=NEUTRAL_NOT_MAGENTA')
+print('split_phases=YELLOW_THEN_MAGENTA')
 print('timer_action_dock=PASS')
 print('darkroom_red_only=PASS')
 print('database_integrity=PASS')
