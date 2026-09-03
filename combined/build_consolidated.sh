@@ -23,6 +23,7 @@ python3 combined/patch_v060_contact_layout.py | tee validation-v060-contact-layo
 python3 combined/patch_v061_graphic_system.py | tee validation-v061-graphic-system-source.txt
 python3 combined/patch_v061_timer_identity.py | tee validation-v061-timer-identity-source.txt
 python3 combined/patch_v061_split_phase_colours.py | tee validation-v061-split-phase-colours-source.txt
+python3 combined/patch_v061_action_information_hierarchy.py | tee validation-v061-action-information-source.txt
 
 python3 - <<'PY' | tee validation-consolidated-v061-source.txt
 from pathlib import Path
@@ -101,6 +102,7 @@ visual = Path('combined/src/main/java/it/darkroom/ui/DarkroomVisualSystem.java')
 assert 'GRAPHIC_SYSTEM_061' in main
 assert 'TIMER_IDENTITY_061' in main
 assert 'SPLIT_PHASE_COLOURS_061' in main
+assert 'ACTION_INFORMATION_HIERARCHY_061' in main
 assert 'SONOFF_STRIP_061' in main
 assert 'TextView deviceName = text("INGRANDITORE"' not in main
 assert 'selectDeviceButton.setContentDescription("Impostazioni Timer e SONOFF")' in main
@@ -114,6 +116,10 @@ assert 'SPLIT_GRADE = Color.rgb(173, 167, 184)' in visual
 assert 'SPLIT_YELLOW = Color.rgb(214, 178, 73)' in visual
 assert 'SPLIT_MAGENTA = Color.rgb(196, 88, 171)' in visual
 assert 'SPLIT_GRADE = Color.rgb(196, 88, 171)' not in visual
+assert 'private int actionInk(int accent)' in main
+assert 'b.setBackground(roundRect(accent, 10, 0, 0));' in main
+assert 'stateCard.setBackground(roundRect(BACKGROUND, 12, 1, accent))' in main
+assert 'printSequenceSummary.setBackground(roundRect(BACKGROUND, 9, 1, PLAN_ACCENT))' in main
 assert len({
     tuple(map(int, value))
     for value in re.findall(
@@ -146,6 +152,8 @@ print('settings_gear=IN_TIMER_HEADING')
 print('functional_colours_distinct=PASS')
 print('split_process_colour=NEUTRAL_NOT_MAGENTA')
 print('split_phases=YELLOW_THEN_MAGENTA')
+print('clickable_controls=FILLED')
+print('non_clickable_information=OUTLINED')
 print('timer_action_dock=PASS')
 print('darkroom_red_only=PASS')
 print('database_integrity=PASS')
