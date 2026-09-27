@@ -109,8 +109,8 @@ for needle in checks:
 auto_start = service.index("SONOFF_LOCAL_INCHING_075")
 auto_end = service.index("private void persistCompletedCycle", auto_start)
 auto_block = service[auto_start:auto_end]
-if "waitForConfirmedSwitchOn()" in auto_block:
-    raise SystemExit("v0.7.5: automatic path still waits for ON confirmation")
+if "long confirmedOnAt = waitForConfirmedSwitchOn();" in auto_block:
+    raise SystemExit("v0.7.5: automatic path still calls ON confirmation")
 
 SERVICE.write_text(service, encoding="utf-8")
 MAIN.write_text(main, encoding="utf-8")
