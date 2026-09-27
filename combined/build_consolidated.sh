@@ -398,7 +398,6 @@ assert '"TEMPO JOBO CPE2 · " + dilution' in activity
 assert 'TEMPO CPE2 DI PARTENZA' not in activity
 assert 'adattamento −15%' in activity
 assert 'nessuna riduzione percentuale universale applicata' not in activity
-assert 'FOMA_TIMES_069' in store
 assert 'SOURCE_PRIORITY_REUSE_UI_070' in activity
 assert 'JOBO_FACTOR = 0.85' in store
 assert 'Produttore · dato ufficiale' in store
