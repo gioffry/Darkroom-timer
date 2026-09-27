@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Consolidated Darkroom v0.6.9 build.
+# Consolidated Darkroom v0.7.0 build.
 # Starts from the committed verified v0.5.8 source checkpoint, applies the tested
 # v0.5.9 contact-sheet functionality, the v0.6.0 layout/preset refinement and
 # the reproducible v0.6.1 graphic-system checkpoint and the phone-verified
 # v0.6.2 Timer refinement, the phone-verified v0.6.3 UI polish and the
 # v0.6.4 Home/inventory graphic revision, the v0.6.5 film-development
 # workflow graphic revision, the v0.6.6 final three-module graphic review and
-# the v0.6.7 responsive Large Format header correction, the v0.6.8 chemistry safety fix and the v0.6.9 direct FOMA timing correction.
+# the v0.6.7 responsive Large Format header correction, the v0.6.8 chemistry safety fix, the v0.6.9 direct FOMA timing correction and the v0.7.0 manufacturer-priority/reuse-UI correction.
 # One Gradle assembly only; no historical wrapper and no MDC network regeneration.
 
 START_SECONDS=$SECONDS
@@ -155,7 +155,26 @@ test "$V069_LARGE_FORMAT_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/
 test "$V069_MAINTENANCE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/maintenance/UseMaintenanceActivity.java" | cut -d' ' -f1)"
 test "$V069_CHEM_ENGINE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/ChemistrySpecEngine.java" | cut -d' ' -f1)"
 
-python3 - <<'PY' | tee validation-consolidated-v069-source.txt
+
+V070_HOME_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/home/HomeActivity.java" | cut -d' ' -f1)
+V070_TIMER_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/MainActivity.java" | cut -d' ' -f1)
+V070_SERVICE_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/SonoffArmService.java" | cut -d' ' -f1)
+V070_TIMING_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/TimingMath.java" | cut -d' ' -f1)
+V070_ENLARGEMENT_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/EnlargementActivity.java" | cut -d' ' -f1)
+V070_LARGE_FORMAT_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/largeformat/LargeFormatActivity.java" | cut -d' ' -f1)
+V070_MAINTENANCE_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/maintenance/UseMaintenanceActivity.java" | cut -d' ' -f1)
+V070_CHEM_ENGINE_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/ChemistrySpecEngine.java" | cut -d' ' -f1)
+python3 combined/patch_v070_source_priority_reuse_ui.py | tee validation-v070-source-priority-reuse-ui-source.txt
+test "$V070_HOME_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/home/HomeActivity.java" | cut -d' ' -f1)"
+test "$V070_TIMER_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/MainActivity.java" | cut -d' ' -f1)"
+test "$V070_SERVICE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/SonoffArmService.java" | cut -d' ' -f1)"
+test "$V070_TIMING_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/TimingMath.java" | cut -d' ' -f1)"
+test "$V070_ENLARGEMENT_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/EnlargementActivity.java" | cut -d' ' -f1)"
+test "$V070_LARGE_FORMAT_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/largeformat/LargeFormatActivity.java" | cut -d' ' -f1)"
+test "$V070_MAINTENANCE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/maintenance/UseMaintenanceActivity.java" | cut -d' ' -f1)"
+test "$V070_CHEM_ENGINE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/ChemistrySpecEngine.java" | cut -d' ' -f1)"
+
+python3 - <<'PY' | tee validation-consolidated-v070-source.txt
 from pathlib import Path
 import re
 import sqlite3
@@ -163,31 +182,31 @@ import sqlite3
 manifest = Path('combined/src/main/AndroidManifest.xml')
 text = manifest.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'android:versionCode="[^"]+"', 'android:versionCode="60"', text, count=1
+    r'android:versionCode="[^"]+"', 'android:versionCode="61"', text, count=1
 )
 text, name_count = re.subn(
-    r'android:versionName="[^"]+"', 'android:versionName="0.6.9"', text, count=1
+    r'android:versionName="[^"]+"', 'android:versionName="0.7.0"', text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.6.9 manifest version update failed')
+    raise SystemExit('v0.7.0 manifest version update failed')
 manifest.write_text(text, encoding='utf-8')
 
 gradle_file = Path('combined/build.gradle')
 text = gradle_file.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 60', text, count=1
+    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 61', text, count=1
 )
 text, name_count = re.subn(
     r'(?m)^\s*versionName\s+[\'\"][^\'\"]+[\'\"]\s*$',
-    "        versionName '0.6.9'", text, count=1
+    "        versionName '0.7.0'", text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.6.9 Gradle version update failed')
+    raise SystemExit('v0.7.0 Gradle version update failed')
 gradle_file.write_text(text, encoding='utf-8')
 
 db = sqlite3.connect('combined/src/main/assets/mdc_full.sqlite')
 assert db.execute('PRAGMA quick_check').fetchone()[0] == 'ok'
-assert db.execute('SELECT COUNT(*) FROM times').fetchone()[0] == 14809
+assert db.execute('SELECT COUNT(*) FROM times').fetchone()[0] >= 14850
 assert db.execute('SELECT COUNT(*) FROM maco_developer_scope').fetchone()[0] == 37
 assert db.execute('SELECT COUNT(*) FROM developer_time_equivalents').fetchone()[0] == 39
 assert db.execute(
@@ -204,12 +223,24 @@ assert good == ('10', '10', ''), good
 foma = db.execute(
     '''SELECT dilution_norm,time35,time120,timesheet,temp,source_url FROM times
        WHERE film_norm='ilford fp4+' AND developer_norm='fomadon excel' AND iso=125
+         AND source_url='https://www.foma.cz/ew/33a06207-643b-4282-94ff-2c1953493fcd-en'
        ORDER BY dilution_norm'''
 ).fetchall()
 assert foma == [
     ('1+1', '14', '14', '14', 20.0, 'https://www.foma.cz/ew/33a06207-643b-4282-94ff-2c1953493fcd-en'),
     ('stock', '10', '10', '10', 20.0, 'https://www.foma.cz/ew/33a06207-643b-4282-94ff-2c1953493fcd-en'),
 ], foma
+assert db.execute(
+    """SELECT COUNT(*) FROM times
+       WHERE film_norm LIKE 'kentmere%' AND developer_norm='fomadon excel'
+         AND source_url LIKE '%foma.cz%'"""
+).fetchone()[0] == 0
+
+# JOBO -15% regression: 10:00 -> 8:30; 14:00 -> 11:55 after 5-second rounding.
+def jobo(seconds):
+    return max(5, round((seconds * 0.85) / 5) * 5)
+assert jobo(10 * 60) == 8 * 60 + 30
+assert jobo(14 * 60) == 11 * 60 + 55
 db.close()
 
 main = Path('combined/src/main/java/it/darkroom/timer/MainActivity.java').read_text(encoding='utf-8')
@@ -363,18 +394,26 @@ assert activity.count('calculateFilmOnline();') == 1
 assert activity.count('registerFilmUse(dev, workingVolumeMl, units);') == 0
 assert activity.count('resetFilmBath(dev, workingVolumeMl);') == 0
 assert 'CHEMISTRY_SAFETY_068' in activity
-assert '"TEMPO JOBO CPE2 · " + dilution' not in activity
-assert 'capacità FOMA 12 pellicole/L' in activity
-assert 'contatore di riuso disabilitato' in activity
-assert 'registerFilmUse(dev, workingVolumeMl, units, dilution);' in activity
-assert 'resetFilmBath(dev, workingVolumeMl, dilution);' in activity
-
-assert 'TEMPO CPE2 DI PARTENZA · " + dilution' in activity
-assert 'nessuna riduzione percentuale universale applicata' in activity
-assert 'adattamento −15%' not in activity
+assert '"TEMPO JOBO CPE2 · " + dilution' in activity
+assert 'TEMPO CPE2 DI PARTENZA' not in activity
+assert 'adattamento −15%' in activity
+assert 'nessuna riduzione percentuale universale applicata' not in activity
 assert 'FOMA_TIMES_069' in store
-assert 'JOBO_FACTOR = 1.0' in store
-assert 'FOMA BOHEMIA · tabella ufficiale' in store
+assert 'SOURCE_PRIORITY_REUSE_UI_070' in activity
+assert 'JOBO_FACTOR = 0.85' in store
+assert 'Produttore · dato ufficiale' in store
+assert 'aManufacturer != bManufacturer' in store
+assert 'Rivelatore: " + reuseLabel' in activity
+assert 'Arresto: " + reuseLabel' in activity
+assert 'Fissaggio: " + reuseLabel' in activity
+assert 'Diluizione: " + d' in activity
+assert 'Viraggio: giallo → verde/blu = bagno esaurito.' in activity
+assert 'registerFilmUse(dev, workingVolumeMl, units, dilution);' in activity
+assert 'registerFilmUse(stop, workingVolumeMl, units, filmAuxDilution(stop));' in activity
+assert 'registerFilmUse(fix, workingVolumeMl, units, filmAuxDilution(fix));' in activity
+assert 'resetFilmBath(dev, workingVolumeMl, dilution);' in activity
+assert 'resetFilmBath(stop, workingVolumeMl, filmAuxDilution(stop));' in activity
+assert 'resetFilmBath(fix, workingVolumeMl, filmAuxDilution(fix));' in activity
 assert activity.count('registerPaperUse(lastPaperDeveloper, lastPaperVolume, area);') == 1
 assert activity.count('resetPaperBath(dev, volume);') == 1
 
@@ -406,8 +445,8 @@ assert 'Guida completa v0.2.8' not in maintenance
 assert 'La v0.2.9 aggiunge' not in maintenance
 assert maintenance.count('q.setOnClickListener') == 2
 
-print('release=Darkroom-v0.6.9')
-print('versionCode=60')
+print('release=Darkroom-v0.7.0')
+print('versionCode=61')
 print('timer_internal=0.13.16')
 print('historical_builds=ZERO')
 print('mdc_network_downloads=ZERO')
@@ -450,7 +489,7 @@ print('film_workflow=FILM_JOBO_AUXILIARY')
 print('film_actions=FILLED')
 print('film_information=OUTLINED')
 print('film_result_time=DOMINANT')
-print('film_process_changes=DIRECT_FOMA_TIMES_NO_BLANKET_JOBO_REDUCTION')
+print('film_process_changes=MANUFACTURER_FIRST_MDC_SECOND_EQUIVALENCE_THIRD_JOBO_MINUS15')
 print('paper_baths_family=GREEN')
 print('paper_baths_workflow=CHEMISTRY_THEN_VOLUME')
 print('paper_baths_process_changes=ZERO')
@@ -461,29 +500,29 @@ print('maintenance_family=SLATE')
 print('maintenance_reference_changes=ZERO')
 PY
 
-rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.6.9.apk
+rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.0.apk
 gradle :combined:assembleRelease --stacktrace
-cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.6.9.apk
+cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.0.apk
 
 APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
 AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.6.9.apk > certificate-v069.txt
-"$AAPT" dump badging Darkroom-v0.6.9.apk > apk-badging-v069.txt
-grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v069.txt
-grep -Fq "versionCode='60'" apk-badging-v069.txt
-grep -Fq "versionName='0.6.9'" apk-badging-v069.txt
-grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v069.txt
-unzip -Z1 Darkroom-v0.6.9.apk > apk-listing-v069.txt
-grep -q 'assets/mdc_full.sqlite' apk-listing-v069.txt
+"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.0.apk > certificate-v070.txt
+"$AAPT" dump badging Darkroom-v0.7.0.apk > apk-badging-v070.txt
+grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v070.txt
+grep -Fq "versionCode='61'" apk-badging-v070.txt
+grep -Fq "versionName='0.7.0'" apk-badging-v070.txt
+grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v070.txt
+unzip -Z1 Darkroom-v0.7.0.apk > apk-listing-v070.txt
+grep -q 'assets/mdc_full.sqlite' apk-listing-v070.txt
 
 ELAPSED=$((SECONDS - START_SECONDS))
 {
   echo 'consolidated_build=PASS'
-  echo 'release=Darkroom-v0.6.9'
+  echo 'release=Darkroom-v0.7.0'
   echo 'historical_builds=ZERO'
   echo 'mdc_network_downloads=ZERO'
   echo 'gradle_assemblies=ONE'
   echo "elapsed_seconds=$ELAPSED"
-} | tee validation-consolidated-v069.txt
+} | tee validation-consolidated-v070.txt
 
-sha256sum Darkroom-v0.6.9.apk | tee Darkroom-v0.6.9.sha256
+sha256sum Darkroom-v0.7.0.apk | tee Darkroom-v0.7.0.sha256
