@@ -280,7 +280,7 @@ assert 'START VOL+ CALLBACK absolute' in service
 assert 'requestAudioFocus' in service
 assert 'START VOL+ ARMATO' in service
 assert 'COMANDO switch=on accettato da START VOL+' in service
-assert 'VolumeProvider.VOLUME_CONTROL_RELATIVE' in service
+assert 'VolumeProvider.VOLUME_CONTROL_ABSOLUTE' in service
 assert 'lastObservedOnAt = commandAcceptedOnAt;' in service
 assert 'startPolling(currentPulseWidthMs + 100L);' in service
 assert 'compactButton("PROVINO SINGOLO")' in main
