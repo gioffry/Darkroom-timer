@@ -169,7 +169,6 @@ python3 combined/patch_v070_java_escape_fix.py | tee validation-v070-java-escape
 python3 combined/patch_v071_database_refresh.py | tee validation-v071-database-refresh-source.txt
 python3 combined/patch_v072_excel_equivalence_fallback.py | tee validation-v072-excel-equivalence-source.txt
 python3 combined/patch_v073_one_plus_zero.py | tee validation-v073-one-plus-zero-source.txt
-python3 combined/patch_v074_sonoff_command_anchor.py | tee validation-v074-sonoff-command-anchor-source.txt
 test "$V070_HOME_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/home/HomeActivity.java" | cut -d' ' -f1)"
 test "$V070_TIMER_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/MainActivity.java" | cut -d' ' -f1)"
 test "$V070_SERVICE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/SonoffArmService.java" | cut -d' ' -f1)"
@@ -178,6 +177,8 @@ test "$V070_ENLARGEMENT_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/d
 test "$V070_LARGE_FORMAT_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/largeformat/LargeFormatActivity.java" | cut -d' ' -f1)"
 test "$V070_MAINTENANCE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/maintenance/UseMaintenanceActivity.java" | cut -d' ' -f1)"
 test "$V070_CHEM_ENGINE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/ChemistrySpecEngine.java" | cut -d' ' -f1)"
+
+python3 combined/patch_v074_sonoff_command_anchor.py | tee validation-v074-sonoff-command-anchor-source.txt
 
 python3 - <<'PY' | tee validation-consolidated-v074-source.txt
 from pathlib import Path
