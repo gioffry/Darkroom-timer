@@ -339,7 +339,7 @@ activity = Path('combined/src/main/java/it/darkroom/assistant/AssistantActivityV
 home = Path('combined/src/main/java/it/darkroom/timer/home/HomeActivity.java').read_text(encoding='utf-8')
 large_format = Path('combined/src/main/java/it/darkroom/timer/largeformat/LargeFormatActivity.java').read_text(encoding='utf-8')
 maintenance = Path('combined/src/main/java/it/darkroom/timer/maintenance/UseMaintenanceActivity.java').read_text(encoding='utf-8')
-assert 'mdc_offline_darkroom_v058.sqlite' in store
+assert 'mdc_offline_darkroom_v071.sqlite' in store
 assert 'if (exact != null) return exact;' in store
 assert 'developer_time_equivalents' in store
 assert 'EQUIVALENZA CONTROLLATA' in activity
