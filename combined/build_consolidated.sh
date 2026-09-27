@@ -405,7 +405,7 @@ assert 'aManufacturer != bManufacturer' in store
 assert 'Rivelatore: " + reuseLabel' in activity
 assert 'Arresto: " + reuseLabel' in activity
 assert 'Fissaggio: " + reuseLabel' in activity
-assert 'Diluizione: " + d' in activity
+assert 'Diluizione: ").append(d)' in activity
 assert 'Viraggio: giallo → verde/blu = bagno esaurito.' in activity
 assert 'registerFilmUse(dev, workingVolumeMl, units, dilution);' in activity
 assert 'registerFilmUse(stop, workingVolumeMl, units, filmAuxDilution(stop));' in activity
