@@ -165,6 +165,7 @@ V070_LARGE_FORMAT_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/ti
 V070_MAINTENANCE_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/maintenance/UseMaintenanceActivity.java" | cut -d' ' -f1)
 V070_CHEM_ENGINE_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/ChemistrySpecEngine.java" | cut -d' ' -f1)
 python3 combined/patch_v070_source_priority_reuse_ui.py | tee validation-v070-source-priority-reuse-ui-source.txt
+python3 combined/patch_v070_java_escape_fix.py | tee validation-v070-java-escape-fix.txt
 test "$V070_HOME_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/home/HomeActivity.java" | cut -d' ' -f1)"
 test "$V070_TIMER_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/MainActivity.java" | cut -d' ' -f1)"
 test "$V070_SERVICE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/SonoffArmService.java" | cut -d' ' -f1)"
