@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Consolidated Darkroom v0.7.7 build.
+# Consolidated Darkroom v0.7.8 build.
 # Starts from the committed verified v0.5.8 source checkpoint, applies the tested
 # v0.5.9 contact-sheet functionality, the v0.6.0 layout/preset refinement and
 # the reproducible v0.6.1 graphic-system checkpoint and the phone-verified
@@ -182,8 +182,9 @@ python3 combined/patch_v074_sonoff_command_anchor.py | tee validation-v074-sonof
 python3 combined/patch_v075_sonoff_local_inching.py | tee validation-v075-sonoff-local-inching-source.txt
 python3 combined/patch_v076_volume_start.py | tee validation-v076-volume-start-source.txt
 python3 combined/patch_v077_volume_start_samsung.py | tee validation-v077-volume-start-samsung-source.txt
+python3 combined/patch_v078_volume_main_looper.py | tee validation-v078-volume-main-looper-source.txt
 
-python3 - <<'PY' | tee validation-consolidated-v077-source.txt
+python3 - <<'PY' | tee validation-consolidated-v078-source.txt
 from pathlib import Path
 import re
 import sqlite3
@@ -191,26 +192,26 @@ import sqlite3
 manifest = Path('combined/src/main/AndroidManifest.xml')
 text = manifest.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'android:versionCode="[^"]+"', 'android:versionCode="68"', text, count=1
+    r'android:versionCode="[^"]+"', 'android:versionCode="69"', text, count=1
 )
 text, name_count = re.subn(
-    r'android:versionName="[^"]+"', 'android:versionName="0.7.7"', text, count=1
+    r'android:versionName="[^"]+"', 'android:versionName="0.7.8"', text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.7 manifest version update failed')
+    raise SystemExit('v0.7.8 manifest version update failed')
 manifest.write_text(text, encoding='utf-8')
 
 gradle_file = Path('combined/build.gradle')
 text = gradle_file.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 68', text, count=1
+    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 69', text, count=1
 )
 text, name_count = re.subn(
     r'(?m)^\s*versionName\s+[\'\"][^\'\"]+[\'\"]\s*$',
-    "        versionName '0.7.7'", text, count=1
+    "        versionName '0.7.8'", text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.7 Gradle version update failed')
+    raise SystemExit('v0.7.8 Gradle version update failed')
 gradle_file.write_text(text, encoding='utf-8')
 
 db = sqlite3.connect('combined/src/main/assets/mdc_full.sqlite')
@@ -270,10 +271,11 @@ db.close()
 main = Path('combined/src/main/java/it/darkroom/timer/MainActivity.java').read_text(encoding='utf-8')
 service = Path('combined/src/main/java/it/darkroom/timer/SonoffArmService.java').read_text(encoding='utf-8')
 enlargement = Path('combined/src/main/java/it/darkroom/timer/EnlargementActivity.java').read_text(encoding='utf-8')
-assert 'APP_VERSION = "0.13.20"' in main
+assert 'APP_VERSION = "0.13.21"' in main
 assert 'SONOFF_COMMAND_ANCHOR_074' not in service
 assert 'SONOFF_LOCAL_INCHING_075' in service
 assert 'VOLUME_START_077' in service
+assert 'new Handler(Looper.getMainLooper())' in service
 assert 'VOLUME_CONTROL_ABSOLUTE' in service
 assert 'START VOL+ CALLBACK adjust' in service
 assert 'START VOL+ CALLBACK absolute' in service
@@ -488,9 +490,9 @@ assert 'Guida completa v0.2.8' not in maintenance
 assert 'La v0.2.9 aggiunge' not in maintenance
 assert maintenance.count('q.setOnClickListener') == 2
 
-print('release=Darkroom-v0.7.7')
-print('versionCode=68')
-print('timer_internal=0.13.20')
+print('release=Darkroom-v0.7.8')
+print('versionCode=69')
+print('timer_internal=0.13.21')
 print('historical_builds=ZERO')
 print('mdc_network_downloads=ZERO')
 print('gradle_assemblies_expected=ONE')
@@ -517,7 +519,7 @@ print('enlargement_header=COMPACT')
 print('settings_groups=COLOUR_CODED')
 print('masking_method_selection=VISIBLE')
 print('log_primary_action=VISIBLE')
-print('timer_process_changes=SONOFF_LOCAL_INCHING_PLUS_SAMSUNG_VOL_START')
+print('timer_process_changes=SONOFF_LOCAL_INCHING_PLUS_SAMSUNG_VOL_START_MAIN_LOOPER_FIX')
 print('enlargement_calculation_changes=ZERO')
 print('darkroom_red_only=PASS')
 print('database_integrity=PASS')
@@ -543,29 +545,29 @@ print('maintenance_family=SLATE')
 print('maintenance_reference_changes=ZERO')
 PY
 
-rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.7.apk
+rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.8.apk
 gradle :combined:assembleRelease --stacktrace
-cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.7.apk
+cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.8.apk
 
 APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
 AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.7.apk > certificate-v077.txt
-"$AAPT" dump badging Darkroom-v0.7.7.apk > apk-badging-v077.txt
-grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v077.txt
-grep -Fq "versionCode='68'" apk-badging-v077.txt
-grep -Fq "versionName='0.7.7'" apk-badging-v077.txt
-grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v077.txt
-unzip -Z1 Darkroom-v0.7.7.apk > apk-listing-v077.txt
-grep -q 'assets/mdc_full.sqlite' apk-listing-v077.txt
+"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.8.apk > certificate-v078.txt
+"$AAPT" dump badging Darkroom-v0.7.8.apk > apk-badging-v078.txt
+grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v078.txt
+grep -Fq "versionCode='69'" apk-badging-v078.txt
+grep -Fq "versionName='0.7.8'" apk-badging-v078.txt
+grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v078.txt
+unzip -Z1 Darkroom-v0.7.8.apk > apk-listing-v078.txt
+grep -q 'assets/mdc_full.sqlite' apk-listing-v078.txt
 
 ELAPSED=$((SECONDS - START_SECONDS))
 {
   echo 'consolidated_build=PASS'
-  echo 'release=Darkroom-v0.7.7'
+  echo 'release=Darkroom-v0.7.8'
   echo 'historical_builds=ZERO'
   echo 'mdc_network_downloads=ZERO'
   echo 'gradle_assemblies=ONE'
   echo "elapsed_seconds=$ELAPSED"
-} | tee validation-consolidated-v077.txt
+} | tee validation-consolidated-v078.txt
 
-sha256sum Darkroom-v0.7.7.apk | tee Darkroom-v0.7.7.sha256
+sha256sum Darkroom-v0.7.8.apk | tee Darkroom-v0.7.8.sha256
