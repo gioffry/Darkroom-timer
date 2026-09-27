@@ -22,9 +22,9 @@ source = source.replace(
 )
 
 # The selected dilution must be visible beside the dominant JOBO time.
-old = '''        addUnifiedChemicalField(summary, "TEMPO JOBO CPE2",
+old = '''        addFilmTimeField(summary, "TEMPO JOBO CPE2",
                 result != null && result.found ? result.finalDisplay() : "Tempo non disponibile");'''
-new = '''        addUnifiedChemicalField(summary, "TEMPO JOBO CPE2 · " + dilution,
+new = '''        addFilmTimeField(summary, "TEMPO JOBO CPE2 · " + dilution,
                 result != null && result.found ? result.finalDisplay() : "Tempo non disponibile");'''
 if old not in source:
     raise SystemExit("v0.6.8 dominant time field marker missing")
