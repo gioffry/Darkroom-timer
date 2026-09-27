@@ -269,7 +269,7 @@ main = Path('combined/src/main/java/it/darkroom/timer/MainActivity.java').read_t
 service = Path('combined/src/main/java/it/darkroom/timer/SonoffArmService.java').read_text(encoding='utf-8')
 enlargement = Path('combined/src/main/java/it/darkroom/timer/EnlargementActivity.java').read_text(encoding='utf-8')
 assert 'APP_VERSION = "0.13.18"' in main
-assert 'SONOFF_COMMAND_ANCHOR_074' in service
+assert 'SONOFF_COMMAND_ANCHOR_074' not in service
 assert 'SONOFF_LOCAL_INCHING_075' in service
 assert 'lastObservedOnAt = commandAcceptedOnAt;' in service
 assert 'startPolling(currentPulseWidthMs + 100L);' in service
