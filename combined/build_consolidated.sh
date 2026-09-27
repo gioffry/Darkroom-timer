@@ -363,7 +363,7 @@ assert activity.count('calculateFilmOnline();') == 1
 assert activity.count('registerFilmUse(dev, workingVolumeMl, units);') == 0
 assert activity.count('resetFilmBath(dev, workingVolumeMl);') == 0
 assert 'CHEMISTRY_SAFETY_068' in activity
-assert '"TEMPO JOBO CPE2 · " + dilution' in activity
+assert '"TEMPO JOBO CPE2 · " + dilution' not in activity
 assert 'capacità FOMA 12 pellicole/L' in activity
 assert 'contatore di riuso disabilitato' in activity
 assert 'registerFilmUse(dev, workingVolumeMl, units, dilution);' in activity
