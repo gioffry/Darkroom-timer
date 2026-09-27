@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Consolidated Darkroom v0.7.0 build.
+# Consolidated Darkroom v0.7.1 build.
 # Starts from the committed verified v0.5.8 source checkpoint, applies the tested
 # v0.5.9 contact-sheet functionality, the v0.6.0 layout/preset refinement and
 # the reproducible v0.6.1 graphic-system checkpoint and the phone-verified
 # v0.6.2 Timer refinement, the phone-verified v0.6.3 UI polish and the
 # v0.6.4 Home/inventory graphic revision, the v0.6.5 film-development
 # workflow graphic revision, the v0.6.6 final three-module graphic review and
-# the v0.6.7 responsive Large Format header correction, the v0.6.8 chemistry safety fix, the v0.6.9 direct FOMA timing correction and the v0.7.0 manufacturer-priority/reuse-UI correction.
+# the v0.6.7 responsive Large Format header correction, the v0.6.8 chemistry safety fix, the v0.6.9 direct FOMA timing correction, the v0.7.0 manufacturer-priority/reuse-UI correction and the v0.7.1 bundled-database refresh.
 # One Gradle assembly only; no historical wrapper and no MDC network regeneration.
 
 START_SECONDS=$SECONDS
@@ -166,6 +166,7 @@ V070_MAINTENANCE_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/tim
 V070_CHEM_ENGINE_HASH_BEFORE=$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/ChemistrySpecEngine.java" | cut -d' ' -f1)
 python3 combined/patch_v070_source_priority_reuse_ui.py | tee validation-v070-source-priority-reuse-ui-source.txt
 python3 combined/patch_v070_java_escape_fix.py | tee validation-v070-java-escape-fix.txt
+python3 combined/patch_v071_database_refresh.py | tee validation-v071-database-refresh-source.txt
 test "$V070_HOME_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/home/HomeActivity.java" | cut -d' ' -f1)"
 test "$V070_TIMER_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/MainActivity.java" | cut -d' ' -f1)"
 test "$V070_SERVICE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/SonoffArmService.java" | cut -d' ' -f1)"
@@ -175,7 +176,7 @@ test "$V070_LARGE_FORMAT_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/
 test "$V070_MAINTENANCE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/maintenance/UseMaintenanceActivity.java" | cut -d' ' -f1)"
 test "$V070_CHEM_ENGINE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/assistant/ChemistrySpecEngine.java" | cut -d' ' -f1)"
 
-python3 - <<'PY' | tee validation-consolidated-v070-source.txt
+python3 - <<'PY' | tee validation-consolidated-v071-source.txt
 from pathlib import Path
 import re
 import sqlite3
@@ -183,26 +184,26 @@ import sqlite3
 manifest = Path('combined/src/main/AndroidManifest.xml')
 text = manifest.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'android:versionCode="[^"]+"', 'android:versionCode="61"', text, count=1
+    r'android:versionCode="[^"]+"', 'android:versionCode="62"', text, count=1
 )
 text, name_count = re.subn(
-    r'android:versionName="[^"]+"', 'android:versionName="0.7.0"', text, count=1
+    r'android:versionName="[^"]+"', 'android:versionName="0.7.1"', text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.0 manifest version update failed')
+    raise SystemExit('v0.7.1 manifest version update failed')
 manifest.write_text(text, encoding='utf-8')
 
 gradle_file = Path('combined/build.gradle')
 text = gradle_file.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 61', text, count=1
+    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 62', text, count=1
 )
 text, name_count = re.subn(
     r'(?m)^\s*versionName\s+[\'\"][^\'\"]+[\'\"]\s*$',
-    "        versionName '0.7.0'", text, count=1
+    "        versionName '0.7.1'", text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.0 Gradle version update failed')
+    raise SystemExit('v0.7.1 Gradle version update failed')
 gradle_file.write_text(text, encoding='utf-8')
 
 db = sqlite3.connect('combined/src/main/assets/mdc_full.sqlite')
@@ -400,6 +401,9 @@ assert 'TEMPO CPE2 DI PARTENZA' not in activity
 assert 'adattamento −15%' in activity
 assert 'nessuna riduzione percentuale universale applicata' not in activity
 assert 'SOURCE_PRIORITY_REUSE_UI_070' in activity
+assert 'DATABASE_REFRESH_071' in store
+assert 'mdc_offline_darkroom_v071.sqlite' in store
+assert 'mdc_offline_darkroom_v058.sqlite' not in store
 assert 'JOBO_FACTOR = 0.85' in store
 assert 'Produttore · dato ufficiale' in store
 assert 'aManufacturer != bManufacturer' in store
@@ -445,8 +449,8 @@ assert 'Guida completa v0.2.8' not in maintenance
 assert 'La v0.2.9 aggiunge' not in maintenance
 assert maintenance.count('q.setOnClickListener') == 2
 
-print('release=Darkroom-v0.7.0')
-print('versionCode=61')
+print('release=Darkroom-v0.7.1')
+print('versionCode=62')
 print('timer_internal=0.13.16')
 print('historical_builds=ZERO')
 print('mdc_network_downloads=ZERO')
@@ -489,7 +493,7 @@ print('film_workflow=FILM_JOBO_AUXILIARY')
 print('film_actions=FILLED')
 print('film_information=OUTLINED')
 print('film_result_time=DOMINANT')
-print('film_process_changes=MANUFACTURER_FIRST_MDC_SECOND_EQUIVALENCE_THIRD_JOBO_MINUS15')
+print('film_process_changes=MANUFACTURER_FIRST_MDC_SECOND_EQUIVALENCE_THIRD_JOBO_MINUS15_DB_REFRESH')
 print('paper_baths_family=GREEN')
 print('paper_baths_workflow=CHEMISTRY_THEN_VOLUME')
 print('paper_baths_process_changes=ZERO')
@@ -500,29 +504,29 @@ print('maintenance_family=SLATE')
 print('maintenance_reference_changes=ZERO')
 PY
 
-rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.0.apk
+rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.1.apk
 gradle :combined:assembleRelease --stacktrace
-cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.0.apk
+cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.1.apk
 
 APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
 AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.0.apk > certificate-v070.txt
-"$AAPT" dump badging Darkroom-v0.7.0.apk > apk-badging-v070.txt
-grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v070.txt
-grep -Fq "versionCode='61'" apk-badging-v070.txt
-grep -Fq "versionName='0.7.0'" apk-badging-v070.txt
-grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v070.txt
-unzip -Z1 Darkroom-v0.7.0.apk > apk-listing-v070.txt
-grep -q 'assets/mdc_full.sqlite' apk-listing-v070.txt
+"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.1.apk > certificate-v071.txt
+"$AAPT" dump badging Darkroom-v0.7.1.apk > apk-badging-v071.txt
+grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v071.txt
+grep -Fq "versionCode='62'" apk-badging-v071.txt
+grep -Fq "versionName='0.7.1'" apk-badging-v071.txt
+grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v071.txt
+unzip -Z1 Darkroom-v0.7.1.apk > apk-listing-v071.txt
+grep -q 'assets/mdc_full.sqlite' apk-listing-v071.txt
 
 ELAPSED=$((SECONDS - START_SECONDS))
 {
   echo 'consolidated_build=PASS'
-  echo 'release=Darkroom-v0.7.0'
+  echo 'release=Darkroom-v0.7.1'
   echo 'historical_builds=ZERO'
   echo 'mdc_network_downloads=ZERO'
   echo 'gradle_assemblies=ONE'
   echo "elapsed_seconds=$ELAPSED"
-} | tee validation-consolidated-v070.txt
+} | tee validation-consolidated-v071.txt
 
-sha256sum Darkroom-v0.7.0.apk | tee Darkroom-v0.7.0.sha256
+sha256sum Darkroom-v0.7.1.apk | tee Darkroom-v0.7.1.sha256
