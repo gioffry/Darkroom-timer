@@ -75,7 +75,9 @@ for label,role,url in CATEGORIES:
         if not anchors:
             anchors=soup.select("div.listing a.product--title")
         if not anchors:
-            raise RuntimeError(f"Could not locate category product listing on {page_url}")
+            if page == 1:
+                raise RuntimeError(f"Could not locate category product listing on {page_url}")
+            break
         page_keys=[]
         for a in anchors:
             title=clean_title(a.get("title") or a.get_text(" ",strip=True))
