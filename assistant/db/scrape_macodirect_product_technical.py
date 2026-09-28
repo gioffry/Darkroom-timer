@@ -51,12 +51,17 @@ def get_props(html):
             if desc: break
     return props,desc
 
-targets=[r for r in rows if r.get("kind")=="chemical" and r.get("source_url")]
+# First technical pass: every paper developer plus film developers that have
+# no audited specialist/MDC link. Linked film developers already inherit their
+# technical/dilution data from the specialist tables.
+targets=[r for r in rows if r.get("kind")=="chemical" and r.get("source_url")
+         and ((int(r.get("roles",0)) & 2) != 0
+              or ((int(r.get("roles",0)) & 1) != 0 and not r.get("specialist_name")))]
 out=[]
 for i,r in enumerate(targets,1):
     url=r["source_url"]
     try:
-        resp=session.get(url,timeout=25)
+        resp=session.get(url,timeout=10)
         status=resp.status_code
         props,desc=get_props(resp.text) if status==200 else ({}, "")
     except Exception as e:
