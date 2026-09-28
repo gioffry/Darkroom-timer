@@ -1,0 +1,24 @@
+name: Crawl MacoDirect technical product fields
+
+on:
+  push:
+    branches:
+      - feature-darkroom-db-macodirect-master-audit
+    paths:
+      - 'assistant/db/scrape_macodirect_product_technical.py'
+      - '.github/workflows/macodirect_technical_crawl.yml'
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests beautifulsoup4
+      - run: python3 assistant/db/scrape_macodirect_product_technical.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macodirect-technical-fields
+          path: build-output/macodirect-technical/
