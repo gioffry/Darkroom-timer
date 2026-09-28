@@ -4,12 +4,13 @@ on:
   workflow_dispatch:
   push:
     branches:
+      - main
       - 'feature-darkroom-v*'
     paths-ignore:
       - 'build-output/**'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build-apk:
@@ -94,21 +95,3 @@ jobs:
             apk-badging-*.txt
             validation-*.txt
             apk-listing-*.txt
-
-      - name: Record generic build metadata
-        if: always()
-        run: |
-          set -euo pipefail
-          mkdir -p build-output/current
-          printf '%s\n' "$GITHUB_RUN_ID" > build-output/current/run-id.txt
-          printf '%s\n' "${{ job.status }}" > build-output/current/status.txt
-          printf '%s\n' "${{ steps.detect.outputs.script }}" > build-output/current/build-script.txt
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- build-output/current
-          if [ "$GITHUB_REF_NAME" = "feature-darkroom-v058-consolidation" ] && [ "${{ job.status }}" = "success" ]; then
-            test -f combined/src/main/assets/mdc_full.sqlite
-            git add -- combined/src
-          fi
-          git commit -m "Record current Darkroom build metadata [skip ci]" || exit 0
-          git push origin HEAD:${GITHUB_REF_NAME}
