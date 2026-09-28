@@ -1,0 +1,36 @@
+name: Materialize and audit effective Darkroom database
+
+on:
+  push:
+    branches:
+      - feature-darkroom-db-macodirect-master-audit
+
+jobs:
+  audit-effective:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Install ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Prepare stable signing
+        run: |
+          mkdir -p "$HOME/.gradle"
+          printf '%s\n'             'RELEASE_STORE_FILE=../darkroom-stable.jks'             'RELEASE_STORE_PASSWORD=darkroomStable2026'             'RELEASE_KEY_ALIAS=darkroom'             'RELEASE_KEY_PASSWORD=darkroomStable2026'             > "$HOME/.gradle/gradle.properties"
+          keytool -genkeypair -v -keystore darkroom-stable.jks             -storepass darkroomStable2026 -keypass darkroomStable2026             -alias darkroom -keyalg RSA -keysize 2048 -validity 10000             -dname "CN=Darkroom, OU=Darkroom, O=Darkroom, L=Cuneo, ST=CN, C=IT"
+      - name: Materialize current source/database through canonical build
+        run: bash combined/build_consolidated.sh
+      - name: Audit post-patch effective SQLite database
+        run: python3 assistant/db/audit_catalog_architecture_current.py
+      - name: Upload effective database audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-effective-postpatch-audit
+          path: build-output/db-audit/
