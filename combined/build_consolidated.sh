@@ -618,7 +618,7 @@ grep -q 'assets/mdc_full.sqlite' apk-listing-v0712.txt
 ELAPSED=$((SECONDS - START_SECONDS))
 {
   echo 'consolidated_build=PASS'
-  echo 'release=Darkroom-v0.7.11'
+  echo 'release=Darkroom-v0.7.12'
   echo 'historical_builds=ZERO'
   echo 'mdc_network_downloads=ZERO'
   echo 'gradle_assemblies=ONE'
