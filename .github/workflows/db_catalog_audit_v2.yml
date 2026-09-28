@@ -1,0 +1,20 @@
+name: Audit effective Darkroom database architecture v2
+
+on:
+  push:
+    branches:
+      - feature-darkroom-db-macodirect-master-audit
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit effective combined SQLite catalog architecture
+        run: python3 assistant/db/audit_catalog_architecture_current.py
+      - name: Upload effective database audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-architecture-audit-v2
+          path: build-output/db-audit/
