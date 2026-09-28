@@ -51,6 +51,13 @@ def film_family(title):
             x=y; break
     x=re.sub(r"\s+\d+\s*(?:sheets|exposures)\b.*$","",x,flags=re.I)
     x=ws(x.strip(" |-"))
+    nx=norm(x)
+    if nx.startswith("fomapan r 100"): x="Fomapan R 100"
+    elif nx.startswith("ilford hp5 plus ulf planfilm"): x="ILFORD HP5 PLUS"
+    elif nx.startswith("maco em film type s"): x="MACO EM film type S"
+    elif nx.startswith("washi handcoated film on kozo paper"): x="WASHI handcoated film on Kozo paper"
+    elif nx.startswith("bergger print film"): x="Bergger print film"
+    elif nx.startswith("rollei paul reinhold 640"): x="Rollei Paul & Reinhold 640"
     # Collapse known Maco naming variations to one commercial film family.
     canon={
         "fomapan 100":"Fomapan 100 Classic",
@@ -126,6 +133,7 @@ def chem_family(title):
         "adox adonal":"ADOX ADONAL",
         "adox adotech iv":"ADOX ADOTECH IV",
         "adox atomal 49 film developer":"ADOX ATOMAL 49",
+        "adox atomal 49 b w film developer":"ADOX ATOMAL 49",
         "adox d 76 classic powder developer":"ADOX D-76 CLASSIC",
         "adox d 76 eco powder developer":"ADOX D-76 ECO",
         "adox fx 39 ii film developer":"ADOX FX-39 II",
@@ -136,6 +144,7 @@ def chem_family(title):
         "adox neutol liquid wa":"ADOX NEUTOL WA",
         "adox silvermax developer":"ADOX SILVERMAX Developer",
         "adox xt 3 film developer":"ADOX XT-3",
+        "adox xt 3 b w film developer":"ADOX XT-3",
         "compard fix ag fixer":"Compard Fix Ag",
         "compard fix ag plus fixer":"Compard Fix Ag Plus",
         "compard print ne":"Compard Print NE",
@@ -152,6 +161,8 @@ def chem_family(title):
         "kodak hc 110 film developer":"KODAK HC-110",
         "kodak professional t max developer":"KODAK T-MAX Developer",
         "kodak xtol film developer":"KODAK XTOL",
+        "kodak xtol b w film developer":"KODAK XTOL",
+        "lineag+ dxone b w monobath film developer":"LineAg+ DxONE B&W Monobath",
         "maco ecoprint universal developer":"MACO ecoprint Universal",
         "maco ecofix fixer":"MACO ecofix",
         "maco eco citrostop stop bath":"MACO eco citrostop",
@@ -210,7 +221,9 @@ ROLE_OVERRIDES={
     norm("Bellini D96 film developer"): ROLE_FILM_DEV|ROLE_CHEMISTRY,
     norm("Bellini DUO STEP film developer"): ROLE_FILM_DEV|ROLE_CHEMISTRY,
     norm("Bellini Ornano NUCLEOL BF200 film developer"): ROLE_FILM_DEV|ROLE_CHEMISTRY,
-    norm("LineAg+ DxONE B&W Monobath film developer"): ROLE_FILM_DEV|ROLE_CHEMISTRY,
+    norm("LineAg+ DxONE B&W Monobath"): ROLE_FILM_DEV|ROLE_CHEMISTRY,
+    norm("JOBO 9510 | JOBO Alpha Neutral Fixer & JOBO Alpha Black & White Film Developer"): ROLE_CHEMISTRY,
+    norm("JOBO 9515 | JOBO B&W Developer Test Kit"): ROLE_CHEMISTRY,
     norm("ROLLEI WASHJET"): ROLE_WASHING|ROLE_CHEMISTRY,
     norm("Ilford Galerie Washaid"): ROLE_WASHING|ROLE_CHEMISTRY,
     norm("Kodak Hypo Clearing Agent"): ROLE_WASHING|ROLE_CHEMISTRY,
@@ -235,6 +248,7 @@ def roles_for(name,cats,processable=True):
 # existing developer_time_equivalents table and are NOT collapsed here.
 DEV_LINKS={
     norm("ADOX ADONAL"):"Rodinal",
+    norm("Compard R09 One Shot"):"Rodinal",
     norm("ADOX ADOTECH IV"):"Adotech IV",
     norm("ADOX ATOMAL 49"):"Atomal 49",
     norm("ADOX D-76 CLASSIC"):"D-76",
@@ -268,6 +282,7 @@ DEV_LINKS={
     norm("ILFORD PQ UNIVERSAL"):"PQ Universal",
     norm("Ilford Perceptol fine grain film developer"):"Perceptol",
     norm("JOBO 9511 | JOBO Alpha film developer"):"JOBO Alpha",
+    norm("JOBO 9511 | JOBO Alpha Black & White Film Developer"):"JOBO Alpha",
     norm("KODAK D-76"):"D-76",
     norm("KODAK DEKTOL"):"Dektol",
     norm("KODAK HC-110"):"HC-110",
@@ -392,6 +407,25 @@ con=sqlite3.connect(DB); con.row_factory=sqlite3.Row
 dev_names={norm(r["name"]):r["name"] for r in con.execute("SELECT name FROM developers")}
 film_names={norm(r["name"]):r["name"] for r in con.execute("SELECT name FROM films")}
 existing={norm(r["name"]):dict(r) for r in con.execute("SELECT * FROM catalog_products")}
+scope_rows=[dict(r) for r in con.execute("SELECT developer_name,maco_product_title FROM maco_developer_scope")]
+
+def scope_developer_link(group_name,listings):
+    gn=norm(group_name)
+    raw_names=[norm(p["title"]) for p in listings]
+    best=None
+    for s in scope_rows:
+        st=norm(s["maco_product_title"])
+        # Exact/contained commercial name, or a raw listing contained by the frozen scope title.
+        candidates=[gn]+raw_names
+        score=0
+        for cn in candidates:
+            if cn and (cn in st or st in cn): score=max(score,100)
+            else:
+                a=set(cn.split()); b=set(st.split())
+                if a and b: score=max(score,int(100*len(a&b)/max(1,len(a))))
+        if score>=70 and (best is None or score>best[0]):
+            best=(score,s["developer_name"])
+    return None if best is None else best[1]
 
 proposal=[]
 unresolved=[]
@@ -416,13 +450,23 @@ for (kind,nk),g in sorted(groups.items(),key=lambda kv:(kv[0][0],kv[1]["name"].l
             link_relation="REPACKAGED_STOCK" if name.lower().startswith("minox spy film") else "DIRECT_PRODUCT_MAPPING"
     elif kind=="chemical" and roles & (ROLE_FILM_DEV|ROLE_PAPER_DEV):
         want=DEV_LINKS.get(nk)
+        if not want:
+            want=scope_developer_link(name,g["listings"])
         if want and norm(want) in dev_names:
             link_kind="developer"; link_name=dev_names[norm(want)]; link_relation="DIRECT_PRODUCT_MAPPING"
     # Carry existing product ID/technical identity when name already exists.
     ex=existing.get(nk)
     if ex:
         pid=ex["id"]
-    status="LINKED" if link_name else ("NON_PROCESSABLE_LISTING" if not g["processable"] else "CATALOG_ONLY")
+    existing_ready=bool(ex and (
+        (ex.get("film_dilutions") or "").strip() or
+        (ex.get("paper_dilutions") or "").strip() or
+        (ex.get("working_dilution") or "").strip() or
+        kind=="film"
+    ))
+    status=("LINKED" if link_name else
+            ("NON_PROCESSABLE_LISTING" if not g["processable"] else
+             ("EXISTING_TECHNICAL" if existing_ready else "CATALOG_ONLY")))
     row={
         "id":pid,"name":name,"manufacturer":manufacturer(name),"kind":kind,
         "roles":roles,"categories":"|".join(cats),"processable":1 if g["processable"] else 0,
