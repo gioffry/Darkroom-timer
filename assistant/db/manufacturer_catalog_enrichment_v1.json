@@ -234,6 +234,53 @@
       "operationalLifeConditionIt": "Soluzione stock in contenitore pieno e ben chiuso.",
       "sourceTitle": "ILFORD B&W Paper Developers technical information",
       "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1828/product/736/"
+    },
+    {
+      "name": "Moersch SE 1 Sepia positive developer",
+      "manufacturer": "MOERSCH",
+      "paperDilutions": [
+        "1+7",
+        "1+15"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Rivelatore carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Diluire da 1+7 a 1+15. È un rivelatore per carte: tono caldo su carte ad alto contenuto di cloruro d'argento e tono neutro su carte bromuro d'argento.",
+      "notesIt": "Rivelatore positivo/carta; non è un rivelatore per pellicola.",
+      "sourceTitle": "Moersch SE1 SEPIA",
+      "sourceUrl": "https://www.moersch-photochemie.de/en/product/se1-sepia/"
+    },
+    {
+      "name": "ROLLEI RHC",
+      "manufacturer": "ROLLEI",
+      "paperDilutions": [
+        "1+4"
+      ],
+      "filmDilutions": [
+        "1+7",
+        "1+4"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Rivelatore universale pellicola tecnica + carta ad alto contrasto",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Per carte RC/FB ad alto contrasto: 1+4. Per pellicole tecniche: 1+7 a contrasto normale oppure 1+4 per aumentare il contrasto.",
+      "capacityIt": "Scheda tecnica: circa 1,4 m²/L per carte ad alto contrasto a 1+4; circa 3,5 m²/L per film a 1+7 e 2,5 m²/L a 1+4.",
+      "sourceTitle": "ROLLEI RHC High Contrast data sheet",
+      "sourceUrl": "https://www.macodirect.de/media/pdf/41/23/07/RHC11_Datenblatt_en.pdf"
+    },
+    {
+      "name": "Spur Push-Master",
+      "manufacturer": "SPUR",
+      "physicalState": "LIQUID_ADDITIVE",
+      "stockPrep": false,
+      "productTypeIt": "Additivo push per rivelatore pellicola",
+      "physicalStateIt": "Additivo liquido",
+      "preparationIt": "Non si usa come rivelatore autonomo. Si aggiunge alla soluzione di lavoro di SPUR SLD in rapporto 1+7 secondo la tabella SPUR per aumentare la sensibilità in sviluppo push.",
+      "notesIt": "Additivo specifico per SPUR SLD; non va presentato nell'app come rivelatore pellicola autonomo.",
+      "sourceTitle": "SPUR Push-Master data sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-Sheet-SPUR-Push-Master-1.pdf"
     }
   ]
 }
