@@ -254,12 +254,9 @@ if old not in main:
 main = main.replace(old, new, 1)
 
 # Add a base-time stepper. Existing main time stepper becomes PASSO in this mode.
-old = """        plus.setOnClickListener(v -> adjustTestTime(+1));
-        exposure.addView(selector);
-        testCumulativeText = text(cumulativeTimes(), 13, BLUE, true);"""
-new = """        plus.setOnClickListener(v -> adjustTestTime(+1));
-        exposure.addView(selector);
-
+import re
+pattern = re.compile(r'''(\s*plus\.setOnClickListener\(v -> adjustTestTime\(\+1\)\);\n\s*exposure\.addView\(selector[^;]*\);\n)(\s*testCumulativeText = text\(cumulativeTimes\(\), 13, BLUE, true\);)''')
+addition = r'''\1
         testBaseTimeRow = new LinearLayout(this);
         testBaseTimeRow.setOrientation(LinearLayout.HORIZONTAL);
         testBaseTimeRow.setGravity(Gravity.CENTER);
@@ -274,10 +271,12 @@ new = """        plus.setOnClickListener(v -> adjustTestTime(+1));
         basePlus.setOnClickListener(v -> adjustTestBaseTime(+1));
         exposure.addView(testBaseTimeRow, margin(lp(-1, -2), 0, 5, 0, 0));
 
-        testCumulativeText = text(cumulativeTimes(), 13, BLUE, true);"""
-if old not in main:
-    raise SystemExit("v0.7.11: base-time row insertion anchor not found")
-main = main.replace(old, new, 1)
+\2'''
+main, n = pattern.subn(addition, main, count=1)
+if n != 1:
+    idx = main.find("adjustTestTime(+1)")
+    snippet = main[max(0, idx - 300):idx + 500] if idx >= 0 else "adjustTestTime(+1) not present"
+    raise SystemExit("v0.7.11: base-time row insertion anchor not found after prior patches:\n" + snippet)
 
 old = """        outer.addView(note, lp(-1, -2));
         refreshSplitProvinoUi();
