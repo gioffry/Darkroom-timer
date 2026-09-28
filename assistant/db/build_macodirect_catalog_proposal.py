@@ -303,6 +303,7 @@ DEV_LINKS={
     norm("Moersch eco film developer"):"Moersch eco",
     norm("ROLLEI Supergrain"):"Rollei Supergrain",
     norm("SPUR Acurol-N"):"Acurol-N",
+    norm("SPUR Dokuspeed SL-N"):"Spur Dokuspeed SL-N",
     norm("SPUR HRX"):"Spur HRX",
     norm("SPUR Nanotech UR"):"Spur Nanotech UR",
     norm("SPUR Omega X"):"Spur Omega X",
