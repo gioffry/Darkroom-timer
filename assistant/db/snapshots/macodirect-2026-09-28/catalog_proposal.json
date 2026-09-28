@@ -170,7 +170,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/6641/adox-adotol-konstant-ii-paper-developer-for-1-liter?c=707"
   },
   {
@@ -342,7 +342,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/6790/adox-mcc-developer-1-liter?c=707"
   },
   {
@@ -363,7 +363,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/7223/adox-neutol-eco-1l?c=707"
   },
   {
@@ -384,7 +384,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/6803/adox-neutol-liquid-ne-1l?c=707"
   },
   {
@@ -405,7 +405,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/6725/adox-neutol-liquid-wa-5l?c=707"
   },
   {
@@ -691,7 +691,7 @@
     "name": "Bellini FX5 Fixer with Hardener (Solutions A+B)",
     "manufacturer": "BELLINI",
     "kind": "chemical",
-    "roles": 64,
+    "roles": 72,
     "categories": "paper_fixer",
     "processable": 1,
     "formats": "",
@@ -1175,7 +1175,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/5454/foma-fomatol-h-positive-developer-for-1l?c=707"
   },
   {
@@ -1430,7 +1430,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/4372/fomatol-powder-p-w14-neutral-tone-paper-developer-for-2.5l?c=707"
   },
   {
@@ -1451,7 +1451,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/4373/fomatol-powder-pw-w24-warmtone-paper-developer-for-1l?c=707"
   },
   {
@@ -1660,7 +1660,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/chemistry/black-white-chemistry/paper-developing/paper-developer/4408/ilford-bromophen-for-5l-working-solution?c=707"
   },
   {
@@ -2845,7 +2845,7 @@
     "name": "Moersch SE 1 Sepia positive developer",
     "manufacturer": "MOERSCH",
     "kind": "chemical",
-    "roles": 65,
+    "roles": 66,
     "categories": "film_developer",
     "processable": 1,
     "formats": "",
@@ -3304,10 +3304,10 @@
       "Spur Dokuspeed SL-N | 100ml Part A + 75ml Part B"
     ],
     "listing_count": 1,
-    "specialist_kind": "",
-    "specialist_name": "",
-    "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "specialist_kind": "developer",
+    "specialist_name": "Spur Dokuspeed SL-N",
+    "specialist_relation": "DIRECT_PRODUCT_MAPPING",
+    "status": "LINKED",
     "source_url": "https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/6233/spur-dokuspeed-sl-n-100ml-part-a-75ml-part-b?c=700"
   },
   {
@@ -3380,7 +3380,7 @@
     "name": "Spur Push-Master",
     "manufacturer": "SPUR",
     "kind": "chemical",
-    "roles": 65,
+    "roles": 64,
     "categories": "film_developer",
     "processable": 1,
     "formats": "",
