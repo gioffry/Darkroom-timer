@@ -17,6 +17,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: macodirect-db-master-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   apply-db:
     runs-on: ubuntu-latest
@@ -69,4 +73,6 @@ jobs:
           git add -- combined/src/main/assets/mdc_full.sqlite assistant/db/snapshots/macodirect-2026-09-28
           git diff --cached --stat
           git commit -m "Gate catalog to MacoDirect master snapshot [skip ci]" || exit 0
+          git fetch origin feature-darkroom-db-macodirect-master-audit
+          git rebase origin/feature-darkroom-db-macodirect-master-audit
           git push origin HEAD:feature-darkroom-db-macodirect-master-audit
