@@ -383,7 +383,7 @@ merge_names={
 }
 for (kind,nk),g in list(groups.items()):
     target=merge_names.get(nk)
-    if target and (kind,target) in groups:
+    if target and target != nk and (kind,target) in groups:
         groups[(kind,target)]["listings"].extend(g["listings"])
         groups[(kind,target)]["categories"].update(g["categories"])
         del groups[(kind,nk)]
