@@ -28,6 +28,15 @@ for t in interesting:
     lines.append(f"\n[{t}] rows={n}")
     lines.append("columns=" + ", ".join(c["name"] for c in cols))
 
+# Full specialist name lists used to reconcile the MacoDirect gatekeeper with MDC.
+for t in ("films","developers"):
+    if t in tables:
+        rows=[dict(r) for r in cur.execute(f"SELECT * FROM {t} ORDER BY name")]
+        summary[t]=rows
+        with (OUT/f"{t}.csv").open("w",newline="",encoding="utf-8") as f:
+            if rows:
+                w=csv.DictWriter(f,fieldnames=rows[0].keys()); w.writeheader(); w.writerows(rows)
+
 # Catalog products
 if "catalog_products" in tables:
     rows = [dict(r) for r in cur.execute("SELECT * FROM catalog_products ORDER BY name")]
