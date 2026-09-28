@@ -197,7 +197,18 @@ test "$TIMING_V0712_SHA_BEFORE" = "$TIMING_V0712_SHA_AFTER"
 echo "v0712_sonoff_source_unchanged=PASS"
 echo "v0712_timing_math_source_unchanged=PASS"
 
-python3 - <<'PY' | tee validation-consolidated-v0712-source.txt
+V0713_SERVICE_HASH_BEFORE="$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/SonoffArmService.java" | cut -d' ' -f1)"
+V0713_TIMING_HASH_BEFORE="$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/TimingMath.java" | cut -d' ' -f1)"
+V0713_ENLARGEMENT_HASH_BEFORE="$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/EnlargementActivity.java" | cut -d' ' -f1)"
+python3 combined/patch_v0713_macodirect_catalog_gate.py | tee validation-v0713-macodirect-catalog-source.txt
+test "$V0713_SERVICE_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/SonoffArmService.java" | cut -d' ' -f1)"
+test "$V0713_TIMING_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/TimingMath.java" | cut -d' ' -f1)"
+test "$V0713_ENLARGEMENT_HASH_BEFORE" = "$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/EnlargementActivity.java" | cut -d' ' -f1)"
+echo "v0713_sonoff_source_unchanged=PASS"
+echo "v0713_timing_math_source_unchanged=PASS"
+echo "v0713_enlargement_source_unchanged=PASS"
+
+python3 - <<'PY' | tee validation-consolidated-v0713-source.txt
 from pathlib import Path
 import re
 import sqlite3
@@ -205,26 +216,26 @@ import sqlite3
 manifest = Path('combined/src/main/AndroidManifest.xml')
 text = manifest.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'android:versionCode="[^"]+"', 'android:versionCode="73"', text, count=1
+    r'android:versionCode="[^"]+"', 'android:versionCode="74"', text, count=1
 )
 text, name_count = re.subn(
-    r'android:versionName="[^"]+"', 'android:versionName="0.7.12"', text, count=1
+    r'android:versionName="[^"]+"', 'android:versionName="0.7.13"', text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.12 manifest version update failed')
+    raise SystemExit('v0.7.13 manifest version update failed')
 manifest.write_text(text, encoding='utf-8')
 
 gradle_file = Path('combined/build.gradle')
 text = gradle_file.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 73', text, count=1
+    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 74', text, count=1
 )
 text, name_count = re.subn(
     r'(?m)^\s*versionName\s+[\'\"][^\'\"]+[\'\"]\s*$',
-    "        versionName '0.7.12'", text, count=1
+    "        versionName '0.7.13'", text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.12 Gradle version update failed')
+    raise SystemExit('v0.7.13 Gradle version update failed')
 gradle_file.write_text(text, encoding='utf-8')
 
 db = sqlite3.connect('combined/src/main/assets/mdc_full.sqlite')
@@ -273,6 +284,16 @@ kentmere_xtol = db.execute(
 ).fetchone()
 assert kentmere_xtol == ('8', 20.0), kentmere_xtol
 
+# v0.7.13 MacoDirect-gated catalog invariants.
+assert db.execute('SELECT COUNT(*) FROM catalog_products').fetchone()[0] == 235
+assert db.execute("SELECT COUNT(*) FROM retailer_catalog_listings WHERE retailer='MACODIRECT'").fetchone()[0] == 523
+assert db.execute('SELECT COUNT(*) FROM catalog_aliases').fetchone()[0] == 706
+assert db.execute('SELECT COUNT(*) FROM catalog_specialist_links').fetchone()[0] == 116
+assert db.execute("SELECT COUNT(*) FROM catalog_products WHERE lower(name) LIKE '%adotol%'").fetchone()[0] == 1
+assert db.execute("SELECT COUNT(*) FROM catalog_products WHERE (roles & 2)<>0").fetchone()[0] == 29
+assert db.execute("SELECT COUNT(*) FROM catalog_products WHERE (roles & 1)<>0 AND (roles & 2)<>0").fetchone()[0] == 4
+assert db.execute("SELECT COUNT(*) FROM catalog_products p LEFT JOIN retailer_catalog_listings r ON r.product_id=p.id AND r.retailer='MACODIRECT' WHERE r.product_id IS NULL").fetchone()[0] == 0
+
 
 # JOBO -15% regression: 10:00 -> 8:30; 14:00 -> 11:55 after 5-second rounding.
 def jobo(seconds):
@@ -284,7 +305,7 @@ db.close()
 main = Path('combined/src/main/java/it/darkroom/timer/MainActivity.java').read_text(encoding='utf-8')
 service = Path('combined/src/main/java/it/darkroom/timer/SonoffArmService.java').read_text(encoding='utf-8')
 enlargement = Path('combined/src/main/java/it/darkroom/timer/EnlargementActivity.java').read_text(encoding='utf-8')
-assert 'APP_VERSION = "0.13.25"' in main
+assert 'APP_VERSION = "0.13.26"' in main
 assert 'SONOFF_COMMAND_ANCHOR_074' not in service
 assert 'SONOFF_LOCAL_INCHING_075' in service
 assert 'VOLUME_START_077' in service
@@ -422,7 +443,7 @@ activity = Path('combined/src/main/java/it/darkroom/assistant/AssistantActivityV
 home = Path('combined/src/main/java/it/darkroom/timer/home/HomeActivity.java').read_text(encoding='utf-8')
 large_format = Path('combined/src/main/java/it/darkroom/timer/largeformat/LargeFormatActivity.java').read_text(encoding='utf-8')
 maintenance = Path('combined/src/main/java/it/darkroom/timer/maintenance/UseMaintenanceActivity.java').read_text(encoding='utf-8')
-assert 'mdc_offline_darkroom_v071.sqlite' in store
+assert 'mdc_offline_darkroom_v0713.sqlite' in store
 assert 'if (exact != null) return exact;' in store
 assert 'developer_time_equivalents' in store
 assert 'EQUIVALENZA CONTROLLATA' in activity
@@ -490,7 +511,8 @@ assert 'if ("1+0".equals(d)) return "stock";' in activity
 assert 'if ("stock".equals(d)) return new double[]{total, 0};' in activity
 assert "Per sicurezza non viene usata automaticamente un'equivalenza con un altro rivelatore." not in activity
 assert 'DATABASE_REFRESH_071' in store
-assert 'mdc_offline_darkroom_v071.sqlite' in store
+assert 'mdc_offline_darkroom_v0713.sqlite' in store
+assert 'mdc_offline_darkroom_v071.sqlite' not in store
 assert 'mdc_offline_darkroom_v058.sqlite' not in store
 assert 'JOBO_FACTOR = 0.85' in store
 assert 'Produttore · dato ufficiale' in store
@@ -508,6 +530,15 @@ assert 'resetFilmBath(stop, workingVolumeMl, filmAuxDilution(stop));' in activit
 assert 'resetFilmBath(fix, workingVolumeMl, filmAuxDilution(fix));' in activity
 assert activity.count('registerPaperUse(lastPaperDeveloper, lastPaperVolume, area);') == 1
 assert activity.count('resetPaperBath(dev, volume);') == 1
+
+full_catalog = Path('combined/src/main/java/it/darkroom/assistant/FullCatalogStore.java').read_text(encoding='utf-8')
+assert 'MACODIRECT_CATALOG_DEVELOPER' in full_catalog
+assert 'MACODIRECT_CATALOG_FILM' in full_catalog
+assert 'catalog_specialist_links' in full_catalog
+assert 'addCatalogAliasesForRole' in full_catalog
+assert 'try(Cursor c=d.rawQuery("SELECT name FROM developers",null))' not in full_catalog
+assert 'try(Cursor c=d.rawQuery("SELECT name FROM films",null))' not in full_catalog
+assert 'if(catalogCanonical(name)!=null) return null;' in full_catalog
 
 assert 'LARGE_FORMAT_VISUAL_066' in large_format
 assert 'VIOLET_FILL = Color.rgb(91, 70, 113)' in large_format
@@ -537,9 +568,9 @@ assert 'Guida completa v0.2.8' not in maintenance
 assert 'La v0.2.9 aggiunge' not in maintenance
 assert maintenance.count('q.setOnClickListener') == 2
 
-print('release=Darkroom-v0.7.12')
-print('versionCode=73')
-print('timer_internal=0.13.25')
+print('release=Darkroom-v0.7.13')
+print('versionCode=74')
+print('timer_internal=0.13.26')
 print('historical_builds=ZERO')
 print('mdc_network_downloads=ZERO')
 print('gradle_assemblies_expected=ONE')
@@ -575,6 +606,12 @@ print('v0712_test_strip_scroll=PASS')
 print('v0712_contact_lens_selectable=PASS')
 print('v0712_seconds_base_toggle=PASS')
 print('v0712_jpg_version_removed=PASS')
+print('v0713_macodirect_catalog_gate=PASS')
+print('v0713_adotol_present=PASS')
+print('v0713_aliases=706')
+print('v0713_specialist_links=116')
+print('v0713_dual_role_developers=4')
+print('v0713_sonoff_vol_plus_minus_changes=ZERO')
 print('enlargement_calculation_changes=ZERO')
 print('darkroom_red_only=PASS')
 print('database_integrity=PASS')
@@ -600,29 +637,29 @@ print('maintenance_family=SLATE')
 print('maintenance_reference_changes=ZERO')
 PY
 
-rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.12.apk
+rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.13.apk
 gradle :combined:assembleRelease --stacktrace
-cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.12.apk
+cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.13.apk
 
 APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
 AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.12.apk > certificate-v0712.txt
-"$AAPT" dump badging Darkroom-v0.7.12.apk > apk-badging-v0712.txt
-grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v0712.txt
-grep -Fq "versionCode='73'" apk-badging-v0712.txt
-grep -Fq "versionName='0.7.12'" apk-badging-v0712.txt
-grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v0712.txt
-unzip -Z1 Darkroom-v0.7.12.apk > apk-listing-v0712.txt
-grep -q 'assets/mdc_full.sqlite' apk-listing-v0712.txt
+"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.13.apk > certificate-v0713.txt
+"$AAPT" dump badging Darkroom-v0.7.13.apk > apk-badging-v0713.txt
+grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v0713.txt
+grep -Fq "versionCode='74'" apk-badging-v0713.txt
+grep -Fq "versionName='0.7.13'" apk-badging-v0713.txt
+grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v0713.txt
+unzip -Z1 Darkroom-v0.7.13.apk > apk-listing-v0713.txt
+grep -q 'assets/mdc_full.sqlite' apk-listing-v0713.txt
 
 ELAPSED=$((SECONDS - START_SECONDS))
 {
   echo 'consolidated_build=PASS'
-  echo 'release=Darkroom-v0.7.12'
+  echo 'release=Darkroom-v0.7.13'
   echo 'historical_builds=ZERO'
   echo 'mdc_network_downloads=ZERO'
   echo 'gradle_assemblies=ONE'
   echo "elapsed_seconds=$ELAPSED"
-} | tee validation-consolidated-v0712.txt
+} | tee validation-consolidated-v0713.txt
 
-sha256sum Darkroom-v0.7.12.apk | tee Darkroom-v0.7.12.sha256
+sha256sum Darkroom-v0.7.13.apk | tee Darkroom-v0.7.13.sha256
