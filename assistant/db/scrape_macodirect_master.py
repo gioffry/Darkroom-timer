@@ -66,9 +66,16 @@ for label,role,url in CATEGORIES:
         print(f"FETCH {label} p={page} status={r.status_code} bytes={len(r.content)}")
         r.raise_for_status()
         soup=BeautifulSoup(r.text,"html.parser")
-        anchors=soup.select("a.product--title")
+        # Only the actual category listing. Shopware also renders top-seller/
+        # recommendation product boxes outside the listing; those MUST NOT define
+        # the MacoDirect master scope.
+        anchors=soup.select(".listing--container a.product--title")
         if not anchors:
-            anchors=[a for a in soup.find_all("a",href=True) if "product" in " ".join(a.get("class",[])).lower() and (a.get("title") or a.get_text(strip=True))]
+            anchors=soup.select(".product--listing a.product--title")
+        if not anchors:
+            anchors=soup.select("div.listing a.product--title")
+        if not anchors:
+            raise RuntimeError(f"Could not locate category product listing on {page_url}")
         page_keys=[]
         for a in anchors:
             title=clean_title(a.get("title") or a.get_text(" ",strip=True))
