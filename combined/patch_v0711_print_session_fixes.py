@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# build retry r3
 """Darkroom 0.7.11: session fixes from 2026-09-28 print test.
 
 Changes:
