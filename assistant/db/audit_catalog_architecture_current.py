@@ -2,9 +2,7 @@
 from pathlib import Path
 import sqlite3, json, csv
 
-ROOT = Path(__file__).resolve().parents[1]
-DB = ROOT / "src/main/assets/mdc_full.sqlite"
-OUT = Path("build-output/db-audit")
+REPO = Path(__file__).resolve().parents[2]\nDB = REPO / "combined/src/main/assets/mdc_full.sqlite"\nOUT = Path("build-output/db-audit")
 OUT.mkdir(parents=True, exist_ok=True)
 
 con = sqlite3.connect(DB)
