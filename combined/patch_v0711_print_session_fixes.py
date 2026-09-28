@@ -255,7 +255,7 @@ main = main.replace(old, new, 1)
 
 # Add a base-time stepper. Existing main time stepper becomes PASSO in this mode.
 import re
-pattern = re.compile(r'''(\s*plus\.setOnClickListener\(v -> adjustTestTime\(\+1\)\);\n\s*exposure\.addView\(selector[^;]*\);\n)(\s*testCumulativeText = text\(cumulativeTimes\(\), 13, BLUE, true\);)''')
+pattern = re.compile(r'''(\s*plus\.setOnClickListener\(v -> adjustTestTime\(\+1\)\);\n\s*exposure\.addView\(selector[^;]*\);\n)(\s*testCumulativeText = text\(cumulativeTimes\(\), 13, [A-Z_]+, true\);)''')
 addition = r'''\1
         testBaseTimeRow = new LinearLayout(this);
         testBaseTimeRow.setOrientation(LinearLayout.HORIZONTAL);
