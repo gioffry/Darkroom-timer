@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Audit current SQLite catalog architecture
+      - name: Audit current combined SQLite catalog architecture
         run: python3 assistant/db/audit_catalog_architecture_current.py
       - name: Upload database audit
         uses: actions/upload-artifact@v4
