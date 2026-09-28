@@ -187,7 +187,17 @@ python3 combined/patch_v079_volume_everywhere_focus.py | tee validation-v079-vol
 python3 combined/patch_v0710_volume_screenoff_fallback.py | tee validation-v0710-volume-screenoff-fallback-source.txt
 python3 combined/patch_v0711_print_session_fixes.py | tee validation-v0711-print-session-fixes-source.txt
 
-python3 - <<'PY' | tee validation-consolidated-v0711-source.txt
+SONOFF_V0712_SHA_BEFORE="$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/SonoffArmService.java" | awk '{print $1}')"
+TIMING_V0712_SHA_BEFORE="$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/TimingMath.java" | awk '{print $1}')"
+python3 combined/patch_v0712_log_enlargement_ux.py | tee validation-v0712-log-enlargement-ux-source.txt
+SONOFF_V0712_SHA_AFTER="$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/SonoffArmService.java" | awk '{print $1}')"
+TIMING_V0712_SHA_AFTER="$(sha256sum "$SOURCE_ROOT/main/java/it/darkroom/timer/TimingMath.java" | awk '{print $1}')"
+test "$SONOFF_V0712_SHA_BEFORE" = "$SONOFF_V0712_SHA_AFTER"
+test "$TIMING_V0712_SHA_BEFORE" = "$TIMING_V0712_SHA_AFTER"
+echo "v0712_sonoff_source_unchanged=PASS"
+echo "v0712_timing_math_source_unchanged=PASS"
+
+python3 - <<'PY' | tee validation-consolidated-v0712-source.txt
 from pathlib import Path
 import re
 import sqlite3
@@ -195,26 +205,26 @@ import sqlite3
 manifest = Path('combined/src/main/AndroidManifest.xml')
 text = manifest.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'android:versionCode="[^"]+"', 'android:versionCode="72"', text, count=1
+    r'android:versionCode="[^"]+"', 'android:versionCode="73"', text, count=1
 )
 text, name_count = re.subn(
-    r'android:versionName="[^"]+"', 'android:versionName="0.7.11"', text, count=1
+    r'android:versionName="[^"]+"', 'android:versionName="0.7.12"', text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.11 manifest version update failed')
+    raise SystemExit('v0.7.12 manifest version update failed')
 manifest.write_text(text, encoding='utf-8')
 
 gradle_file = Path('combined/build.gradle')
 text = gradle_file.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 72', text, count=1
+    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 73', text, count=1
 )
 text, name_count = re.subn(
     r'(?m)^\s*versionName\s+[\'\"][^\'\"]+[\'\"]\s*$',
-    "        versionName '0.7.11'", text, count=1
+    "        versionName '0.7.12'", text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.11 Gradle version update failed')
+    raise SystemExit('v0.7.12 Gradle version update failed')
 gradle_file.write_text(text, encoding='utf-8')
 
 db = sqlite3.connect('combined/src/main/assets/mdc_full.sqlite')
@@ -274,7 +284,7 @@ db.close()
 main = Path('combined/src/main/java/it/darkroom/timer/MainActivity.java').read_text(encoding='utf-8')
 service = Path('combined/src/main/java/it/darkroom/timer/SonoffArmService.java').read_text(encoding='utf-8')
 enlargement = Path('combined/src/main/java/it/darkroom/timer/EnlargementActivity.java').read_text(encoding='utf-8')
-assert 'APP_VERSION = "0.13.24"' in main
+assert 'APP_VERSION = "0.13.25"' in main
 assert 'SONOFF_COMMAND_ANCHOR_074' not in service
 assert 'SONOFF_LOCAL_INCHING_075' in service
 assert 'VOLUME_START_077' in service
@@ -297,7 +307,25 @@ assert 'EXTRA_TEST_VARIABLE_PULSES' in main and 'testVariablePulses' in service
 assert 'ACTION_ENABLE_SCREEN_OFF_FOCUS' in service
 assert 'FOCUS VOL- SCREEN-OFF 0.7.11 ARMATO' in service
 assert 'FILTRO DENSITÀ LPL' in main
-assert 'Filtro densità' in Path('combined/src/main/java/it/darkroom/timer/JpegCardRenderer.java').read_text(encoding='utf-8')
+jpeg = Path('combined/src/main/java/it/darkroom/timer/JpegCardRenderer.java').read_text(encoding='utf-8')
+assert 'Filtro densità' in jpeg
+assert 'private Switch testBaseToggle;' in main
+assert 'SERIE IN SECONDI · CUMULATIVA' not in main
+assert 'showTestSecondsPatternDialog' not in main
+assert 'setTestBaseStepEnabled(boolean enabled)' in main
+assert 'ScrollView stripScroll = new ScrollView(this);' in main
+assert 'CORREGGI INGRANDIMENTO DELLA SCHEDA' in main
+assert 'putBoolean("enlargementNeedsConfirmation", true)' in main
+assert '⚠  INGRANDIMENTO DA VERIFICARE' in main
+assert 'contactPresetField("OBIETTIVO (mm)", lens)' in main
+assert '.putString("lens_" + preset.id, preset.lens)' in main
+assert 'Colonna LPL: ' in main
+assert 'β / Scala LPL' not in jpeg
+assert '"Colonna LPL"' in jpeg
+assert 'String footer = "Darkroom Timer di F.G.";' in jpeg
+assert 'Darkroom Timer di F.G. - v' not in jpeg
+assert '"editlog".equals(mode)' in enlargement
+assert 'CALCOLA CORREZIONE' in enlargement
 assert Path('combined/src/main/res/raw/darkroom_volume_keepalive.wav').stat().st_size >= 4000
 assert 'START VOL+ ARMATO' in service
 assert 'COMANDO switch=on accettato da START VOL+' in service
@@ -509,9 +537,9 @@ assert 'Guida completa v0.2.8' not in maintenance
 assert 'La v0.2.9 aggiunge' not in maintenance
 assert maintenance.count('q.setOnClickListener') == 2
 
-print('release=Darkroom-v0.7.11')
-print('versionCode=72')
-print('timer_internal=0.13.24')
+print('release=Darkroom-v0.7.12')
+print('versionCode=73')
+print('timer_internal=0.13.25')
 print('historical_builds=ZERO')
 print('mdc_network_downloads=ZERO')
 print('gradle_assemblies_expected=ONE')
@@ -539,6 +567,14 @@ print('settings_groups=COLOUR_CODED')
 print('masking_method_selection=VISIBLE')
 print('log_primary_action=VISIBLE')
 print('timer_process_changes=VOL_PLUS_SCREEN_OFF_PLUS_VOL_MINUS_SCREEN_OFF_FOCUS_PLUS_BASE_STEP_TEST')
+print('v0712_sonoff_vol_plus_minus_changes=ZERO')
+print('v0712_lpl_calibration_changes=ZERO')
+print('v0712_log_edit_enlargement=PASS')
+print('v0712_enlargement_verification_alert=PASS')
+print('v0712_test_strip_scroll=PASS')
+print('v0712_contact_lens_selectable=PASS')
+print('v0712_seconds_base_toggle=PASS')
+print('v0712_jpg_version_removed=PASS')
 print('enlargement_calculation_changes=ZERO')
 print('darkroom_red_only=PASS')
 print('database_integrity=PASS')
@@ -564,20 +600,20 @@ print('maintenance_family=SLATE')
 print('maintenance_reference_changes=ZERO')
 PY
 
-rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.11.apk
+rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.12.apk
 gradle :combined:assembleRelease --stacktrace
-cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.11.apk
+cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.12.apk
 
 APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
 AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.11.apk > certificate-v0711.txt
-"$AAPT" dump badging Darkroom-v0.7.11.apk > apk-badging-v0711.txt
-grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v0711.txt
-grep -Fq "versionCode='72'" apk-badging-v0711.txt
-grep -Fq "versionName='0.7.11'" apk-badging-v0711.txt
-grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v0711.txt
-unzip -Z1 Darkroom-v0.7.11.apk > apk-listing-v0711.txt
-grep -q 'assets/mdc_full.sqlite' apk-listing-v0711.txt
+"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.12.apk > certificate-v0712.txt
+"$AAPT" dump badging Darkroom-v0.7.12.apk > apk-badging-v0712.txt
+grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v0712.txt
+grep -Fq "versionCode='73'" apk-badging-v0712.txt
+grep -Fq "versionName='0.7.12'" apk-badging-v0712.txt
+grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v0712.txt
+unzip -Z1 Darkroom-v0.7.12.apk > apk-listing-v0712.txt
+grep -q 'assets/mdc_full.sqlite' apk-listing-v0712.txt
 
 ELAPSED=$((SECONDS - START_SECONDS))
 {
@@ -587,6 +623,6 @@ ELAPSED=$((SECONDS - START_SECONDS))
   echo 'mdc_network_downloads=ZERO'
   echo 'gradle_assemblies=ONE'
   echo "elapsed_seconds=$ELAPSED"
-} | tee validation-consolidated-v0711.txt
+} | tee validation-consolidated-v0712.txt
 
-sha256sum Darkroom-v0.7.11.apk | tee Darkroom-v0.7.11.sha256
+sha256sum Darkroom-v0.7.12.apk | tee Darkroom-v0.7.12.sha256
