@@ -17,8 +17,12 @@ jobs:
         run: pip install requests beautifulsoup4
       - name: Crawl MacoDirect and compare with current database
         run: python3 assistant/db/scrape_macodirect_master.py
+      - name: Build canonical MacoDirect-gated catalog proposal
+        run: python3 assistant/db/build_macodirect_catalog_proposal.py
       - name: Upload MacoDirect audit
         uses: actions/upload-artifact@v4
         with:
           name: macodirect-master-audit
-          path: build-output/macodirect-master/
+          path: |
+            build-output/macodirect-master/
+            build-output/macodirect-proposal/
