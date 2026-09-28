@@ -786,10 +786,10 @@
       "Bergger BER49 powder developer to make 5l"
     ],
     "listing_count": 2,
-    "specialist_kind": "developer",
-    "specialist_name": "Foma Retro Special",
-    "specialist_relation": "DIRECT_PRODUCT_MAPPING",
-    "status": "LINKED",
+    "specialist_kind": "",
+    "specialist_name": "",
+    "specialist_relation": "",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/5679/bergger-ber49-powder-developer-to-make-1l?c=700"
   },
   {
@@ -1066,10 +1066,10 @@
       "Compard R09 Studio 1l"
     ],
     "listing_count": 1,
-    "specialist_kind": "",
-    "specialist_name": "",
-    "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "specialist_kind": "developer",
+    "specialist_name": "Studional",
+    "specialist_relation": "DIRECT_PRODUCT_MAPPING",
+    "status": "LINKED",
     "source_url": "https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/1003/compard-r09-studio-1l?c=700"
   },
   {
@@ -1979,7 +1979,7 @@
     ],
     "listing_count": 1,
     "specialist_kind": "developer",
-    "specialist_name": "ID-11",
+    "specialist_name": "Ilfosol 3",
     "specialist_relation": "DIRECT_PRODUCT_MAPPING",
     "status": "LINKED",
     "source_url": "https://www.macodirect.de/en/chemistry/black-white-chemistry/film-developing/film-developer/6226/ilford-simplicity-film-developer-60ml?c=700"
@@ -3671,7 +3671,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/film/black-white-films/7267/agfaphoto-apx-200-35mm-36-exposures?c=617"
   },
   {
@@ -3740,7 +3740,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/film/black-white-films/6318/bergger-print-film-8x10-20.3x25.4cm-25-sheets?c=617"
   },
   {
@@ -3761,7 +3761,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/film/movie-films-super-8-to-35mm/5335/cfp-double-x-b-w-film-35mm-36-exposures?c=617"
   },
   {
@@ -4066,7 +4066,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/film/movie-films-super-8-to-35mm/1716/fomapan-r-100-16mm-x-30.5m-double-normal-8?c=617"
   },
   {
@@ -4109,7 +4109,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/film/black-white-films/6565/gothik-xx-250-35mm-36-exposures?c=617"
   },
   {
@@ -4627,7 +4627,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/film/black-white-films/1631/maco-em-film-type-s-6.5x9cm-100-sheets?c=617"
   },
   {
@@ -4906,7 +4906,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/film/black-white-films/6399/rollei-paul-reinhold-640-2-135-36-exp.?c=617"
   },
   {
@@ -5091,7 +5091,7 @@
     "specialist_kind": "",
     "specialist_name": "",
     "specialist_relation": "",
-    "status": "CATALOG_ONLY",
+    "status": "EXISTING_TECHNICAL",
     "source_url": "https://www.macodirect.de/en/film/black-white-films/7238/washi-handcoated-film-on-kozo-paper-4-x-5-inch-10-2-x-12-7-cm-12-sheets?c=617"
   },
   {
