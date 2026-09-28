@@ -1,0 +1,56 @@
+name: Apply MacoDirect master catalog to database
+
+on:
+  push:
+    branches:
+      - feature-darkroom-db-macodirect-master-audit
+    paths:
+      - 'assistant/db/apply_macodirect_master_catalog.py'
+      - '.github/workflows/apply_macodirect_master_db.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply-db:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install crawler dependencies
+        run: pip install requests beautifulsoup4
+      - name: Crawl MacoDirect current B&W catalog
+        run: python3 assistant/db/scrape_macodirect_master.py
+      - name: Build canonical gated proposal
+        run: python3 assistant/db/build_macodirect_catalog_proposal.py
+      - name: Apply proposal to SQLite only
+        run: python3 assistant/db/apply_macodirect_master_catalog.py | tee macodirect-db-apply.txt
+      - name: Validate database
+        run: |
+          python3 - <<'PY'
+          import sqlite3, json
+          db=sqlite3.connect('combined/src/main/assets/mdc_full.sqlite')
+          assert db.execute('PRAGMA quick_check').fetchone()[0]=='ok'
+          assert db.execute("SELECT COUNT(*) FROM retailer_catalog_listings WHERE retailer='MACODIRECT'").fetchone()[0] >= 500
+          assert db.execute("SELECT COUNT(*) FROM catalog_products").fetchone()[0] >= 200
+          assert db.execute("SELECT COUNT(*) FROM catalog_products WHERE lower(name) LIKE '%adotol%'").fetchone()[0] == 1
+          assert db.execute("SELECT COUNT(*) FROM catalog_products WHERE (roles & 1)<>0 AND (roles & 2)<>0").fetchone()[0] >= 4
+          assert db.execute("SELECT COUNT(*) FROM developer_time_equivalents").fetchone()[0] == 39
+          print('db_quick_check=PASS')
+          print('macodirect_gate=PASS')
+          print('adotol_present=PASS')
+          print('dual_role_developers=PASS')
+          print('timing_equivalences_preserved=PASS')
+          PY
+      - name: Commit database and frozen MacoDirect snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- combined/src/main/assets/mdc_full.sqlite assistant/db/snapshots/macodirect-2026-09-28
+          git diff --cached --stat
+          git commit -m "Gate catalog to MacoDirect master snapshot [skip ci]" || exit 0
+          git push origin HEAD:feature-darkroom-db-macodirect-master-audit
