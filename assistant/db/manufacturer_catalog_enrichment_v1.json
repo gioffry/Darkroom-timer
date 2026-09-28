@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MACODIRECT_GATE_MANUFACTURER_TECHNICAL",
+  "checkedAt": "2026-09-28",
+  "records": [
+    {
+      "name": "ADOX ADOTOL Konstant II",
+      "manufacturer": "ADOX",
+      "paperDilutions": [
+        "1+0"
+      ],
+      "physicalState": "POWDER",
+      "stockPrep": true,
+      "productTypeIt": "Rivelatore carta",
+      "physicalStateIt": "Polvere",
+      "preparationIt": "Sciogliere l'intera confezione per ottenere direttamente la soluzione di lavoro da 1 L o 5 L. La soluzione ottenuta non va ulteriormente diluita.",
+      "shelfLifeUnopenedIt": "Usare la confezione in polvere entro 2 anni dall'acquisto.",
+      "sourceTitle": "ADOX ADOTOL Konstant",
+      "sourceUrl": "https://www.adox.de/chemistry/paper-developers/adotol-konstant/"
+    },
+    {
+      "name": "ADOX MCC Developer",
+      "manufacturer": "ADOX",
+      "paperDilutions": [
+        "1+4",
+        "1+6"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Rivelatore carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Per uso in bacinella: diluire da 1+4 a 1+6. Per macchine e rigenerazione: 1+4.",
+      "notesIt": "Sviluppatore Fine Art per carte multigrade; può essere rigenerato.",
+      "sourceTitle": "ADOX MCC Developer",
+      "sourceUrl": "https://www.adox.de/chemistry/paper-developers/mcc-developer/"
+    },
+    {
+      "name": "ADOX NEUTOL ECO",
+      "manufacturer": "ADOX",
+      "paperDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Rivelatore carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Diluizione standard 1+4; diluizione ad alta resa 1+9.",
+      "capacityIt": "1+4: circa 5 m²/L di soluzione di lavoro. 1+9: circa 4 m²/L.",
+      "shelfLifeOpenedIt": "Concentrato aperto: circa 6 mesi, ben chiuso nel contenitore originale.",
+      "shelfLifeWorkingIt": "Soluzione 1+4: circa 1 settimana. Soluzione 1+9: circa 1–2 giorni.",
+      "operationalLifeKind": "CONCENTRATO_APERTO",
+      "operationalLifeIt": "Circa 6 mesi",
+      "operationalLifeMonths": 6,
+      "operationalLifeConditionIt": "Conservato ben chiuso nel contenitore originale.",
+      "sourceTitle": "ADOX NEUTOL ECO technical information",
+      "sourceUrl": "https://www.adox.de/Technical_Informations/TA_NEUTOL_ECO_EN.pdf"
+    },
+    {
+      "name": "ADOX NEUTOL NE",
+      "manufacturer": "ADOX",
+      "paperDilutions": [
+        "1+7",
+        "1+11",
+        "1+15"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Rivelatore carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Diluizione professionale consigliata 1+7; per uso più economico/sporadico sono previste diluizioni più alte fino a 1+15. ADOX indica anche 1+11 come diluizione economica nelle istruzioni di processo.",
+      "sourceTitle": "ADOX NEUTOL Liquid NE",
+      "sourceUrl": "https://www.adox.de/chemistry/paper-developers/adotol-liquid-ne/"
+    },
+    {
+      "name": "ADOX NEUTOL WA",
+      "manufacturer": "ADOX",
+      "paperDilutions": [
+        "1+7",
+        "1+11",
+        "1+15"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Rivelatore carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Diluizione professionale consigliata 1+7; per uso più economico/sporadico sono previste diluizioni più alte fino a 1+15. ADOX indica anche 1+11 come diluizione economica nelle istruzioni di processo.",
+      "sourceTitle": "ADOX NEUTOL Liquid WA",
+      "sourceUrl": "https://www.adox.de/chemistry/paper-developers/adotol-liquid-wa-2/"
+    },
+    {
+      "name": "FOMATOL LQN",
+      "manufacturer": "FOMA",
+      "paperDilutions": [
+        "1+7",
+        "1+4"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Rivelatore carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Per lavorazione manuale diluire 1+7; per lavorazione automatica 1+4.",
+      "capacityIt": "A 1+7, 1 L di soluzione di lavoro sviluppa circa 1,5 m² di carta FB o 3 m² di carta RC.",
+      "sourceTitle": "FOMA FOMATOL LQN",
+      "sourceUrl": "https://www.foma.cz/en/paper"
+    },
+    {
+      "name": "FOMATOL P",
+      "manufacturer": "FOMA",
+      "paperDilutions": [
+        "1+0"
+      ],
+      "physicalState": "POWDER",
+      "stockPrep": true,
+      "productTypeIt": "Rivelatore carta",
+      "physicalStateIt": "Polvere a due componenti",
+      "preparationIt": "Sciogliere prima la busta grande e poi la piccola in 2 L di acqua a circa 40 °C; completare con acqua fino a 2,5 L. È una soluzione di lavoro pronta all'uso (1+0).",
+      "capacityIt": "Una confezione sviluppa circa 3,75 m² di carta FB o 7,5 m² di carta RC.",
+      "shelfLifeWorkingIt": "Soluzione di lavoro: circa 2 giorni nelle condizioni indicate dal produttore.",
+      "sourceTitle": "FOMA Developers for black-and-white photographic papers",
+      "sourceUrl": "https://www.foma.cz/en/paper"
+    },
+    {
+      "name": "FOMATOL PW",
+      "manufacturer": "FOMA",
+      "paperDilutions": [
+        "1+0",
+        "1+1",
+        "1+2"
+      ],
+      "physicalState": "POWDER",
+      "stockPrep": true,
+      "productTypeIt": "Rivelatore carta",
+      "physicalStateIt": "Polvere",
+      "preparationIt": "Sciogliere le due buste in 700 ml di acqua a circa 40 °C e completare a 1 L. Usare come soluzione di lavoro oppure diluire ulteriormente 1+1 o 1+2 per accentuare il tono caldo.",
+      "capacityIt": "Una confezione sviluppa circa 1,5 m² di Fomatone MG Classic o Retrobrom Sp.",
+      "sourceTitle": "FOMA Developers for black-and-white photographic papers",
+      "sourceUrl": "https://www.foma.cz/en/paper"
+    },
+    {
+      "name": "Foma Fomatol H positive developer",
+      "manufacturer": "FOMA",
+      "paperDilutions": [
+        "1+0"
+      ],
+      "physicalState": "POWDER",
+      "stockPrep": true,
+      "productTypeIt": "Rivelatore carta",
+      "physicalStateIt": "Polvere a due componenti",
+      "preparationIt": "Preparare 1 L di soluzione di lavoro dalla confezione completa; usare non diluita (1+0).",
+      "capacityIt": "Circa 1,5 m² di carta FB o 3 m² di carta RC per 1 L di soluzione di lavoro.",
+      "sourceTitle": "FOMA processing baths guide",
+      "sourceUrl": "https://www.foma.cz/en/catalogue_bw_photo_materials_and_developing_information"
+    },
+    {
+      "name": "FOMA Universal",
+      "manufacturer": "FOMA",
+      "paperDilutions": [
+        "1+0"
+      ],
+      "physicalState": "POWDER",
+      "stockPrep": true,
+      "productTypeIt": "Rivelatore universale pellicola + carta",
+      "physicalStateIt": "Polvere a due componenti",
+      "preparationIt": "Per 1 L, sciogliere le due buste in circa 800 ml di acqua calda (50–70 °C) e completare a 1 L. Per la carta usare la soluzione non diluita (1+0).",
+      "capacityIt": "1 L di soluzione sviluppa circa 1,5 m² di carta FB o 3 m² di carta RC.",
+      "sourceTitle": "FOMA Developers for black-and-white photographic papers",
+      "sourceUrl": "https://www.foma.cz/en/paper"
+    },
+    {
+      "name": "ILFORD MULTIGRADE Developer",
+      "manufacturer": "ILFORD",
+      "paperDilutions": [
+        "1+9",
+        "1+14"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Rivelatore carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Diluire 1+9 per l'uso normale oppure 1+14 per maggiore controllo/economia.",
+      "shelfLifeUnopenedIt": "Concentrato non aperto: circa 2 anni a 5–20 °C.",
+      "shelfLifeOpenedIt": "Concentrato aperto: usare entro circa 6 mesi, mantenendo il contenitore ben chiuso.",
+      "shelfLifeWorkingIt": "Soluzione di lavoro: non oltre una giornata in bacinella aperta; fino a 24 ore in bottiglia ben chiusa.",
+      "operationalLifeKind": "CONCENTRATO_APERTO",
+      "operationalLifeIt": "Circa 6 mesi",
+      "operationalLifeMonths": 6,
+      "operationalLifeConditionIt": "Concentrato conservato ben chiuso; 5–20 °C.",
+      "sourceTitle": "ILFORD B&W Paper Developers technical information",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1828/product/736/"
+    },
+    {
+      "name": "ILFORD PQ UNIVERSAL",
+      "manufacturer": "ILFORD",
+      "paperDilutions": [
+        "1+9"
+      ],
+      "filmDilutions": [
+        "1+9",
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Rivelatore universale carta + pellicola in lastra/tecnica",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Carta: 1+9. Pellicole tecniche e pellicole in lastra in bacinella: 1+9 o 1+19. Non raccomandato per pellicole 35 mm e 120 di uso generale.",
+      "shelfLifeUnopenedIt": "Concentrato non aperto: circa 2 anni a 5–20 °C.",
+      "shelfLifeOpenedIt": "Concentrato aperto: usare entro circa 6 mesi, mantenendo il contenitore ben chiuso.",
+      "shelfLifeWorkingIt": "Soluzione di lavoro: non oltre una giornata in bacinella aperta; fino a 24 ore in bottiglia ben chiusa.",
+      "operationalLifeKind": "CONCENTRATO_APERTO",
+      "operationalLifeIt": "Circa 6 mesi",
+      "operationalLifeMonths": 6,
+      "operationalLifeConditionIt": "Concentrato conservato ben chiuso; 5–20 °C.",
+      "sourceTitle": "ILFORD B&W Paper Developers technical information",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1828/product/736/"
+    },
+    {
+      "name": "Ilford Bromophen",
+      "manufacturer": "ILFORD",
+      "paperDilutions": [
+        "1+3"
+      ],
+      "physicalState": "POWDER",
+      "stockPrep": true,
+      "productTypeIt": "Rivelatore carta",
+      "physicalStateIt": "Polvere a due componenti",
+      "preparationIt": "Preparare l'intera soluzione stock sciogliendo prima la parte A e poi la parte B in acqua calda; completare al volume indicato. Per l'uso diluire lo stock 1+3.",
+      "shelfLifeUnopenedIt": "Polvere non aperta: conservata fresca e asciutta (5–20 °C), durata indicata come indefinita dal produttore.",
+      "shelfLifeStockIt": "Stock: fino a 6 mesi in contenitore pieno e chiuso; circa 3 mesi in contenitore mezzo pieno ben chiuso.",
+      "shelfLifeWorkingIt": "Soluzione 1+3: non oltre una giornata in bacinella aperta; fino a 24 ore in bottiglia ben chiusa.",
+      "operationalLifeKind": "STOCK_PREPARATO",
+      "operationalLifeIt": "Fino a 6 mesi",
+      "operationalLifeMonths": 6,
+      "operationalLifeConditionIt": "Soluzione stock in contenitore pieno e ben chiuso.",
+      "sourceTitle": "ILFORD B&W Paper Developers technical information",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1828/product/736/"
+    }
+  ]
+}
