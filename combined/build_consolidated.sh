@@ -187,6 +187,14 @@ python3 combined/patch_v079_volume_everywhere_focus.py | tee validation-v079-vol
 python3 combined/patch_v0710_volume_screenoff_fallback.py | tee validation-v0710-volume-screenoff-fallback-source.txt
 python3 combined/patch_v0711_print_session_fixes.py | tee validation-v0711-print-session-fixes-source.txt
 
+mkdir -p build-output/current/effective-v0711
+cp "$SOURCE_ROOT/main/java/it/darkroom/timer/MainActivity.java" build-output/current/effective-v0711/
+cp "$SOURCE_ROOT/main/java/it/darkroom/timer/JpegCardRenderer.java" build-output/current/effective-v0711/
+cp "$SOURCE_ROOT/main/java/it/darkroom/timer/TimingMath.java" build-output/current/effective-v0711/
+cp "$SOURCE_ROOT/main/java/it/darkroom/timer/LogStore.java" build-output/current/effective-v0711/
+cp "$SOURCE_ROOT/main/java/it/darkroom/timer/LogEntry.java" build-output/current/effective-v0711/
+cp "$SOURCE_ROOT/main/java/it/darkroom/timer/EnlargementActivity.java" build-output/current/effective-v0711/
+
 python3 - <<'PY' | tee validation-consolidated-v0711-source.txt
 from pathlib import Path
 import re
