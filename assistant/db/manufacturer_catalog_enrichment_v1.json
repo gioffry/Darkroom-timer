@@ -341,6 +341,271 @@
       "shelfLifeWorkingIt": "Soluzione di lavoro: circa una settimana in bottiglia riempita fino all'orlo.",
       "sourceTitle": "SPUR Dokuspeed SL-N data sheet",
       "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-Sheet-SPUR-Dokuspeed-SL-N.pdf"
+    },
+    {
+      "name": "Adox Adostop ECO stopbath with Indicator",
+      "manufacturer": "ADOX",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "paperDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Bagno di arresto universale pellicola + carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Diluire 1+19. L'indicatore vira da giallo verso verde/blu quando il bagno è esaurito.",
+      "capacityIt": "Capacità superiore a 3 m² di carta per litro di soluzione di lavoro.",
+      "shelfLifeUnopenedIt": "Concentrato: circa 24 mesi dalla produzione.",
+      "shelfLifeWorkingIt": "Soluzione di lavoro: circa 1–2 settimane.",
+      "sourceTitle": "ADOX ADOSTOP ECO",
+      "sourceUrl": "https://www.adox.de/adostop-eco-2/"
+    },
+    {
+      "name": "Adox Adostop ECO P stopbath with Indicator",
+      "manufacturer": "ADOX",
+      "filmDilutions": [
+        "1+0"
+      ],
+      "paperDilutions": [
+        "1+0"
+      ],
+      "physicalState": "POWDER",
+      "stockPrep": true,
+      "productTypeIt": "Bagno di arresto universale pellicola + carta",
+      "physicalStateIt": "Polvere",
+      "preparationIt": "Sciogliere la confezione per ottenere direttamente la soluzione di lavoro. Non diluire ulteriormente.",
+      "capacityIt": "Capacità superiore a 3 m² di carta per litro di soluzione di lavoro.",
+      "shelfLifeUnopenedIt": "Polvere: oltre 5 anni dalla produzione.",
+      "shelfLifeWorkingIt": "Soluzione di lavoro: circa 1–2 settimane.",
+      "sourceTitle": "ADOX ADOSTOP ECO",
+      "sourceUrl": "https://www.adox.de/adostop-eco-2/"
+    },
+    {
+      "name": "ADOX ADOFIX Plus",
+      "manufacturer": "ADOX",
+      "filmDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "paperDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Fissaggio universale pellicola + carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Diluire tra 1+4 e 1+9 in funzione del processo.",
+      "capacityIt": "A 1+9: circa 6–9 pellicole oppure 1,4–2 m² di carta per litro di soluzione di lavoro.",
+      "sourceTitle": "ADOX ADOFIX Plus",
+      "sourceUrl": "https://www.adox.de/chemistry/stopbath-and-fixer/adofix/"
+    },
+    {
+      "name": "ADOX ADOFIX P II",
+      "manufacturer": "ADOX",
+      "filmDilutions": [
+        "1+0"
+      ],
+      "paperDilutions": [
+        "1+0"
+      ],
+      "physicalState": "POWDER",
+      "stockPrep": true,
+      "productTypeIt": "Fissaggio universale pellicola + carta",
+      "physicalStateIt": "Polvere",
+      "preparationIt": "Sciogliere la confezione per ottenere direttamente la soluzione di lavoro. Non diluire ulteriormente.",
+      "shelfLifeWorkingIt": "Soluzione preparata: almeno 6 settimane.",
+      "sourceTitle": "ADOX ADOFIX P II Powder Fixer",
+      "sourceUrl": "https://www.adox.de/adofix-p-ii-powder-fixer/"
+    },
+    {
+      "name": "FOMACITRO",
+      "manufacturer": "FOMA",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "paperDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Bagno di arresto universale pellicola + carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Diluire 1+19.",
+      "sourceTitle": "FOMA FOMACITRO",
+      "sourceUrl": "https://www.foma.cz/en/catalogue-fomacitro-detail-407"
+    },
+    {
+      "name": "FOMAFIX",
+      "manufacturer": "FOMA",
+      "filmDilutions": [
+        "1+5"
+      ],
+      "paperDilutions": [
+        "1+5",
+        "1+4"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Fissaggio universale pellicola + carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Per lavorazione manuale diluire 1+5; per carta in macchina FOMA indica 1+4.",
+      "sourceTitle": "FOMA black-and-white processing guide",
+      "sourceUrl": "https://www.foma.cz/en/catalogue_bw_photo_materials_and_developing_information"
+    },
+    {
+      "name": "Fomafix P - U1",
+      "manufacturer": "FOMA",
+      "filmDilutions": [
+        "1+0"
+      ],
+      "paperDilutions": [
+        "1+0"
+      ],
+      "physicalState": "POWDER",
+      "stockPrep": true,
+      "productTypeIt": "Fissaggio universale pellicola + carta",
+      "physicalStateIt": "Polvere",
+      "preparationIt": "Sciogliere la confezione direttamente fino al volume di soluzione di lavoro indicato; non è richiesta una successiva diluizione.",
+      "sourceTitle": "FOMA FOMAFIX P",
+      "sourceUrl": "https://www.foma.cz/en/catalogue-fomafix-p-detail-288"
+    },
+    {
+      "name": "ILFORD ILFOSTOP",
+      "manufacturer": "ILFORD",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "paperDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Bagno di arresto universale pellicola + carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Diluire 1+19.",
+      "sourceTitle": "ILFORD processing recommendations",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1826/product/728/"
+    },
+    {
+      "name": "ILFORD Rapid Fixer",
+      "manufacturer": "ILFORD",
+      "filmDilutions": [
+        "1+4"
+      ],
+      "paperDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Fissaggio universale pellicola + carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Pellicola: 1+4. Carta: 1+4 o 1+9 secondo il processo.",
+      "sourceTitle": "ILFORD processing recommendations",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1826/product/728/"
+    },
+    {
+      "name": "ILFORD HYPAM Fixer",
+      "manufacturer": "ILFORD",
+      "filmDilutions": [
+        "1+4"
+      ],
+      "paperDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Fissaggio universale pellicola + carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Pellicola: 1+4. Carta: 1+4 o 1+9 secondo il processo.",
+      "sourceTitle": "ILFORD processing recommendations",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1826/product/728/"
+    },
+    {
+      "name": "ILFORD ILFOTOL",
+      "manufacturer": "ILFORD",
+      "filmDilutions": [
+        "1+200"
+      ],
+      "paperDilutions": [
+        "1+200"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Imbibente / agente di risciacquo",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Diluire circa 1+200 (5 ml per litro di acqua).",
+      "shelfLifeWorkingIt": "Soluzione di lavoro: circa 7 giorni.",
+      "sourceTitle": "ILFORD chemical sundries technical information",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1865/product/1566/"
+    },
+    {
+      "name": "Ilford Galerie Washaid",
+      "manufacturer": "ILFORD",
+      "filmDilutions": [
+        "1+4"
+      ],
+      "paperDilutions": [
+        "1+4"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Aiuto lavaggio",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Diluire 1+4.",
+      "sourceTitle": "ILFORD chemical sundries technical information",
+      "sourceUrl": "https://www.ilfordphoto.com/amfile/file/download/file/1865/product/1566/"
+    },
+    {
+      "name": "Ilford Simplicity Stop Bath",
+      "manufacturer": "ILFORD",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Bagno di arresto pellicola monodose",
+      "physicalStateIt": "Concentrato liquido monodose",
+      "preparationIt": "Versare l'intera bustina e completare con acqua a 600 ml; il contenuto è ILFOSTOP e corrisponde a 1+19.",
+      "sourceTitle": "ILFORD SIMPLICITY Stop Bath",
+      "sourceUrl": "https://www.ilfordphoto.com/catalog/product/view/_ignore_category/1/id/1566/s/simplicity-stop-bath/"
+    },
+    {
+      "name": "Ilford Simplicity Fixer",
+      "manufacturer": "ILFORD",
+      "filmDilutions": [
+        "1+5"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Fissaggio pellicola monodose",
+      "physicalStateIt": "Concentrato liquido monodose",
+      "preparationIt": "Versare l'intera bustina e completare con acqua a 600 ml; la diluizione è 1+5.",
+      "sourceTitle": "ILFORD SIMPLICITY Fixer",
+      "sourceUrl": "https://www.ilfordphoto.com/catalog/product/view/id/1567/s/simplicity-fixer/"
+    },
+    {
+      "name": "SPUR Ultrafix A",
+      "manufacturer": "SPUR",
+      "filmDilutions": [
+        "1+5",
+        "1+10"
+      ],
+      "paperDilutions": [
+        "1+5",
+        "1+10"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Fissaggio alcalino universale pellicola + carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Diluire tra 1+5 e 1+10 per pellicole e carte.",
+      "sourceTitle": "SPUR Ultrafix A data sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/data-sheet-spur-ultrafix-a.pdf"
     }
   ]
 }
