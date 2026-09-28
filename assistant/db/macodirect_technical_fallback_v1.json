@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "hierarchy": "MACODIRECT_GATE_TECHNICAL_RETAILER_FALLBACK",
+  "checkedAt": "2026-09-28",
+  "records": [
+    {
+      "name": "ADOX ADOTOL Konstant II",
+      "paperDilutions": [
+        "1+0"
+      ],
+      "physicalState": "POWDER",
+      "note": "MacoDirect lists powder concentrate / stock solution."
+    },
+    {
+      "name": "ADOX MCC Developer",
+      "paperDilutions": [
+        "1+4",
+        "1+6"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "ADOX NEUTOL ECO",
+      "paperDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "ADOX NEUTOL NE",
+      "paperDilutions": [
+        "1+7",
+        "1+15"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "ADOX NEUTOL WA",
+      "paperDilutions": [
+        "1+7",
+        "1+15"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Bellini DEK 76 film developer ready to use",
+      "filmDilutions": [
+        "1+0"
+      ],
+      "physicalState": "READY_TO_USE"
+    },
+    {
+      "name": "Bergger One Monobath Film Developer",
+      "filmDilutions": [
+        "1+0"
+      ],
+      "physicalState": "READY_TO_USE"
+    },
+    {
+      "name": "Compard Print NE",
+      "paperDilutions": [
+        "1+7",
+        "1+11"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Compard R09 Spezial",
+      "filmDilutions": [
+        "1+15"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Foma Fomatol H positive developer",
+      "paperDilutions": [
+        "1+0"
+      ],
+      "physicalState": "POWDER"
+    },
+    {
+      "name": "FOMATOL LQN",
+      "paperDilutions": [
+        "1+4",
+        "1+7"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "FOMATOL P",
+      "paperDilutions": [
+        "1+14"
+      ],
+      "physicalState": "POWDER",
+      "note": "Retailer metadata; manufacturer batch overrides this product."
+    },
+    {
+      "name": "FOMATOL PW",
+      "paperDilutions": [
+        "1+14"
+      ],
+      "physicalState": "POWDER",
+      "note": "Retailer metadata; manufacturer batch overrides this product."
+    },
+    {
+      "name": "Ilford 2000RT paper developer and replenisher",
+      "paperDilutions": [
+        "1+4"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "ILFORD PQ UNIVERSAL",
+      "paperDilutions": [
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "KODAK DEKTOL",
+      "paperDilutions": [
+        "1+2"
+      ],
+      "physicalState": "POWDER"
+    },
+    {
+      "name": "Kodak Polymax T developer",
+      "paperDilutions": [
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "LineAg+ DxONE B&W Monobath",
+      "filmDilutions": [
+        "1+0"
+      ],
+      "physicalState": "READY_TO_USE"
+    },
+    {
+      "name": "MACO ecoprint Universal",
+      "filmDilutions": [
+        "1+12"
+      ],
+      "paperDilutions": [
+        "1+7"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Moersch Easylith lith developer",
+      "paperDilutions": [
+        "1+15",
+        "1+30"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Moersch ECO 4812 paper developer",
+      "paperDilutions": [
+        "1+14"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Moersch SE 1 Sepia positive developer",
+      "paperDilutions": [
+        "1+7",
+        "1+15"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Moersch SE2 warm universal developer",
+      "paperDilutions": [
+        "1+19",
+        "1+25"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Moersch SE5 Lith Master Set",
+      "paperDilutions": [
+        "1+10",
+        "1+30"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Moersch Separol Soft Powder",
+      "paperDilutions": [
+        "1+5",
+        "1+9"
+      ],
+      "physicalState": "MIXED_CONCENTRATE"
+    },
+    {
+      "name": "ROLLEI Print Neutral eco",
+      "paperDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "ROLLEI RHC",
+      "filmDilutions": [
+        "1+7",
+        "1+4"
+      ],
+      "paperDilutions": [
+        "1+4"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "ROLLEI RPN Print Neutral",
+      "paperDilutions": [
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Spur Cool Black paper developer",
+      "paperDilutions": [
+        "1+9",
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    }
+  ]
+}
