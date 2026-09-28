@@ -280,21 +280,20 @@ if n != 1:
 
 # refreshSplitProvinoUi() now refreshes the seconds-pattern UI too.
 
-# Keep pattern UI synced when entering/leaving Split Grade.
-old = """        if (actionButton != null && mode == MODE_TEST && !armed) {
-            if (provinoFlow == PROVINO_SPLIT_SOFT) actionButton.setText("ARMA FASE 1 · MORBIDO · " + testCount + " STRISCE");
-            else if (provinoFlow == PROVINO_SPLIT_HARD) actionButton.setText("ARMA FASE 2 · BASE MORBIDA + DURO");
-        }
-        refreshTestBaseFilterUi();"""
-new = """        if (actionButton != null && mode == MODE_TEST && !armed) {
-            if (provinoFlow == PROVINO_SPLIT_SOFT) actionButton.setText("ARMA FASE 1 · MORBIDO · " + testCount + " STRISCE");
-            else if (provinoFlow == PROVINO_SPLIT_HARD) actionButton.setText("ARMA FASE 2 · BASE MORBIDA + DURO");
-        }
-        refreshTestSecondsPatternUi();
-        refreshTestBaseFilterUi();"""
-if old not in main:
-    raise SystemExit("v0.7.11: refreshSplitProvinoUi anchor not found")
-main = main.replace(old, new, 1)
+# Keep pattern UI synced when entering/leaving Split Grade, independent
+# of visual-system changes to the action dock.
+split_start = main.find("    private void refreshSplitProvinoUi()")
+split_end = main.find("    private String testStripMethodButtonLabel()", split_start)
+if split_start < 0 or split_end < 0:
+    raise SystemExit("v0.7.11: refreshSplitProvinoUi method bounds not found")
+split_body = main[split_start:split_end]
+if "refreshTestSecondsPatternUi();" not in split_body:
+    needle = "        refreshTestBaseFilterUi();"
+    pos = split_body.rfind(needle)
+    if pos < 0:
+        raise SystemExit("v0.7.11: refreshSplitProvinoUi final filter refresh not found")
+    split_body = split_body[:pos] + "        refreshTestSecondsPatternUi();\n" + split_body[pos:]
+    main = main[:split_start] + split_body + main[split_end:]
 
 # Adjust/set the common BASE independently from the added PASSO.
 old = """    private void setPrintTime(int ms) {"""
