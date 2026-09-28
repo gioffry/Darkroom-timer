@@ -222,6 +222,7 @@ ROLE_OVERRIDES={
     norm("Bellini DUO STEP film developer"): ROLE_FILM_DEV|ROLE_CHEMISTRY,
     norm("Bellini Ornano NUCLEOL BF200 film developer"): ROLE_FILM_DEV|ROLE_CHEMISTRY,
     norm("LineAg+ DxONE B&W Monobath"): ROLE_FILM_DEV|ROLE_CHEMISTRY,
+    norm("Bellini FX5 Fixer with Hardener (Solutions A+B)"): ROLE_FIX|ROLE_CHEMISTRY,
     norm("JOBO 9510 | JOBO Alpha Neutral Fixer & JOBO Alpha Black & White Film Developer"): ROLE_CHEMISTRY,
     norm("JOBO 9515 | JOBO B&W Developer Test Kit"): ROLE_CHEMISTRY,
     norm("ROLLEI WASHJET"): ROLE_WASHING|ROLE_CHEMISTRY,
