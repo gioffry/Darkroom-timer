@@ -281,6 +281,66 @@
       "notesIt": "Additivo specifico per SPUR SLD; non va presentato nell'app come rivelatore pellicola autonomo.",
       "sourceTitle": "SPUR Push-Master data sheet",
       "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-Sheet-SPUR-Push-Master-1.pdf"
+    },
+    {
+      "name": "Bergger BER49 powder developer",
+      "manufacturer": "BERGGER",
+      "filmDilutions": [
+        "stock",
+        "1+1"
+      ],
+      "physicalState": "POWDER",
+      "stockPrep": true,
+      "productTypeIt": "Rivelatore pellicola",
+      "physicalStateIt": "Polvere",
+      "preparationIt": "Preparare la soluzione stock sciogliendo la polvere secondo la scheda BERGGER. Usare stock oppure diluire la soluzione stock 1+1.",
+      "notesIt": "Rivelatore a grana molto fine e contrasto medio. Non viene collegato automaticamente ad altri rivelatori senza una equivalenza documentata.",
+      "sourceTitle": "BERGGER Ber49 Data sheet",
+      "sourceUrl": "https://bergger.com/en/index.php?controller=attachment&id_attachment=6"
+    },
+    {
+      "name": "Bergger One Monobath Film Developer",
+      "manufacturer": "BERGGER",
+      "filmDilutions": [
+        "1+0"
+      ],
+      "physicalState": "READY_TO_USE",
+      "stockPrep": false,
+      "productTypeIt": "Monobagno sviluppo + fissaggio per pellicola",
+      "physicalStateIt": "Soluzione pronta all'uso",
+      "preparationIt": "Usare senza diluizione. È un monobagno che sviluppa e fissa la pellicola nella stessa soluzione.",
+      "capacityIt": "1 L tratta fino a 20 pellicole; il produttore indica 10 min per le prime 10, 12 min per le pellicole 11–15 e 14 min per le 16–20.",
+      "sourceTitle": "BERGGER ONE - Monobath film developer",
+      "sourceUrl": "https://bergger.com/en/film-developer/bergger-one-revelateur-monobain-1l.html"
+    },
+    {
+      "name": "Bergger warmtone developer",
+      "manufacturer": "BERGGER",
+      "paperDilutions": [
+        "1+7",
+        "1+12"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Rivelatore carta",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Diluire da 1+7 a 1+12; la tonalità varia da calda a molto calda in funzione di diluizione, tempo e carta.",
+      "sourceTitle": "BERGGER WarmTone Print - Paper developer",
+      "sourceUrl": "https://bergger.com/en/paper-developer/bergger-warmtone-print-rvlateur-papier.html"
+    },
+    {
+      "name": "SPUR Dokuspeed SL-N",
+      "manufacturer": "SPUR",
+      "physicalState": "TWO_PART_LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Rivelatore pellicola a due componenti",
+      "physicalStateIt": "Concentrati liquidi A + B",
+      "preparationIt": "La soluzione di lavoro varia con formato e sensibilità: per 135, esempi SPUR sono 10 ml A + 5 ml B fino a 250 ml oppure 12 ml A + 6 ml B fino a 300 ml; per 120 sono previste combinazioni A/B specifiche indicate nella scheda tecnica.",
+      "capacityIt": "250–300 ml di soluzione di lavoro per una pellicola 135; 500–600 ml per due pellicole 135 o 120.",
+      "shelfLifeUnopenedIt": "Parte A non aperta: circa 3–4 anni; Parte B è indicata come conservabile indefinitamente.",
+      "shelfLifeWorkingIt": "Soluzione di lavoro: circa una settimana in bottiglia riempita fino all'orlo.",
+      "sourceTitle": "SPUR Dokuspeed SL-N data sheet",
+      "sourceUrl": "https://spur-photo.com/wp-content/uploads/Data-Sheet-SPUR-Dokuspeed-SL-N.pdf"
     }
   ]
 }
