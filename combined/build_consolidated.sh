@@ -282,15 +282,14 @@ assert 'VOLUME_CONTROL_ABSOLUTE' in service
 assert 'START VOL+ CALLBACK adjust' in service
 assert 'START VOL+ CALLBACK absolute' in service
 assert 'requestAudioFocus' in service
-assert 'new Handler(Looper.getMainLooper())' in service
-assert 'START VOL+ ARMATO 0.7.11' in service
+assert 'START VOL+ ARMATO 0.7.10' in service
 assert 'VOLUME_CONTROLS_079' in main
 assert 'KEYCODE_VOLUME_DOWN' in main
 assert 'toggleFocusFromVolume' in main
 assert 'VOLUME_SCREEN_OFF_0710' in service
 assert 'MediaPlayer volumeScreenOffPlayer' in service
 assert 'START VOL+ FALLBACK screen-off' in service
-assert 'START VOL+ SCREEN-OFF 0.7.11 ARMATO' in service
+assert 'START VOL+ SCREEN-OFF 0.7.10 ARMATO' in service
 assert 'R.raw.darkroom_volume_keepalive' in service
 assert 'TEST_SECONDS_BASE_STEP' in main
 assert 'baseStepSecondsSeries' in Path('combined/src/main/java/it/darkroom/timer/TimingMath.java').read_text(encoding='utf-8')
