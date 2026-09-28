@@ -10,6 +10,8 @@ on:
       - 'assistant/db/scrape_macodirect_master.py'
       - 'assistant/db/manufacturer_catalog_enrichment_v1.json'
       - 'assistant/db/apply_manufacturer_catalog_enrichment.py'
+      - 'assistant/db/macodirect_technical_fallback_v1.json'
+      - 'assistant/db/apply_macodirect_technical_fallback.py'
       - '.github/workflows/apply_macodirect_master_db.yml'
 
 permissions:
@@ -33,6 +35,8 @@ jobs:
         run: python3 assistant/db/build_macodirect_catalog_proposal.py
       - name: Apply proposal to SQLite only
         run: python3 assistant/db/apply_macodirect_master_catalog.py | tee macodirect-db-apply.txt
+      - name: Apply MacoDirect technical fallback
+        run: python3 assistant/db/apply_macodirect_technical_fallback.py | tee macodirect-technical-fallback.txt
       - name: Apply authoritative manufacturer technical batch
         run: python3 assistant/db/apply_manufacturer_catalog_enrichment.py | tee manufacturer-db-enrichment.txt
       - name: Validate database
@@ -45,13 +49,15 @@ jobs:
           assert db.execute("SELECT COUNT(*) FROM catalog_products").fetchone()[0] >= 200
           assert db.execute("SELECT COUNT(*) FROM catalog_products WHERE lower(name) LIKE '%adotol%'").fetchone()[0] == 1
           assert db.execute("SELECT paper_dilutions FROM catalog_products WHERE norm_name='adox adotol konstant ii'").fetchone()[0] == '1+0'
-          assert db.execute("SELECT COUNT(*) FROM catalog_technical_sources WHERE source_kind='MANUFACTURER'").fetchone()[0] >= 10
+          assert db.execute("SELECT COUNT(*) FROM catalog_technical_sources WHERE source_kind='TECHNICAL_RETAILER'").fetchone()[0] >= 25
+          assert db.execute("SELECT COUNT(*) FROM catalog_technical_sources WHERE source_kind='MANUFACTURER'").fetchone()[0] >= 15
           assert db.execute("SELECT COUNT(*) FROM catalog_products WHERE (roles & 1)<>0 AND (roles & 2)<>0").fetchone()[0] >= 4
           assert db.execute("SELECT COUNT(*) FROM developer_time_equivalents").fetchone()[0] == 39
           print('db_quick_check=PASS')
           print('macodirect_gate=PASS')
           print('adotol_present=PASS')
           print('adotol_technical=PASS')
+          print('retailer_technical_sources=PASS')
           print('manufacturer_technical_sources=PASS')
           print('dual_role_developers=PASS')
           print('timing_equivalences_preserved=PASS')
