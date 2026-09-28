@@ -228,6 +228,339 @@
         "1+19"
       ],
       "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "ADOX ADOFIX P II",
+      "filmDilutions": [
+        "1+0"
+      ],
+      "paperDilutions": [
+        "1+0"
+      ],
+      "physicalState": "POWDER"
+    },
+    {
+      "name": "ADOX ADOFIX Plus",
+      "filmDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "paperDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "ADOX ADOFLO II",
+      "filmDilutions": [
+        "1+200"
+      ],
+      "paperDilutions": [
+        "1+200"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Adox Adostop ECO P stopbath with Indicator",
+      "filmDilutions": [
+        "1+0"
+      ],
+      "paperDilutions": [
+        "1+0"
+      ],
+      "physicalState": "POWDER"
+    },
+    {
+      "name": "Adox Adostop ECO stopbath with Indicator",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "paperDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Bellini FX100 Universal Fixer",
+      "filmDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "paperDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Bellini Stop Bath odourless with index",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "paperDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Compard AG STAB image silver stabilizer",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "paperDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Compard Fix Ag fixer concentrate",
+      "filmDilutions": [
+        "1+4",
+        "1+5",
+        "1+7"
+      ],
+      "paperDilutions": [
+        "1+4",
+        "1+5",
+        "1+7"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "note": "MacoDirect property range only; product-specific film/paper recipe remains a separate technical-source concern."
+    },
+    {
+      "name": "Compard Fix Ag Plus fixer concentrate",
+      "filmDilutions": [
+        "1+5",
+        "1+9"
+      ],
+      "paperDilutions": [
+        "1+5",
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Compard Stop Bath",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "paperDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Compard WAC",
+      "filmDilutions": [
+        "1+200"
+      ],
+      "paperDilutions": [
+        "1+200"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "FOMACITRO",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "paperDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "FOMAFIX",
+      "filmDilutions": [
+        "1+5",
+        "1+4"
+      ],
+      "paperDilutions": [
+        "1+5",
+        "1+4"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Fomafix P - U1",
+      "filmDilutions": [
+        "1+0"
+      ],
+      "paperDilutions": [
+        "1+0"
+      ],
+      "physicalState": "POWDER"
+    },
+    {
+      "name": "FOTONAL",
+      "filmDilutions": [
+        "1+200"
+      ],
+      "paperDilutions": [
+        "1+200"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Fotospeed Rinse Aid",
+      "filmDilutions": [
+        "1+200"
+      ],
+      "paperDilutions": [
+        "1+200"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Ilford Galerie Washaid",
+      "filmDilutions": [
+        "1+4"
+      ],
+      "paperDilutions": [
+        "1+4"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "ILFORD HYPAM Fixer",
+      "filmDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "paperDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "ILFORD ILFOSTOP",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "paperDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "ILFORD ILFOTOL",
+      "filmDilutions": [
+        "1+200"
+      ],
+      "paperDilutions": [
+        "1+200"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "ILFORD Rapid Fixer",
+      "filmDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "paperDilutions": [
+        "1+4",
+        "1+9"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Ilford Simplicity Fixer",
+      "filmDilutions": [
+        "1+5"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Ilford Simplicity Stop Bath",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "JOBO 9512 | JOBO Alpha Neutral Fixer",
+      "filmDilutions": [
+        "1+0"
+      ],
+      "paperDilutions": [
+        "1+0"
+      ],
+      "physicalState": "POWDER",
+      "note": "Powder package produces working solution directly; retailer lists 3 x 2 L working solution."
+    },
+    {
+      "name": "Kodak indicator stop bath",
+      "filmDilutions": [
+        "1+63"
+      ],
+      "paperDilutions": [
+        "1+63"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Kodak T-MAX Fix",
+      "filmDilutions": [
+        "1+4"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "MACO eco citrostop",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "paperDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "MACO ecofix fixing bath",
+      "filmDilutions": [
+        "1+4",
+        "1+7"
+      ],
+      "paperDilutions": [
+        "1+4",
+        "1+7"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "Moersch Lobostab image stabilizer",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "paperDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "ROLLEI WASHJET",
+      "filmDilutions": [
+        "1+19"
+      ],
+      "paperDilutions": [
+        "1+19"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
+    },
+    {
+      "name": "SPUR Ultrafix A",
+      "filmDilutions": [
+        "1+5",
+        "1+10"
+      ],
+      "paperDilutions": [
+        "1+5",
+        "1+10"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE"
     }
   ]
 }
