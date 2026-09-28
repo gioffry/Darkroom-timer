@@ -146,7 +146,14 @@ main = replace_once(main, old_pattern_ui, new_pattern_ui, "direct base toggle UI
 
 pattern_start = "    private String testSecondsPatternButtonLabel()"
 pattern_end = "    private String testStripMethodButtonLabel()"
-pattern_methods = '''    private void refreshTestSecondsPatternUi() {
+pattern_methods = '''    private String currentTestStepLabel() {
+        if (isBaseStepSeconds()) {
+            return "BASE " + formatTime(testBaseMs) + " + PASSO " + formatTime(testWidthMs);
+        }
+        return TimingMath.stepLabel(timingMethod);
+    }
+
+    private void refreshTestSecondsPatternUi() {
         boolean secondsSingle = provinoFlow == PROVINO_SINGLE && !TimingMath.isFStop(timingMethod);
         if (testBaseToggle != null) {
             testBaseToggle.setVisibility(secondsSingle ? View.VISIBLE : View.GONE);
