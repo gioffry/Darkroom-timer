@@ -208,7 +208,10 @@ echo "v0713_sonoff_source_unchanged=PASS"
 echo "v0713_timing_math_source_unchanged=PASS"
 echo "v0713_enlargement_source_unchanged=PASS"
 
-python3 - <<'PY' | tee validation-consolidated-v0713-source.txt
+python3 assistant/db/test_specialist_link_matrix.py | tee validation-v0714-specialist-link-matrix.txt
+python3 combined/patch_v0714_specialist_film_lookup.py | tee validation-v0714-specialist-film-lookup-source.txt
+
+python3 - <<'PY' | tee validation-consolidated-v0714-source.txt
 from pathlib import Path
 import re
 import sqlite3
@@ -216,26 +219,26 @@ import sqlite3
 manifest = Path('combined/src/main/AndroidManifest.xml')
 text = manifest.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'android:versionCode="[^"]+"', 'android:versionCode="74"', text, count=1
+    r'android:versionCode="[^"]+"', 'android:versionCode="75"', text, count=1
 )
 text, name_count = re.subn(
-    r'android:versionName="[^"]+"', 'android:versionName="0.7.13"', text, count=1
+    r'android:versionName="[^"]+"', 'android:versionName="0.7.14"', text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.13 manifest version update failed')
+    raise SystemExit('v0.7.14 manifest version update failed')
 manifest.write_text(text, encoding='utf-8')
 
 gradle_file = Path('combined/build.gradle')
 text = gradle_file.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 74', text, count=1
+    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 75', text, count=1
 )
 text, name_count = re.subn(
     r'(?m)^\s*versionName\s+[\'\"][^\'\"]+[\'\"]\s*$',
-    "        versionName '0.7.13'", text, count=1
+    "        versionName '0.7.14'", text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.13 Gradle version update failed')
+    raise SystemExit('v0.7.14 Gradle version update failed')
 gradle_file.write_text(text, encoding='utf-8')
 
 db = sqlite3.connect('combined/src/main/assets/mdc_full.sqlite')
@@ -305,7 +308,7 @@ db.close()
 main = Path('combined/src/main/java/it/darkroom/timer/MainActivity.java').read_text(encoding='utf-8')
 service = Path('combined/src/main/java/it/darkroom/timer/SonoffArmService.java').read_text(encoding='utf-8')
 enlargement = Path('combined/src/main/java/it/darkroom/timer/EnlargementActivity.java').read_text(encoding='utf-8')
-assert 'APP_VERSION = "0.13.26"' in main
+assert 'APP_VERSION = "0.13.27"' in main
 assert 'SONOFF_COMMAND_ANCHOR_074' not in service
 assert 'SONOFF_LOCAL_INCHING_075' in service
 assert 'VOLUME_START_077' in service
@@ -540,6 +543,11 @@ assert 'try(Cursor c=d.rawQuery("SELECT name FROM developers",null))' not in ful
 assert 'try(Cursor c=d.rawQuery("SELECT name FROM films",null))' not in full_catalog
 assert 'if(catalogCanonical(name)!=null) return null;' in full_catalog
 
+mdc_store = Path('combined/src/main/java/it/darkroom/assistant/MdcOfflineStore.java').read_text(encoding='utf-8')
+assert 'String canonicalFilm = FullCatalogStore.canonicalFilm(wantedFilm);' in mdc_store
+assert 'String fn = norm(canonicalFilm == null ? wantedFilm : canonicalFilm);' in mdc_store
+assert 'String fn = norm(stripFormat(filmName));' not in mdc_store
+
 assert 'LARGE_FORMAT_VISUAL_066' in large_format
 assert 'VIOLET_FILL = Color.rgb(91, 70, 113)' in large_format
 assert 'VIOLET_ACTION = Color.rgb(113, 83, 143)' in large_format
@@ -568,9 +576,9 @@ assert 'Guida completa v0.2.8' not in maintenance
 assert 'La v0.2.9 aggiunge' not in maintenance
 assert maintenance.count('q.setOnClickListener') == 2
 
-print('release=Darkroom-v0.7.13')
-print('versionCode=74')
-print('timer_internal=0.13.26')
+print('release=Darkroom-v0.7.14')
+print('versionCode=75')
+print('timer_internal=0.13.27')
 print('historical_builds=ZERO')
 print('mdc_network_downloads=ZERO')
 print('gradle_assemblies_expected=ONE')
@@ -612,6 +620,11 @@ print('v0713_aliases=706')
 print('v0713_specialist_links=116')
 print('v0713_dual_role_developers=4')
 print('v0713_sonoff_vol_plus_minus_changes=ZERO')
+print('v0714_specialist_link_matrix=PASS')
+print('v0714_kentmere100_fomadon_excel_regression=PASS')
+print('v0714_sonoff_changes=ZERO')
+print('v0714_timing_math_changes=ZERO')
+print('v0714_enlargement_changes=ZERO')
 print('enlargement_calculation_changes=ZERO')
 print('darkroom_red_only=PASS')
 print('database_integrity=PASS')
@@ -637,29 +650,29 @@ print('maintenance_family=SLATE')
 print('maintenance_reference_changes=ZERO')
 PY
 
-rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.13.apk
+rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.14.apk
 gradle :combined:assembleRelease --stacktrace
-cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.13.apk
+cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.14.apk
 
 APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
 AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.13.apk > certificate-v0713.txt
-"$AAPT" dump badging Darkroom-v0.7.13.apk > apk-badging-v0713.txt
-grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v0713.txt
-grep -Fq "versionCode='74'" apk-badging-v0713.txt
-grep -Fq "versionName='0.7.13'" apk-badging-v0713.txt
-grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v0713.txt
-unzip -Z1 Darkroom-v0.7.13.apk > apk-listing-v0713.txt
-grep -q 'assets/mdc_full.sqlite' apk-listing-v0713.txt
+"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.14.apk > certificate-v0714.txt
+"$AAPT" dump badging Darkroom-v0.7.14.apk > apk-badging-v0714.txt
+grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v0714.txt
+grep -Fq "versionCode='75'" apk-badging-v0714.txt
+grep -Fq "versionName='0.7.14'" apk-badging-v0714.txt
+grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v0714.txt
+unzip -Z1 Darkroom-v0.7.14.apk > apk-listing-v0714.txt
+grep -q 'assets/mdc_full.sqlite' apk-listing-v0714.txt
 
 ELAPSED=$((SECONDS - START_SECONDS))
 {
   echo 'consolidated_build=PASS'
-  echo 'release=Darkroom-v0.7.13'
+  echo 'release=Darkroom-v0.7.14'
   echo 'historical_builds=ZERO'
   echo 'mdc_network_downloads=ZERO'
   echo 'gradle_assemblies=ONE'
   echo "elapsed_seconds=$ELAPSED"
-} | tee validation-consolidated-v0713.txt
+} | tee validation-consolidated-v0714.txt
 
-sha256sum Darkroom-v0.7.13.apk | tee Darkroom-v0.7.13.sha256
+sha256sum Darkroom-v0.7.14.apk | tee Darkroom-v0.7.14.sha256
