@@ -109,6 +109,7 @@ for r in proposal:
     pid=r["id"]; name=ws(r["name"]); nk=norm(name)
     old=existing.get(pid) or existing_by_norm.get(nk)
     roles=int(r["roles"])
+    exact_aliases=list(r.get("alias_list") or [])
     aliases=r.get("aliases","")
     if old:
         aliases=merge_pipe(old.get("aliases",""),aliases)
@@ -172,7 +173,7 @@ for r in proposal:
     """,cols)
 
     # Only actual names/listing titles are aliases. Specialist equivalents are links, not aliases.
-    alias_values=[name]+split_pipe(aliases)
+    alias_values=[name]+exact_aliases+split_pipe(aliases)
     seen=set()
     for a in alias_values:
         k=norm(a)
@@ -191,7 +192,8 @@ for r in proposal:
 # Map exact current Maco listings back to canonical products through proposal aliases.
 alias_to_pid={}
 for r in proposal:
-    for a in [r["name"]]+split_pipe(r.get("aliases","")):
+    exact=list(r.get("alias_list") or [])
+    for a in [r["name"]]+exact+split_pipe(r.get("aliases","")):
         alias_to_pid.setdefault(norm(a),r["id"])
 
 unmapped=[]
