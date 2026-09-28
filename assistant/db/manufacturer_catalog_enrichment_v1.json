@@ -126,13 +126,13 @@
       "paperDilutions": [
         "1+0",
         "1+1",
-        "1+2"
+        "1+3"
       ],
       "physicalState": "POWDER",
       "stockPrep": true,
       "productTypeIt": "Rivelatore carta",
       "physicalStateIt": "Polvere",
-      "preparationIt": "Sciogliere le due buste in 700 ml di acqua a circa 40 °C e completare a 1 L. Usare come soluzione di lavoro oppure diluire ulteriormente 1+1 o 1+2 per accentuare il tono caldo.",
+      "preparationIt": "Sciogliere le due buste in 700 ml di acqua a circa 40 °C e completare a 1 L. La soluzione può essere usata non diluita oppure ulteriormente diluita 1+1 o 1+3 per accentuare il tono caldo.",
       "capacityIt": "Una confezione sviluppa circa 1,5 m² di Fomatone MG Classic o Retrobrom Sp.",
       "sourceTitle": "FOMA Developers for black-and-white photographic papers",
       "sourceUrl": "https://www.foma.cz/en/paper"
@@ -155,6 +155,9 @@
     {
       "name": "FOMA Universal",
       "manufacturer": "FOMA",
+      "filmDilutions": [
+        "1+3"
+      ],
       "paperDilutions": [
         "1+0"
       ],
@@ -162,10 +165,10 @@
       "stockPrep": true,
       "productTypeIt": "Rivelatore universale pellicola + carta",
       "physicalStateIt": "Polvere a due componenti",
-      "preparationIt": "Per 1 L, sciogliere le due buste in circa 800 ml di acqua calda (50–70 °C) e completare a 1 L. Per la carta usare la soluzione non diluita (1+0).",
+      "preparationIt": "Per 1 L, sciogliere le due buste in circa 800 ml di acqua calda (50–70 °C) e completare a 1 L. Pellicola: diluire 1+3. Carta: usare la soluzione non diluita (1+0).",
       "capacityIt": "1 L di soluzione sviluppa circa 1,5 m² di carta FB o 3 m² di carta RC.",
-      "sourceTitle": "FOMA Developers for black-and-white photographic papers",
-      "sourceUrl": "https://www.foma.cz/en/paper"
+      "sourceTitle": "FOMA Universal",
+      "sourceUrl": "https://www.foma.cz/en/catalogue-foma-universal-detail-1109"
     },
     {
       "name": "ILFORD MULTIGRADE Developer",
@@ -606,6 +609,23 @@
       "preparationIt": "Diluire tra 1+5 e 1+10 per pellicole e carte.",
       "sourceTitle": "SPUR Ultrafix A data sheet",
       "sourceUrl": "https://spur-photo.com/wp-content/uploads/data-sheet-spur-ultrafix-a.pdf"
+    },
+    {
+      "name": "FOTONAL",
+      "manufacturer": "FOMA",
+      "filmDilutions": [
+        "1+200"
+      ],
+      "paperDilutions": [
+        "1+200"
+      ],
+      "physicalState": "LIQUID_CONCENTRATE",
+      "stockPrep": false,
+      "productTypeIt": "Imbibente / agente di risciacquo",
+      "physicalStateIt": "Concentrato liquido",
+      "preparationIt": "Aggiungere 5 ml di concentrato a 1 L d'acqua (circa 1+200). Per alcune pellicole ortocromatiche FOMA indica 10–20 ml/L.",
+      "sourceTitle": "FOMA FOTONAL",
+      "sourceUrl": "https://www.foma.cz/en/catalogue-fotonal-detail-293"
     }
   ]
 }
