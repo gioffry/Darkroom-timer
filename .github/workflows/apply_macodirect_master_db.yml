@@ -6,6 +6,8 @@ on:
       - feature-darkroom-db-macodirect-master-audit
     paths:
       - 'assistant/db/apply_macodirect_master_catalog.py'
+      - 'assistant/db/build_macodirect_catalog_proposal.py'
+      - 'assistant/db/scrape_macodirect_master.py'
       - '.github/workflows/apply_macodirect_master_db.yml'
 
 permissions:
