@@ -3,6 +3,7 @@ from pathlib import Path
 import json,re,time,unicodedata
 import requests
 from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 SNAP=Path("assistant/db/snapshots/macodirect-2026-09-28/catalog_proposal.json")
 OUT=Path("build-output/macodirect-technical")
@@ -51,34 +52,40 @@ def get_props(html):
             if desc: break
     return props,desc
 
-# First technical pass: every paper developer plus film developers that have
-# no audited specialist/MDC link. Linked film developers already inherit their
-# technical/dilution data from the specialist tables.
+# Crawl every processing chemical that can appear in a functional bath selector.
+# Pure film stocks and generic kits/accessories are intentionally excluded here.
 targets=[r for r in rows if r.get("kind")=="chemical" and r.get("source_url")
-         and ((int(r.get("roles",0)) & 2) != 0
-              or ((int(r.get("roles",0)) & 1) != 0 and not r.get("specialist_name")))]
-out=[]
-for i,r in enumerate(targets,1):
+         and (int(r.get("roles",0)) & (1|2|4|8|16|32)) != 0]
+
+def fetch_one(r):
     url=r["source_url"]
+    local=requests.Session()
+    local.headers.update({"User-Agent":"Mozilla/5.0 DarkroomCatalogAudit/1.0"})
     try:
-        resp=session.get(url,timeout=10)
+        resp=local.get(url,timeout=10)
         status=resp.status_code
         props,desc=get_props(resp.text) if status==200 else ({}, "")
+        err=""
     except Exception as e:
         status=0; props={}; desc=""; err=type(e).__name__+":"+str(e)
-    else:
-        err=""
-    rec={
+    return {
       "id":r["id"],"name":r["name"],"roles":r["roles"],"url":url,
       "status":status,"properties":props,"description":desc,"error":err
     }
-    out.append(rec)
-    keys={normkey(k):v for k,v in props.items()}
-    dilution=next((v for k,v in keys.items() if "dilution" in k or "verdunnung" in k), "")
-    state=next((v for k,v in keys.items() if k in ("type","verarbeitungszustand","processing state")), "")
-    if dilution or state:
-        print(f"{i:03d}/{len(targets)} {r['name']} | state={state} | dilution={dilution}")
-    time.sleep(0.03)
+
+out=[]
+with ThreadPoolExecutor(max_workers=12) as ex:
+    futures={ex.submit(fetch_one,r):r for r in targets}
+    done=0
+    for fut in as_completed(futures):
+        rec=fut.result(); out.append(rec); done+=1
+        props=rec["properties"]
+        keys={normkey(k):v for k,v in props.items()}
+        dilution=next((v for k,v in keys.items() if "dilution" in k or "verdunnung" in k), "")
+        state=next((v for k,v in keys.items() if k in ("type","verarbeitungszustand","processing state")), "")
+        if dilution or state:
+            print(f"{done:03d}/{len(targets)} {rec['name']} | state={state} | dilution={dilution}")
+out.sort(key=lambda x:x["name"].lower())
 
 (OUT/"macodirect_technical.json").write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding="utf-8")
 summary={
