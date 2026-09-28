@@ -66,6 +66,8 @@ jobs:
           print('dual_role_developers=PASS')
           print('timing_equivalences_preserved=PASS')
           PY
+      - name: Audit final gated database
+        run: python3 assistant/db/audit_macodirect_gated_db.py | tee macodirect-final-db-audit.txt
       - name: Commit database and frozen MacoDirect snapshot
         run: |
           git config user.name "github-actions[bot]"
