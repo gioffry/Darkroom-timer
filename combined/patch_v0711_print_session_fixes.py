@@ -278,16 +278,7 @@ if n != 1:
     snippet = main[max(0, idx - 300):idx + 500] if idx >= 0 else "adjustTestTime(+1) not present"
     raise SystemExit("v0.7.11: base-time row insertion anchor not found after prior patches:\n" + snippet)
 
-old = """        outer.addView(note, lp(-1, -2));
-        refreshSplitProvinoUi();
-        return outer;"""
-new = """        outer.addView(note, lp(-1, -2));
-        refreshTestSecondsPatternUi();
-        refreshSplitProvinoUi();
-        return outer;"""
-if old not in main:
-    raise SystemExit("v0.7.11: buildTestPanel final anchor not found")
-main = main.replace(old, new, 1)
+# refreshSplitProvinoUi() now refreshes the seconds-pattern UI too.
 
 # Keep pattern UI synced when entering/leaving Split Grade.
 old = """        if (actionButton != null && mode == MODE_TEST && !armed) {
