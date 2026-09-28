@@ -228,6 +228,11 @@ ROLE_OVERRIDES={
     norm("Ilford Galerie Washaid"): ROLE_WASHING|ROLE_CHEMISTRY,
     norm("Kodak Hypo Clearing Agent"): ROLE_WASHING|ROLE_CHEMISTRY,
     norm("Fotospeed Wash Aid"): ROLE_WASHING|ROLE_CHEMISTRY,
+    # Manufacturer semantics override retailer-category placement:
+    # Push-Master is an additive to SPUR SLD, not a standalone developer.
+    norm("Spur Push-Master"): ROLE_CHEMISTRY,
+    # Moersch SE1 is a positive/paper developer, not a film developer.
+    norm("Moersch SE 1 Sepia positive developer"): ROLE_PAPER_DEV|ROLE_CHEMISTRY,
 }
 def roles_for(name,cats,processable=True):
     if "bw_film" in cats:
