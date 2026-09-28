@@ -1,0 +1,24 @@
+name: Crawl MacoDirect master catalog
+
+on:
+  push:
+    branches:
+      - feature-darkroom-db-macodirect-master-audit
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install crawler dependencies
+        run: pip install requests beautifulsoup4
+      - name: Crawl MacoDirect and compare with current database
+        run: python3 assistant/db/scrape_macodirect_master.py
+      - name: Upload MacoDirect audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: macodirect-master-audit
+          path: build-output/macodirect-master/
