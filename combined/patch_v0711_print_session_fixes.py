@@ -569,22 +569,18 @@ if old not in service:
 service = service.replace(old, focus_fields + old, 1)
 
 # Add screen-off focus actions before the normal ARM branch and tear bridge down on ARM.
-old = """        String action = intent.getAction();
-        if (ACTION_ARM_PRINT.equals(action) || ACTION_ARM_TEST.equals(action)) {
-            interlockActive = false;"""
-new = """        String action = intent.getAction();
-        if (ACTION_ENABLE_SCREEN_OFF_FOCUS.equals(action)) {
+arm_line = "        if (ACTION_ARM_PRINT.equals(action) || ACTION_ARM_TEST.equals(action)) {"
+if arm_line not in service:
+    raise SystemExit("v0.7.11: service ARM action line not found")
+arm_chain = """        if (ACTION_ENABLE_SCREEN_OFF_FOCUS.equals(action)) {
             enableScreenOffFocusKeys();
             return START_NOT_STICKY;
         } else if (ACTION_DISABLE_SCREEN_OFF_FOCUS.equals(action)) {
             disableScreenOffFocusKeys(true);
             return START_NOT_STICKY;
         } else if (ACTION_ARM_PRINT.equals(action) || ACTION_ARM_TEST.equals(action)) {
-            disableScreenOffFocusKeys(false);
-            interlockActive = false;"""
-if old not in service:
-    raise SystemExit("v0.7.11: service onStart action anchor not found")
-service = service.replace(old, new, 1)
+            disableScreenOffFocusKeys(false);"""
+service = service.replace(arm_line, arm_chain, 1)
 
 old = """            timingMethod = TimingMath.normalizeMethod(intent.getStringExtra(EXTRA_TIMING_METHOD));
             testStripMethod = TimingMath.normalizeMaskingMethod(intent.getStringExtra(EXTRA_TEST_MASKING_METHOD));
