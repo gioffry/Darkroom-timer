@@ -388,7 +388,7 @@ verification_methods = quick_save_anchor + '''    private boolean enlargementNee
         String summary = enlargementLogSummary(meta);
         showAppChoiceDialog("INGRANDIMENTO DA VERIFICARE",
                 new String[]{
-                        "CONFERMA DATI ATTUALI\n" + summary,
+                        "CONFERMA DATI ATTUALI\\n" + summary,
                         "MODIFICA INGRANDIMENTO"
                 },
                 which -> {
