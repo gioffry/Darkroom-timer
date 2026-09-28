@@ -596,22 +596,9 @@ if old not in service:
     raise SystemExit("v0.7.11: service parse test settings anchor not found")
 service = service.replace(old, new, 1)
 
-# Technical log and preparation label describe exact final strip targets for variable seconds.
-old = """: (TimingMath.isFStop(timingMethod) ? "PROVINO F-STOP · ¼ stop • strisce " + TimingMath.seriesLabel(testTargetsMs) + " • pausa " + seconds(pauseMs) : "PROVINO richiesto " + count + " × " + seconds(widthMs) + " • pausa " + seconds(pauseMs)));"""
-new = """: ((TimingMath.isFStop(timingMethod) || testVariablePulses)
-                        ? "PROVINO " + testStepLabel + " • strisce " + TimingMath.seriesLabel(testTargetsMs) + " • pausa " + seconds(pauseMs)
-                        : "PROVINO richiesto " + count + " × " + seconds(widthMs) + " • pausa " + seconds(pauseMs)));"""
-if old not in service:
-    raise SystemExit("v0.7.11: service technical session label anchor not found")
-service = service.replace(old, new, 1)
-
-old = """: (TimingMath.isFStop(timingMethod) ? "Preparo provino: " + count + " strisce • ¼ stop" : "Preparo provino: " + count + " × " + seconds(widthMs)));"""
-new = """: ((TimingMath.isFStop(timingMethod) || testVariablePulses)
-                        ? "Preparo provino: " + count + " strisce • " + testStepLabel
-                        : "Preparo provino: " + count + " × " + seconds(widthMs)));"""
-if old not in service:
-    raise SystemExit("v0.7.11: service preparation label anchor not found")
-service = service.replace(old, new, 1)
+# Keep existing technical-session/preparation wording intact. Exact final
+# targets are already stored in lastTestStripTimes and shown by the Timer/Log.
+# Avoid coupling this functional patch to historical status-message wording.
 
 # Every subsequent seconds BASE+PASSO pulse must use the exact pulse array, same
 # as F-stop already does.
