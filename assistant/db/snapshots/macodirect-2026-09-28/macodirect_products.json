@@ -17475,7 +17475,7 @@
         "id": "chem-moersch-se-1-sepia-positive-developer",
         "name": "Moersch SE 1 Sepia positive developer",
         "term": "Moersch SE 1 Sepia positive developer 1l",
-        "roles": 65
+        "roles": 66
       },
       {
         "score": 1000,
@@ -17483,7 +17483,7 @@
         "id": "chem-moersch-se-1-sepia-positive-developer",
         "name": "Moersch SE 1 Sepia positive developer",
         "term": "Moersch SE 1 Sepia positive developer 1l",
-        "roles": 65
+        "roles": 66
       },
       {
         "score": 854,
@@ -17491,7 +17491,7 @@
         "id": "chem-moersch-se-1-sepia-positive-developer",
         "name": "Moersch SE 1 Sepia positive developer",
         "term": "Moersch SE 1 Sepia positive developer",
-        "roles": 65
+        "roles": 66
       },
       {
         "score": 854,
@@ -17499,7 +17499,7 @@
         "id": "chem-moersch-se-1-sepia-positive-developer",
         "name": "Moersch SE 1 Sepia positive developer",
         "term": "Moersch SE 1 Sepia positive developer",
-        "roles": 65
+        "roles": 66
       },
       {
         "score": 854,
@@ -17507,7 +17507,7 @@
         "id": "chem-moersch-se-1-sepia-positive-developer",
         "name": "Moersch SE 1 Sepia positive developer",
         "term": "Moersch SE 1 Sepia positive developer",
-        "roles": 65
+        "roles": 66
       }
     ],
     "best_score": 1000,
@@ -18345,7 +18345,7 @@
         "id": "chem-spur-push-master",
         "name": "Spur Push-Master",
         "term": "Spur Push-Master 500ml",
-        "roles": 65
+        "roles": 64
       },
       {
         "score": 1000,
@@ -18353,7 +18353,7 @@
         "id": "chem-spur-push-master",
         "name": "Spur Push-Master",
         "term": "Spur Push-Master 500ml",
-        "roles": 65
+        "roles": 64
       },
       {
         "score": 845,
@@ -18361,7 +18361,7 @@
         "id": "chem-spur-push-master",
         "name": "Spur Push-Master",
         "term": "Spur Push-Master",
-        "roles": 65
+        "roles": 64
       },
       {
         "score": 845,
@@ -18369,7 +18369,7 @@
         "id": "chem-spur-push-master",
         "name": "Spur Push-Master",
         "term": "Spur Push-Master",
-        "roles": 65
+        "roles": 64
       },
       {
         "score": 845,
@@ -18377,7 +18377,7 @@
         "id": "chem-spur-push-master",
         "name": "Spur Push-Master",
         "term": "Spur Push-Master",
-        "roles": 65
+        "roles": 64
       }
     ],
     "best_score": 1000,
@@ -27045,7 +27045,7 @@
         "id": "chem-bellini-fx5-fixer-with-hardener-solutions-a-b",
         "name": "Bellini FX5 Fixer with Hardener (Solutions A+B)",
         "term": "Bellini FX5 Fixer with Hardener (Solutions A+B)",
-        "roles": 64
+        "roles": 72
       },
       {
         "score": 1000,
@@ -27053,7 +27053,7 @@
         "id": "chem-bellini-fx5-fixer-with-hardener-solutions-a-b",
         "name": "Bellini FX5 Fixer with Hardener (Solutions A+B)",
         "term": "Bellini FX5 Fixer with Hardener (Solutions A+B)",
-        "roles": 64
+        "roles": 72
       },
       {
         "score": 1000,
@@ -27061,7 +27061,7 @@
         "id": "chem-bellini-fx5-fixer-with-hardener-solutions-a-b",
         "name": "Bellini FX5 Fixer with Hardener (Solutions A+B)",
         "term": "Bellini FX5 Fixer with Hardener (Solutions A+B)",
-        "roles": 64
+        "roles": 72
       },
       {
         "score": 755,
