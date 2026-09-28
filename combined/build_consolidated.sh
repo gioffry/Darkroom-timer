@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Consolidated Darkroom v0.7.10 build.
+# Consolidated Darkroom v0.7.11 build.
 # Starts from the committed verified v0.5.8 source checkpoint, applies the tested
 # v0.5.9 contact-sheet functionality, the v0.6.0 layout/preset refinement and
 # the reproducible v0.6.1 graphic-system checkpoint and the phone-verified
@@ -185,8 +185,9 @@ python3 combined/patch_v077_volume_start_samsung.py | tee validation-v077-volume
 python3 combined/patch_v078_volume_handler.py | tee validation-v078-volume-handler-source.txt
 python3 combined/patch_v079_volume_everywhere_focus.py | tee validation-v079-volume-everywhere-focus-source.txt
 python3 combined/patch_v0710_volume_screenoff_fallback.py | tee validation-v0710-volume-screenoff-fallback-source.txt
+python3 combined/patch_v0711_print_session_fixes.py | tee validation-v0711-print-session-fixes-source.txt
 
-python3 - <<'PY' | tee validation-consolidated-v0710-source.txt
+python3 - <<'PY' | tee validation-consolidated-v0711-source.txt
 from pathlib import Path
 import re
 import sqlite3
@@ -194,26 +195,26 @@ import sqlite3
 manifest = Path('combined/src/main/AndroidManifest.xml')
 text = manifest.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'android:versionCode="[^"]+"', 'android:versionCode="71"', text, count=1
+    r'android:versionCode="[^"]+"', 'android:versionCode="72"', text, count=1
 )
 text, name_count = re.subn(
-    r'android:versionName="[^"]+"', 'android:versionName="0.7.10"', text, count=1
+    r'android:versionName="[^"]+"', 'android:versionName="0.7.11"', text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.10 manifest version update failed')
+    raise SystemExit('v0.7.11 manifest version update failed')
 manifest.write_text(text, encoding='utf-8')
 
 gradle_file = Path('combined/build.gradle')
 text = gradle_file.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 71', text, count=1
+    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 72', text, count=1
 )
 text, name_count = re.subn(
     r'(?m)^\s*versionName\s+[\'\"][^\'\"]+[\'\"]\s*$',
-    "        versionName '0.7.10'", text, count=1
+    "        versionName '0.7.11'", text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.10 Gradle version update failed')
+    raise SystemExit('v0.7.11 Gradle version update failed')
 gradle_file.write_text(text, encoding='utf-8')
 
 db = sqlite3.connect('combined/src/main/assets/mdc_full.sqlite')
@@ -273,7 +274,7 @@ db.close()
 main = Path('combined/src/main/java/it/darkroom/timer/MainActivity.java').read_text(encoding='utf-8')
 service = Path('combined/src/main/java/it/darkroom/timer/SonoffArmService.java').read_text(encoding='utf-8')
 enlargement = Path('combined/src/main/java/it/darkroom/timer/EnlargementActivity.java').read_text(encoding='utf-8')
-assert 'APP_VERSION = "0.13.23"' in main
+assert 'APP_VERSION = "0.13.24"' in main
 assert 'SONOFF_COMMAND_ANCHOR_074' not in service
 assert 'SONOFF_LOCAL_INCHING_075' in service
 assert 'VOLUME_START_077' in service
@@ -282,15 +283,22 @@ assert 'START VOL+ CALLBACK adjust' in service
 assert 'START VOL+ CALLBACK absolute' in service
 assert 'requestAudioFocus' in service
 assert 'new Handler(Looper.getMainLooper())' in service
-assert 'START VOL+ ARMATO 0.7.10' in service
+assert 'START VOL+ ARMATO 0.7.11' in service
 assert 'VOLUME_CONTROLS_079' in main
 assert 'KEYCODE_VOLUME_DOWN' in main
 assert 'toggleFocusFromVolume' in main
 assert 'VOLUME_SCREEN_OFF_0710' in service
 assert 'MediaPlayer volumeScreenOffPlayer' in service
 assert 'START VOL+ FALLBACK screen-off' in service
-assert 'START VOL+ SCREEN-OFF 0.7.10 ARMATO' in service
+assert 'START VOL+ SCREEN-OFF 0.7.11 ARMATO' in service
 assert 'R.raw.darkroom_volume_keepalive' in service
+assert 'TEST_SECONDS_BASE_STEP' in main
+assert 'baseStepSecondsSeries' in Path('combined/src/main/java/it/darkroom/timer/TimingMath.java').read_text(encoding='utf-8')
+assert 'EXTRA_TEST_VARIABLE_PULSES' in main and 'testVariablePulses' in service
+assert 'ACTION_ENABLE_SCREEN_OFF_FOCUS' in service
+assert 'FOCUS VOL- SCREEN-OFF 0.7.11 ARMATO' in service
+assert 'FILTRO DENSITÀ LPL' in main
+assert 'Filtro densità' in Path('combined/src/main/java/it/darkroom/timer/JpegCardRenderer.java').read_text(encoding='utf-8')
 assert Path('combined/src/main/res/raw/darkroom_volume_keepalive.wav').stat().st_size >= 4000
 assert 'START VOL+ ARMATO' in service
 assert 'COMANDO switch=on accettato da START VOL+' in service
@@ -502,9 +510,9 @@ assert 'Guida completa v0.2.8' not in maintenance
 assert 'La v0.2.9 aggiunge' not in maintenance
 assert maintenance.count('q.setOnClickListener') == 2
 
-print('release=Darkroom-v0.7.10')
-print('versionCode=71')
-print('timer_internal=0.13.23')
+print('release=Darkroom-v0.7.11')
+print('versionCode=72')
+print('timer_internal=0.13.24')
 print('historical_builds=ZERO')
 print('mdc_network_downloads=ZERO')
 print('gradle_assemblies_expected=ONE')
@@ -531,7 +539,7 @@ print('enlargement_header=COMPACT')
 print('settings_groups=COLOUR_CODED')
 print('masking_method_selection=VISIBLE')
 print('log_primary_action=VISIBLE')
-print('timer_process_changes=VOL_PLUS_EVERYWHERE_PLUS_VOL_MINUS_FOCUS_PLUS_SCREEN_OFF_FALLBACK')
+print('timer_process_changes=VOL_PLUS_SCREEN_OFF_PLUS_VOL_MINUS_SCREEN_OFF_FOCUS_PLUS_BASE_STEP_TEST')
 print('enlargement_calculation_changes=ZERO')
 print('darkroom_red_only=PASS')
 print('database_integrity=PASS')
@@ -557,29 +565,29 @@ print('maintenance_family=SLATE')
 print('maintenance_reference_changes=ZERO')
 PY
 
-rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.10.apk
+rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.11.apk
 gradle :combined:assembleRelease --stacktrace
-cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.10.apk
+cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.11.apk
 
 APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
 AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.10.apk > certificate-v0710.txt
-"$AAPT" dump badging Darkroom-v0.7.10.apk > apk-badging-v0710.txt
-grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v0710.txt
-grep -Fq "versionCode='71'" apk-badging-v0710.txt
-grep -Fq "versionName='0.7.10'" apk-badging-v0710.txt
-grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v0710.txt
-unzip -Z1 Darkroom-v0.7.10.apk > apk-listing-v0710.txt
-grep -q 'assets/mdc_full.sqlite' apk-listing-v0710.txt
+"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.11.apk > certificate-v0711.txt
+"$AAPT" dump badging Darkroom-v0.7.11.apk > apk-badging-v0711.txt
+grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v0711.txt
+grep -Fq "versionCode='72'" apk-badging-v0711.txt
+grep -Fq "versionName='0.7.11'" apk-badging-v0711.txt
+grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v0711.txt
+unzip -Z1 Darkroom-v0.7.11.apk > apk-listing-v0711.txt
+grep -q 'assets/mdc_full.sqlite' apk-listing-v0711.txt
 
 ELAPSED=$((SECONDS - START_SECONDS))
 {
   echo 'consolidated_build=PASS'
-  echo 'release=Darkroom-v0.7.10'
+  echo 'release=Darkroom-v0.7.11'
   echo 'historical_builds=ZERO'
   echo 'mdc_network_downloads=ZERO'
   echo 'gradle_assemblies=ONE'
   echo "elapsed_seconds=$ELAPSED"
-} | tee validation-consolidated-v0710.txt
+} | tee validation-consolidated-v0711.txt
 
-sha256sum Darkroom-v0.7.10.apk | tee Darkroom-v0.7.10.sha256
+sha256sum Darkroom-v0.7.11.apk | tee Darkroom-v0.7.11.sha256
