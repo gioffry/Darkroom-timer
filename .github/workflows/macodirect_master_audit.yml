@@ -1,4 +1,4 @@
-name: Crawl MacoDirect master catalog
+name: Crawl MacoDirect master catalog v2
 
 on:
   push:
