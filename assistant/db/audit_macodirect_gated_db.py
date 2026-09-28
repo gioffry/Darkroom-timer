@@ -62,7 +62,27 @@ report["technical_gaps"]={
      WHERE (p.roles&128)<>0 AND COALESCE(p.nominal_iso,0)<=0 ORDER BY p.name"""),
   "films_no_format": q("""SELECT p.name,p.nominal_iso,l.specialist_name FROM catalog_products p
      LEFT JOIN catalog_specialist_links l ON l.product_id=p.id AND l.specialist_kind='film'
-     WHERE (p.roles&128)<>0 AND trim(COALESCE(p.formats,''))='' ORDER BY p.name""")
+     WHERE (p.roles&128)<>0 AND trim(COALESCE(p.formats,''))='' ORDER BY p.name"""),
+  "stop_no_dilution": q("""SELECT p.name,p.film_dilutions,p.paper_dilutions,p.working_dilution
+     FROM catalog_products p WHERE (p.roles&4)<>0
+       AND trim(COALESCE(p.film_dilutions,''))=''
+       AND trim(COALESCE(p.paper_dilutions,''))=''
+       AND trim(COALESCE(p.working_dilution,''))='' ORDER BY p.name"""),
+  "fix_no_dilution": q("""SELECT p.name,p.film_dilutions,p.paper_dilutions,p.working_dilution
+     FROM catalog_products p WHERE (p.roles&8)<>0
+       AND trim(COALESCE(p.film_dilutions,''))=''
+       AND trim(COALESCE(p.paper_dilutions,''))=''
+       AND trim(COALESCE(p.working_dilution,''))='' ORDER BY p.name"""),
+  "wetting_no_dilution": q("""SELECT p.name,p.film_dilutions,p.paper_dilutions,p.working_dilution
+     FROM catalog_products p WHERE (p.roles&16)<>0
+       AND trim(COALESCE(p.film_dilutions,''))=''
+       AND trim(COALESCE(p.paper_dilutions,''))=''
+       AND trim(COALESCE(p.working_dilution,''))='' ORDER BY p.name"""),
+  "washing_no_dilution": q("""SELECT p.name,p.film_dilutions,p.paper_dilutions,p.working_dilution
+     FROM catalog_products p WHERE (p.roles&32)<>0
+       AND trim(COALESCE(p.film_dilutions,''))=''
+       AND trim(COALESCE(p.paper_dilutions,''))=''
+       AND trim(COALESCE(p.working_dilution,''))='' ORDER BY p.name""")
 }
 eq=q("""SELECT selected_developer,selected_dilution,source_developer,source_dilution,evidence_kind
 FROM developer_time_equivalents ORDER BY selected_developer,selected_dilution""")
@@ -108,6 +128,10 @@ print(json.dumps({
  "paper_dev_no_dilution":[x["name"] for x in report["technical_gaps"]["paper_dev_no_dilution"]],
  "films_no_iso":[x["name"] for x in report["technical_gaps"]["films_no_iso"]],
  "films_no_format":[x["name"] for x in report["technical_gaps"]["films_no_format"]],
+ "stop_no_dilution":[x["name"] for x in report["technical_gaps"]["stop_no_dilution"]],
+ "fix_no_dilution":[x["name"] for x in report["technical_gaps"]["fix_no_dilution"]],
+ "wetting_no_dilution":[x["name"] for x in report["technical_gaps"]["wetting_no_dilution"]],
+ "washing_no_dilution":[x["name"] for x in report["technical_gaps"]["washing_no_dilution"]],
  "adotol":report["adotol"],
 },ensure_ascii=False,indent=2))
 db.close()
