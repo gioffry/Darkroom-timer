@@ -249,9 +249,11 @@ def roles_for(name,cats,processable=True):
 DEV_LINKS={
     norm("ADOX ADONAL"):"Rodinal",
     norm("Compard R09 One Shot"):"Rodinal",
+    norm("Compard R09 Studio"):"Studional",
     norm("ADOX ADOTECH IV"):"Adotech IV",
     norm("ADOX ATOMAL 49"):"Atomal 49",
     norm("ADOX D-76 CLASSIC"):"D-76",
+    norm("ADOX D-76 ECO"):"D-76",
     norm("ADOX FX-39 II"):"FX-39",
     norm("ADOX HC-110 PRO ''Original Syrup'' Made in Germany"):"HC-110",
     norm("ADOX HR-DEV"):"Adox HR-DEV",
@@ -274,6 +276,7 @@ DEV_LINKS={
     norm("FOMADON R09"):"Fomadon R09",
     norm("Ilford ID-11 fine grain film developer"):"ID-11",
     norm("Ilford Ilfosol 3"):"Ilfosol 3",
+    norm("Ilford Simplicity Film Developer"):"Ilfosol 3",
     norm("Ilford Ilfotec DD-X"):"Ilfotec DD-X",
     norm("Ilford Ilfotec HC"):"Ilfotec HC",
     norm("Ilford Ilfotec LC29 liquid concentrate film developer"):"Ilfotec LC29",
@@ -449,9 +452,9 @@ for (kind,nk),g in sorted(groups.items(),key=lambda kv:(kv[0][0],kv[1]["name"].l
             link_kind="film"; link_name=film_names[norm(want)]
             link_relation="REPACKAGED_STOCK" if name.lower().startswith("minox spy film") else "DIRECT_PRODUCT_MAPPING"
     elif kind=="chemical" and roles & (ROLE_FILM_DEV|ROLE_PAPER_DEV):
+        # Product identity/equivalence links must be explicit and audited.
+        # Never create one from fuzzy retailer-title matching.
         want=DEV_LINKS.get(nk)
-        if not want:
-            want=scope_developer_link(name,g["listings"])
         if want and norm(want) in dev_names:
             link_kind="developer"; link_name=dev_names[norm(want)]; link_relation="DIRECT_PRODUCT_MAPPING"
     # Carry existing product ID/technical identity when name already exists.
