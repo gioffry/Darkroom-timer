@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Consolidated Darkroom v0.7.11 build.
+# Consolidated Darkroom v0.8 build.
 # Starts from the committed verified v0.5.8 source checkpoint, applies the tested
 # v0.5.9 contact-sheet functionality, the v0.6.0 layout/preset refinement and
 # the reproducible v0.6.1 graphic-system checkpoint and the phone-verified
@@ -210,8 +210,9 @@ echo "v0713_enlargement_source_unchanged=PASS"
 
 python3 assistant/db/test_specialist_link_matrix.py | tee validation-v0714-specialist-link-matrix.txt
 python3 combined/patch_v0714_specialist_film_lookup.py | tee validation-v0714-specialist-film-lookup-source.txt
+python3 combined/patch_v080_split_safelight.py | tee validation-v080-split-safelight-source.txt
 
-python3 - <<'PY' | tee validation-consolidated-v0714-source.txt
+python3 - <<'PY' | tee validation-consolidated-v080-source.txt
 from pathlib import Path
 import re
 import sqlite3
@@ -225,20 +226,20 @@ text, name_count = re.subn(
     r'android:versionName="[^"]+"', 'android:versionName="0.7.14"', text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.14 manifest version update failed')
+    raise SystemExit('v0.8 manifest version update failed')
 manifest.write_text(text, encoding='utf-8')
 
 gradle_file = Path('combined/build.gradle')
 text = gradle_file.read_text(encoding='utf-8')
 text, code_count = re.subn(
-    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 75', text, count=1
+    r'(?m)^\s*versionCode\s+\d+\s*$', '        versionCode 76', text, count=1
 )
 text, name_count = re.subn(
     r'(?m)^\s*versionName\s+[\'\"][^\'\"]+[\'\"]\s*$',
-    "        versionName '0.7.14'", text, count=1
+    "        versionName '0.8'", text, count=1
 )
 if code_count != 1 or name_count != 1:
-    raise SystemExit('v0.7.14 Gradle version update failed')
+    raise SystemExit('v0.8 Gradle version update failed')
 gradle_file.write_text(text, encoding='utf-8')
 
 db = sqlite3.connect('combined/src/main/assets/mdc_full.sqlite')
@@ -330,6 +331,9 @@ assert 'baseStepSecondsSeries' in Path('combined/src/main/java/it/darkroom/timer
 assert 'EXTRA_TEST_VARIABLE_PULSES' in main and 'testVariablePulses' in service
 assert 'ACTION_ENABLE_SCREEN_OFF_FOCUS' in service
 assert 'FOCUS VOL- SCREEN-OFF 0.7.11 ARMATO' in service
+assert 'SPLIT_SAFELIGHT_080' in service
+assert 'testSplitFilterPauseSafelightOn = enableSafelightForSplitFilterChange("provino: cambio morbido -> duro")' in service
+assert 'enableSafelightForSplitFilterChange("stampa: cambio giallo -> magenta")' in service
 assert 'FILTRO DENSITÀ LPL' in main
 jpeg = Path('combined/src/main/java/it/darkroom/timer/JpegCardRenderer.java').read_text(encoding='utf-8')
 assert 'Filtro densità' in jpeg
@@ -576,8 +580,8 @@ assert 'Guida completa v0.2.8' not in maintenance
 assert 'La v0.2.9 aggiunge' not in maintenance
 assert maintenance.count('q.setOnClickListener') == 2
 
-print('release=Darkroom-v0.7.14')
-print('versionCode=75')
+print('release=Darkroom-v0.8')
+print('versionCode=76')
 print('timer_internal=0.13.27')
 print('historical_builds=ZERO')
 print('mdc_network_downloads=ZERO')
@@ -622,7 +626,7 @@ print('v0713_dual_role_developers=4')
 print('v0713_sonoff_vol_plus_minus_changes=ZERO')
 print('v0714_specialist_link_matrix=PASS')
 print('v0714_kentmere100_fomadon_excel_regression=PASS')
-print('v0714_sonoff_changes=ZERO')
+print('v080_split_safelight=PASS')
 print('v0714_timing_math_changes=ZERO')
 print('v0714_enlargement_changes=ZERO')
 print('enlargement_calculation_changes=ZERO')
@@ -650,29 +654,29 @@ print('maintenance_family=SLATE')
 print('maintenance_reference_changes=ZERO')
 PY
 
-rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.14.apk
+rm -f combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.8.apk
 gradle :combined:assembleRelease --stacktrace
-cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.7.14.apk
+cp combined/build/outputs/apk/release/combined-release.apk Darkroom-v0.8.apk
 
 APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
 AAPT="$ANDROID_HOME/build-tools/34.0.0/aapt"
-"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.7.14.apk > certificate-v0714.txt
-"$AAPT" dump badging Darkroom-v0.7.14.apk > apk-badging-v0714.txt
-grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v0714.txt
-grep -Fq "versionCode='75'" apk-badging-v0714.txt
-grep -Fq "versionName='0.7.14'" apk-badging-v0714.txt
-grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v0714.txt
-unzip -Z1 Darkroom-v0.7.14.apk > apk-listing-v0714.txt
-grep -q 'assets/mdc_full.sqlite' apk-listing-v0714.txt
+"$APKSIGNER" verify --verbose --print-certs Darkroom-v0.8.apk > certificate-v080.txt
+"$AAPT" dump badging Darkroom-v0.8.apk > apk-badging-v080.txt
+grep -Fq "package: name='it.darkroom.darkroom'" apk-badging-v080.txt
+grep -Fq "versionCode='76'" apk-badging-v080.txt
+grep -Fq "versionName='0.8'" apk-badging-v080.txt
+grep -Fq "launchable-activity: name='it.darkroom.timer.home.HomeActivity'" apk-badging-v080.txt
+unzip -Z1 Darkroom-v0.8.apk > apk-listing-v080.txt
+grep -q 'assets/mdc_full.sqlite' apk-listing-v080.txt
 
 ELAPSED=$((SECONDS - START_SECONDS))
 {
   echo 'consolidated_build=PASS'
-  echo 'release=Darkroom-v0.7.14'
+  echo 'release=Darkroom-v0.8'
   echo 'historical_builds=ZERO'
   echo 'mdc_network_downloads=ZERO'
   echo 'gradle_assemblies=ONE'
   echo "elapsed_seconds=$ELAPSED"
-} | tee validation-consolidated-v0714.txt
+} | tee validation-consolidated-v080.txt
 
-sha256sum Darkroom-v0.7.14.apk | tee Darkroom-v0.7.14.sha256
+sha256sum Darkroom-v0.8.apk | tee Darkroom-v0.8.sha256
